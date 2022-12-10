@@ -2,10 +2,10 @@ package edu.ods.java.service;
 
 import edu.ods.java.dto.RoleDTO;
 import edu.ods.java.dto.RoleUpdateDTO;
-import edu.ods.java.exceptions.RoleNotFoundException;
-import edu.ods.java.exceptions.UserNotFoundException;
-import edu.ods.java.models.Role;
-import edu.ods.java.models.User;
+import edu.ods.java.exception.RoleNotFoundException;
+import edu.ods.java.exception.UserNotFoundException;
+import edu.ods.java.model.Role;
+import edu.ods.java.model.User;
 import edu.ods.java.repository.RoleRepository;
 import edu.ods.java.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

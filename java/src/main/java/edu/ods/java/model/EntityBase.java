@@ -1,4 +1,4 @@
-package edu.ods.java.models;
+package edu.ods.java.model;
 
 import java.io.Serializable;
 import java.util.Date;

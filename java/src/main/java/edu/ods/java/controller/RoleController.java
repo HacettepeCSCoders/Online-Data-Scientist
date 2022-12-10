@@ -1,4 +1,4 @@
-package edu.ods.java.controllers;
+package edu.ods.java.controller;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import edu.ods.java.dto.RoleDTO;
 import edu.ods.java.dto.RoleUpdateDTO;
-import edu.ods.java.models.User;
+import edu.ods.java.model.User;
 import edu.ods.java.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

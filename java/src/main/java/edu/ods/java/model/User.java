@@ -1,4 +1,4 @@
-package edu.ods.java.models;
+package edu.ods.java.model;
 
 import java.util.HashSet;
 import java.util.Set;

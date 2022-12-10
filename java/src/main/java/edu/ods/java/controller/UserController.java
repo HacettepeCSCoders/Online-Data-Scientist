@@ -1,4 +1,4 @@
-package edu.ods.java.controllers;
+package edu.ods.java.controller;
 
 import java.util.List;
 

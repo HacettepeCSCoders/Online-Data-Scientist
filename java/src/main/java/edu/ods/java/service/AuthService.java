@@ -2,8 +2,8 @@ package edu.ods.java.service;
 
 import edu.ods.java.config.EmailValidator;
 import edu.ods.java.dto.UserDTO;
-import edu.ods.java.exceptions.UserNotFoundException;
-import edu.ods.java.models.User;
+import edu.ods.java.exception.UserNotFoundException;
+import edu.ods.java.model.User;
 import edu.ods.java.repository.RoleRepository;
 import edu.ods.java.repository.UserRepository;
 import edu.ods.java.security.JWTGenerator;
