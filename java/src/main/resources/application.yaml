@@ -1,0 +1,29 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    username: root
+    password: 123123
+    url: jdbc:mysql://34.65.125.97:3306/online_data_scientist
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  #    hikari:
+#      connection-timeout: 12000
+  jpa:
+    hibernate:
+      ddl-auto: update
+#server:
+#  port: 5000
+#
+#spring:
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
+#  datasource:
+#    username: uqi
+#    password: Meluqi123.
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://awseb-e-zfjukemj4x-stack-awsebrdsdatabase-8sedorozjpf5.chn4qmjggoiv.eu-central-1.rds.amazonaws.com:3306/bookPortal
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
