@@ -1,0 +1,45 @@
+.layout-background{
+    background-color: #E6E8E6;
+}
+.content-nav{
+    margin-top: 30px;
+    margin-left: 30px;
+}
+.nav-background{
+    background-color: #9FB8AD;
+}
+.sider-navigate{
+    overflow: auto;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color:#9FB8AD !important; 
+}
+.sider-menu{
+    background-color:#9FB8AD !important;
+}
+.logo-size{
+    width: 200px ;
+    height: 150px;
+}
+
+.ant-menu.ant-menu-dark .ant-menu-item-selected.customclass {
+    background-color:  #475841; /*Overriden property*/
+}
+
+.header-nav{
+    position: sticky;
+    top: 0; 
+    z-index: 1;
+    width: 100%;
+    background-color: #9FB8AD  !important;
+
+}
+.header-menu{
+    background-color:#9FB8AD !important;
+
+}
+.create-workspace-back{
+    background-color: #3F403F !important;
+}
