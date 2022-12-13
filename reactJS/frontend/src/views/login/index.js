@@ -5,9 +5,11 @@ import "../../styles/form.css";
 import logo from "../../assets/ods.png";
 import LoginForm from "../../components/login/loginForm";
 import { Col, Row } from "antd";
+import { loginHandler } from "../../reducers/actions/authActions";
 
 const Login = () => {
   const [values, setValues] = useState({});
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,6 +18,7 @@ const Login = () => {
 
   const onClickLogin = async (values) => {
     try {
+      const response = await dispatch(loginHandler(values));
       navigate("/signup");
     } catch {}
   };
@@ -39,7 +42,7 @@ const Login = () => {
               values={values}
               setValues={setValues}
               onClickLogin={onClickLogin}
-            ></LoginForm>
+            />
           </Col>
         </Row>
       </div>
