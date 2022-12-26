@@ -43,3 +43,10 @@
 .create-workspace-back{
     background-color: #3F403F !important;
 }
+.workspace-header {
+    background-color: #3F403F !important;
+}
+
+.workspace-font {
+    color: #9FB8AD;
+}
