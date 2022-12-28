@@ -9,6 +9,7 @@ import { routes } from "./utils/routes";
 import { Skeleton, Layout } from "antd";
 import SideBar from "./components/common/sideBar";
 import TopBar from "./components/common/topBar";
+
 import "./styles/common.css";
 
 const App = () => {

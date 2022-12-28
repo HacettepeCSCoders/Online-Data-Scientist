@@ -1,5 +1,6 @@
 import React from "react";
 import UploadFile from "../../components/workspace/uploadFile";
+import VisualizeData from "../../components/workspace/visualizeData";
 
 export const steps = [
   {
@@ -7,8 +8,8 @@ export const steps = [
     content: <UploadFile />,
   },
   {
-    title: "Second",
-    content: "Second-content",
+    title: "Visualize Data",
+    content: <VisualizeData />,
   },
   {
     title: "Last",
