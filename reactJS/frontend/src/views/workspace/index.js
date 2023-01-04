@@ -45,7 +45,7 @@ const Workspace = () => {
                 )}
               </div>
             </Content>
-            <Sider className="workspace-header">
+            <Sider className="workspace-sider">
               <Steps
                 direction="vertical"
                 current={current}
