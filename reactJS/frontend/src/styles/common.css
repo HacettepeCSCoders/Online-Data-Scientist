@@ -47,6 +47,23 @@
     background-color: #3F403F !important;
 }
 
+.workspace-sider{
+    background-color: #9FB8AD !important;
+}
+
 .workspace-font {
     color: #9FB8AD;
+}
+
+.workspace-table-content{
+    height: 100vh;
+}
+
+.csv-table-overflow{
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+.csv-table-row-back:hover{
+    background-color: coral;
 }

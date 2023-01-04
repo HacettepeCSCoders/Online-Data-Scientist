@@ -14,12 +14,7 @@ const UploadFile = () => {
     console.log(dataDetails);
   });
 
-  // const onClickButton = () => {
-  //   console.log("Data");
-  //   console.log(data);
-  //   setDataDetails(data);
-  //   console.log(dataDetails);
-  // };
+  // hasHeader and csvDelimeter check buttons should be added ???????????????
 
   return (
     <>
