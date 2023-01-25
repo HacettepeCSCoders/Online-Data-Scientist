@@ -1,6 +1,8 @@
 import React from "react";
 import UploadFile from "../../components/workspace/uploadFile";
 import VisualizeData from "../../components/workspace/visualizeData";
+import SelectProcessing from "../../components/workspace/selectProcessing";
+import StartProcessing from "../../components/workspace/startProcessing";
 
 export const steps = [
   {
@@ -12,7 +14,11 @@ export const steps = [
     content: <VisualizeData />,
   },
   {
-    title: "Last",
-    content: "Last-content",
+    title: "Select Processing",
+    content: <SelectProcessing />,
+  },
+  {
+    title: "Start Processing",
+    content: <StartProcessing />,
   },
 ];

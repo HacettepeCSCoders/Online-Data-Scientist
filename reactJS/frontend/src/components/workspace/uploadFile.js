@@ -59,7 +59,6 @@ const UploadFile = () => {
           const fileName = file.name;
           const fileNameArray = fileName.split(".");
           const fileExtension = fileNameArray[1];
-          console.log(fileExtension);
           if (fileExtension === "txt" || fileExtension === "csv") {
             readCSV(file);
           } else if (fileExtension === "xlsx" || fileExtension === "xls") {
