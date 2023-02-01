@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 const { Dragger } = Upload;
 
 const UploadFile = () => {
-  const { dataDetails, setDataDetails } = useData();
+  const { setDataDetails } = useData();
   const [data, setData] = useState();
 
   const readExcel = (file) => {
