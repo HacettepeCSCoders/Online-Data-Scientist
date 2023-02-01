@@ -1,7 +1,7 @@
 import { Button, Checkbox, Form, Input, Radio } from "antd";
 import React, { useState } from "react";
 
-const DataManipulationForm = ({ setValues, onClickSave }) => {
+const DataManipulationForm = ({ setValues }) => {
   const [missingValueEnabled, setMissingValueEnabled] = useState(false);
   const [dropColumnEnabled, setDropColumnEnabled] = useState(false);
   const [dropRowEnabled, setDropRowEnabled] = useState(false);
@@ -37,17 +37,19 @@ const DataManipulationForm = ({ setValues, onClickSave }) => {
         >
           Fill Missing Values
         </Checkbox>
-        <Form.Item
-          name="fillMissingValues"
-          label="With"
-          disabled={!missingValueEnabled}
-        >
-          <Radio.Group disabled={!missingValueEnabled}>
-            <Radio value="1">Mean Value</Radio>
-            <Radio value="2">Specific Value</Radio>
-            <Radio value="3">item 3</Radio>
-          </Radio.Group>
-        </Form.Item>
+        {missingValueEnabled && (
+          <Form.Item
+            name="fillMissingValues"
+            label="With"
+            disabled={!missingValueEnabled}
+          >
+            <Radio.Group disabled={!missingValueEnabled}>
+              <Radio value="1">Mean Value</Radio>
+              <Radio value="2">Specific Value</Radio>
+              <Radio value="3">item 3</Radio>
+            </Radio.Group>
+          </Form.Item>
+        )}
 
         <Checkbox
           checked={dropColumnEnabled}

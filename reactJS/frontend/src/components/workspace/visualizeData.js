@@ -31,6 +31,13 @@ const VisualizeData = () => {
             />
           </Content>
         )}
+        {dataDetails === undefined && (
+          <div>
+            {" "}
+            You don't upload any data. Please return and upload CSV or Excel
+            file.
+          </div>
+        )}
       </Suspense>
     </>
   );
