@@ -5,19 +5,7 @@ import { Layout, Skeleton } from "antd";
 const { Content } = Layout;
 
 const VisualizeData = () => {
-  const { dataDetails, setDataDetails } = useData();
-
-  // Instead of using ready-made components, we can create a table ourselves.
-
-  // useEffect(() => {
-  //   const rows = dataDetails.split("\n");
-  //   let cols = rows.slice(0, 1)[0];
-  //   cols = cols.split(",");
-
-  //   console.log(cols);
-  // }, []);
-
-  // const rowSplit = () => {};
+  const { dataDetails } = useData();
 
   return (
     <>
