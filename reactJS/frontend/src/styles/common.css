@@ -47,6 +47,10 @@
     background-color: #3F403F !important;
 }
 
+.workspace-content {
+    margin-top: 10px;
+}
+
 .workspace-sider{
     background-color: #9FB8AD !important;
 }
@@ -59,6 +63,11 @@
     height: 100vh;
 }
 
+.workspace-button-margin{
+    margin-top: 10px;
+}
+
+
 .csv-table-overflow{
     overflow-x: scroll;
     overflow-y: scroll;
@@ -67,3 +76,38 @@
 .csv-table-row-back:hover{
     background-color: coral;
 }
+
+/* .dragger-style{
+
+
+    display: flex;
+    flex-direction: row;
+} */
+
+.ant-upload.ant-upload-drag{
+    width: 80%;
+    margin: 20px;
+}
+.ant-upload-list.ant-upload-list-picture{
+    width: 100%;
+    margin: 20px;
+}
+.welcome-workspace-content{
+    justify-content: center;
+}
+.welcome-workspace-button{
+    background-color: #062846 !important;
+}
+.welcome-firstRow-margin{
+    margin-bottom: 100px;
+}
+.workspace-nextButton{
+    margin-left: 800px;
+    background-color: #475841;
+}
+/* .workspace-nextButton:hover{
+    background-color: #475841;
+} */
+
+
+

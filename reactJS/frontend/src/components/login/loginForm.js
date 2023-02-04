@@ -48,7 +48,7 @@ export const LoginForm = ({ setValues, onClickLogin }) => {
         />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-        <Button type="primary" htmlType="submit" className="form-button-color">
+        <Button htmlType="submit" className="form-button-color">
           Login
         </Button>
       </Form.Item>

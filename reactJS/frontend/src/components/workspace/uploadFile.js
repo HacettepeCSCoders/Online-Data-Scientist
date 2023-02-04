@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Upload } from "antd";
+import { Upload, message } from "antd";
 import { useData } from "../../hocs/dataProvider";
 import * as XLSX from "xlsx";
 const { Dragger } = Upload;
@@ -51,32 +51,33 @@ const UploadFile = () => {
 
   return (
     <>
-      <Dragger
-        accept=".txt, .csv, .xlsx, .xls"
-        showUploadList={true}
-        multiple={false}
-        beforeUpload={(file) => {
-          const fileName = file.name;
-          const fileNameArray = fileName.split(".");
-          const fileExtension = fileNameArray[1];
-          if (fileExtension === "txt" || fileExtension === "csv") {
-            readCSV(file);
-          } else if (fileExtension === "xlsx" || fileExtension === "xls") {
-            readExcel(file);
-          }
-          return false;
-        }}
-      >
-        <p className="ant-upload-drag-icon"></p>
-        <p className="ant-upload-text">
-          Click or drag file to this area to upload
-        </p>
-        <p className="ant-upload-hint">
-          Support for a single or bulk upload. Strictly prohibit from uploading
-          company data or other band files
-        </p>
-      </Dragger>
-      {/* <Button onClick={onClickButton}></Button> */}
+      <div>
+        <Dragger
+          accept=".txt, .csv, .xlsx, .xls"
+          showUploadList={true}
+          multiple={false}
+          beforeUpload={(file) => {
+            const fileName = file.name;
+            const fileNameArray = fileName.split(".");
+            const fileExtension = fileNameArray[1];
+            if (fileExtension === "txt" || fileExtension === "csv") {
+              readCSV(file);
+            } else if (fileExtension === "xlsx" || fileExtension === "xls") {
+              readExcel(file);
+            }
+            return false;
+          }}
+        >
+          <p className="ant-upload-drag-icon"></p>
+          <p className="ant-upload-text">
+            Click or drag file to this area to upload
+          </p>
+          <p className="ant-upload-hint">
+            Support for a single upload. Please upload Excel, CSV or TXT files.
+            Uploading company data or other group files is a violation.
+          </p>
+        </Dragger>
+      </div>
     </>
   );
 };
