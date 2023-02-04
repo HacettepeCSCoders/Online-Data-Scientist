@@ -2,6 +2,7 @@ import React, { Suspense, useEffect } from "react";
 import { useData } from "../../hocs/dataProvider";
 import { CsvToHtmlTable } from "react-csv-to-table";
 import { Layout, Skeleton } from "antd";
+import DataTable from "./dataTable/dataTable";
 const { Content } = Layout;
 
 const VisualizeData = () => {
@@ -12,16 +13,11 @@ const VisualizeData = () => {
       <Suspense fallback={<Skeleton active />}>
         {dataDetails && (
           <Content className="workspace-table-content csv-table-overflow ">
-            <CsvToHtmlTable
-              tableRowClassName="csv-table-row-back"
-              data={dataDetails}
-              csvDelimiter=","
-            />
+            <DataTable dataDetails={dataDetails}></DataTable>
           </Content>
         )}
         {dataDetails === undefined && (
           <div>
-            {" "}
             You don't upload any data. Please return and upload CSV or Excel
             file.
           </div>

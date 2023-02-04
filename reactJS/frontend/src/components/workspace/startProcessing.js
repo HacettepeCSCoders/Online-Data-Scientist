@@ -4,6 +4,7 @@ import { useProcessing } from "../../hocs/proccesingProvider";
 import { CsvToHtmlTable } from "react-csv-to-table";
 import { useData } from "../../hocs/dataProvider";
 import { startProcess } from "../../services/processService";
+import DataTable from "./dataTable/dataTable";
 const { Content } = Layout;
 
 const StartProcessing = () => {
@@ -70,11 +71,7 @@ const StartProcessing = () => {
           <Suspense fallback={<Skeleton active />}>
             {dataDetails && (
               <Content className="workspace-table-content csv-table-overflow ">
-                <CsvToHtmlTable
-                  tableRowClassName="csv-table-row-back"
-                  data={dataDetails}
-                  csvDelimiter=","
-                />
+                <DataTable dataDetails={dataDetails}></DataTable>
               </Content>
             )}
           </Suspense>
