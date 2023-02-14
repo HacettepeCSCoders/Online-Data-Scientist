@@ -1,7 +1,6 @@
 import React, { useEffect, useState, Suspense } from "react";
-import { Row, Col, List, Skeleton, Layout, Button } from "antd";
+import { Row, Col, List, Skeleton, Layout, Button, message } from "antd";
 import { useProcessing } from "../../hocs/proccesingProvider";
-import { CsvToHtmlTable } from "react-csv-to-table";
 import { useData } from "../../hocs/dataProvider";
 import { startProcess } from "../../services/processService";
 import DataTable from "./dataTable/dataTable";
@@ -13,6 +12,14 @@ const StartProcessing = () => {
   const [processingValues, setProcessingValues] = useState();
   const [processingValuesShow, setProcessingValueShow] = useState();
   const { dataDetails } = useData();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content: "Processing successfully started",
+    });
+  };
 
   useEffect(() => {
     if (processingDetails !== undefined) {
@@ -42,11 +49,13 @@ const StartProcessing = () => {
       } catch {
         console.error();
       }
+      success();
     }
   };
 
   return (
     <>
+      {contextHolder}
       <Row>
         {processingDetails === undefined && (
           <div> Please Select Processing</div>

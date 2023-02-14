@@ -3,9 +3,11 @@ import { Tabs } from "antd";
 import DataManipulationForm from "./processingTabs/dataManipulationForm";
 import StatisticalProcessingForm from "./processingTabs/statisticalProcessingForm";
 import { useProcessing } from "../../hocs/proccesingProvider";
+import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 const SelectProcessing = () => {
   const [values, setValues] = useState();
   const { processingDetails, setProcessingDetails } = useProcessing();
+  const { workspaceTypeDetails, setWorkspaceTypeDetails } = useWorkspaceType();
 
   useEffect(() => {
     setProcessingDetails(values);
@@ -17,7 +19,7 @@ const SelectProcessing = () => {
     console.log(processingDetails);
   };
 
-  const tabs = [
+  const processingTabs = [
     {
       key: "1",
       label: `Data Manipulation`,
@@ -30,10 +32,18 @@ const SelectProcessing = () => {
     },
   ];
 
+  const machineLearningTabs = [
+    {
+      key: "1",
+      label: "Machine Learning",
+      children: <div> sag</div>,
+    },
+  ];
+
   return (
     <>
       <div> Select Preprocessing Tehniques</div>
-      <Tabs defaultActiveKey="1" type="card" items={tabs} />
+      <Tabs defaultActiveKey="1" type="card" items={processingTabs} />
     </>
   );
 };
