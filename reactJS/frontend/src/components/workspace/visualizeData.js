@@ -1,6 +1,5 @@
 import React, { Suspense, useEffect } from "react";
 import { useData } from "../../hocs/dataProvider";
-import { CsvToHtmlTable } from "react-csv-to-table";
 import { Layout, Skeleton } from "antd";
 import DataTable from "./dataTable/dataTable";
 const { Content } = Layout;
