@@ -25,8 +25,8 @@ export const LoginForm = ({ setValues, onClickLogin }) => {
       autoComplete="off"
       className="form-center"
     >
-      <Form.Item wrapperCol={{ offset: 3, span: 16 }}>
-        <h1> Sıgn In With</h1>
+      <Form.Item wrapperCol={{ offset: 5, span: 16 }}>
+        <h1> Sign In</h1>
       </Form.Item>
       <Form.Item
         name="username"
