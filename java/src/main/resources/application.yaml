@@ -3,9 +3,9 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   datasource:
-    username: root
-    password: 123123
-    url: jdbc:mysql://34.65.125.97:3306/online_data_scientist
+    username: uqi
+    password: Onlinedatascientist123.
+    url: jdbc:mysql://online-data-scientist.mysql.database.azure.com:3306/main
     driver-class-name: com.mysql.cj.jdbc.Driver
   #    hikari:
 #      connection-timeout: 12000
