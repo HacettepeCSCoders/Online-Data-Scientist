@@ -26,15 +26,6 @@ const Login = () => {
   return (
     <>
       <div className="page-background ">
-        <Row>
-          <Col span={10} offset={11}>
-            <img
-              src={logo}
-              style={{ width: "100px" }}
-              onClick={onClickLogin}
-            ></img>
-          </Col>
-        </Row>
         <Row className="form-location" gutter={16}>
           <Col className="gutter-row login-form" span={8} offset={8}>
             <LoginForm
