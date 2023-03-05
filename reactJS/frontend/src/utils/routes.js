@@ -1,13 +1,16 @@
 import React from "react";
+import MainPage from "../views/mainPage";
+import ProfilePage from "../views/profilePage";
+import Settings from "../views/settings";
 const Login = React.lazy(() => import("../views/login"));
 const Signup = React.lazy(() => import("../views/signup"));
 const HomePage = React.lazy(() => import("../views/homePage"));
-const Deneme = React.lazy(() => import("../views/deneme"));
 const Workspace = React.lazy(() => import("../views/workspace"));
+const AllWorkspaces = React.lazy(() => import("../views/allWorkpages"));
 
 export const routes = [
   {
-    path: "/",
+    path: "/login",
     element: <Login />,
     isPrivate: false,
   },
@@ -22,13 +25,28 @@ export const routes = [
     isPrivate: true,
   },
   {
-    path: "/deneme",
-    element: <Deneme />,
+    path: "/workspace/:workspaceId",
+    element: <Workspace />,
     isPrivate: true,
   },
   {
-    path: "/workspace/:workspaceId",
-    element: <Workspace />,
+    path: "/workspace",
+    element: <AllWorkspaces />,
+    isPrivate: true,
+  },
+  {
+    path: "/settings",
+    element: <Settings />,
+    isPrivate: true,
+  },
+  {
+    path: "/",
+    element: <MainPage />,
+    isPrivate: false,
+  },
+  {
+    path: "/:profileName",
+    element: <ProfilePage />,
     isPrivate: true,
   },
 ];

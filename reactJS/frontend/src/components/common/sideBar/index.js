@@ -36,12 +36,12 @@ const SideBar = () => {
             className="customclass"
             // onClick={onClickItem("/homepage")}
           >
-            <div onClick={() => navigate("/homepage")}>
+            <div onClick={() => navigate("/home")}>
               <HomeOutlined /> HomePage
             </div>
           </Menu.Item>
           <Menu.Item key="2" className="customclass">
-            <div onClick={() => navigate("/homepage")}>
+            <div onClick={() => navigate("/workspace")}>
               <PieChartOutlined /> Workspace
             </div>
           </Menu.Item>
