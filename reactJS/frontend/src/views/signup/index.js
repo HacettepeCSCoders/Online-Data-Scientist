@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/form.css";
-import logo from "../../assets/ods.png";
 import SignupForm from "../../components/signup/signupForm";
 import { Col, Row } from "antd";
+import { useDispatch } from "react-redux";
+import { signupHandler } from "../../reducers/actions/authActions";
 
 const Signup = () => {
-  const [values, setValues] = useState();
+  const dispatch = useDispatch();
 
-  useEffect(() => {
+  const onClickSignup = async (values) => {
+    console.log("Post sent");
     console.log(values);
-  }, []);
+    delete values.confirmPassword;
+    try {
+      dispatch(signupHandler(values));
+    } catch (apiError) {
+      console.log(apiError);
+    }
+  };
 
-  const onClickSignup = () => {};
   return (
     <>
       <div className="page-background ">
@@ -19,8 +26,6 @@ const Signup = () => {
           <Col className="gutter-row login-form" span={8} offset={8}>
             <SignupForm
               className="form-c"
-              values={values}
-              setValues={setValues}
               onClickSignup={onClickSignup}
             ></SignupForm>
           </Col>
