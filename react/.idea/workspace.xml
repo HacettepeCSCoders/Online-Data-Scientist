@@ -4,73 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ccfc169f-9c17-46e6-bffb-daf2c92a4b7b" name="Changes" comment="rename">
-      <change afterPath="$PROJECT_DIR$/../react/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../react/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../react/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/reactJS.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../react/.idea/react.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_28_02_2023_11_53_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_28_02_2023_11_53__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_7_03_2023_13_06_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_7_03_2023_13_06__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../react/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../react/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../react/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../react/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/../react/public/favicon.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../react/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/logo192.png" beforeDir="false" afterPath="$PROJECT_DIR$/../react/public/logo192.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/logo512.png" beforeDir="false" afterPath="$PROJECT_DIR$/../react/public/logo512.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/../react/public/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/robots.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../react/public/robots.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/App.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/dataManipulation.png" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/assets/dataManipulation.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/logo1.png" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/assets/logo1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/machineLearningImage.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/assets/machineLearningImage.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/ods.png" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/assets/ods.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/sideBar/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/common/sideBar/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/topBar/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/common/topBar/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/login/loginForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/login/loginForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/signup/signupForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/signup/signupForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/dataTable/dataTable.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/dataTable/dataTable.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/processingTabs/dataManipulationForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/processingTabs/dataManipulationForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/processingTabs/statisticalProcessingForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/processingTabs/statisticalProcessingForm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/selectProcessing.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/selectProcessing.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/startProcessing.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/startProcessing.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/uploadFile.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/uploadFile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/visualizeData.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/visualizeData.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/workspace/welcomeWorkspace.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/components/workspace/welcomeWorkspace.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hocs/dataProvider.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/hocs/dataProvider.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hocs/proccesingProvider.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/hocs/proccesingProvider.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hocs/workspaceTypeProvider.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/hocs/workspaceTypeProvider.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reducers/actions/authActions.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/reducers/actions/authActions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reducers/actions/types.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/reducers/actions/types.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reducers/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/reducers/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reducers/configureStore.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/reducers/configureStore.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reducers/reducer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/reducers/reducer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reportWebVitals.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/reportWebVitals.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/services/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/authService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/services/authService.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/processService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/services/processService.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/setupTests.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/setupTests.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/store.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles/common.css" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/styles/common.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/styles/form.css" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/styles/form.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/utils/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/workspace/steps.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/utils/workspace/steps.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/allWorkpages/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/allWorkpages/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/homePage/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/homePage/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/login/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/login/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/mainPage/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/mainPage/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/profilePage/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/profilePage/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/settings/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/settings/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/signup/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/signup/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/views/workspace/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../react/src/views/workspace/index.js" afterDir="false" />
-    </list>
+    <list default="true" id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="squash! files added" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -78,11 +12,12 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RESET_MODE" value="HARD" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2MgP5xQ1o6Ulv9HCYFAHyLG5my5" />
+  <component name="ProjectId" id="2MgYC6MfREuIlXLlZvarAFgY0sp" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -92,16 +27,13 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;U:/iç/Sources/WorkSpace[4.1]/479-DesignProject/Online-Data-Scientist/reactJS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="npm.start">
+  <component name="RunManager" selected="npm.install">
     <configuration name="install" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="install" />
@@ -124,22 +56,66 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="ccfc169f-9c17-46e6-bffb-daf2c92a4b7b" name="Changes" comment="" />
-      <created>1678186073461</created>
+      <changelist id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="" />
+      <created>1678190566266</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1678186073461</updated>
-      <workItem from="1678186075762" duration="1005000" />
-      <workItem from="1678187963695" duration="434000" />
+      <updated>1678190566266</updated>
+      <workItem from="1678190567669" duration="122000" />
     </task>
+    <task id="LOCAL-00001" summary="project name change">
+      <created>1678190638947</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1678190638947</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="master" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refresh" />
-    <MESSAGE value="rename" />
-    <option name="LAST_COMMIT_MESSAGE" value="rename" />
+    <MESSAGE value="project name change" />
+    <option name="LAST_COMMIT_MESSAGE" value="project name change" />
   </component>
 </project>
