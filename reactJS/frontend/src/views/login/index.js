@@ -8,19 +8,16 @@ import { Col, Row } from "antd";
 import { loginHandler } from "../../reducers/actions/authActions";
 
 const Login = () => {
-  const [values, setValues] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log(values);
-  }, [values]);
-
   const onClickLogin = async (values) => {
     try {
-      const response = await dispatch(loginHandler(values));
-      navigate("/signup");
-    } catch {}
+      await dispatch(loginHandler(values));
+      navigate("/homepage");
+    } catch (apiError) {
+      console.log(apiError);
+    }
   };
 
   return (
@@ -28,12 +25,7 @@ const Login = () => {
       <div className="page-background ">
         <Row className="form-location" gutter={16}>
           <Col className="gutter-row login-form" span={8} offset={8}>
-            <LoginForm
-              className="form-c"
-              values={values}
-              setValues={setValues}
-              onClickLogin={onClickLogin}
-            />
+            <LoginForm className="form-c" onClickLogin={onClickLogin} />
           </Col>
         </Row>
       </div>

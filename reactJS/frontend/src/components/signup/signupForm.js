@@ -3,11 +3,9 @@ import { Button, Form, Input, Anchor } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 const { Link } = Anchor;
 
-export const SignupForm = ({ setValues, onClickSignup }) => {
+export const SignupForm = ({ onClickSignup }) => {
   const onFinish = (values) => {
-    console.log("Success:", values);
-    setValues(values);
-    onClickSignup();
+    onClickSignup(values);
   };
 
   const onFinishFailed = (errorInfo) => {
