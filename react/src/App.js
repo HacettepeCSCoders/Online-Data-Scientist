@@ -6,7 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { routes } from "./utils/routes";
+import { privateRoutes, routes } from "./utils/routes";
 import { Layout, Skeleton } from "antd";
 import SideBar from "./components/common/sideBar";
 import TopBar from "./components/common/topBar";
@@ -14,26 +14,35 @@ import TopBar from "./components/common/topBar";
 import "./styles/common.css";
 
 const App = () => {
-  const { isLoggedIn } = useSelector((store) => ({
+  const { name, isLoggedIn } = useSelector((store) => ({
+    name: store.name,
     isLoggedIn: store.isLoggedIn,
   }));
+
   return (
     <>
       <Suspense fallback={<Skeleton active />}>
         <Router>
           <Layout>
             {isLoggedIn && <SideBar></SideBar>}
-
             <Layout>
-              <TopBar></TopBar>
+              <TopBar name={name} isLoggedIn={isLoggedIn} />
               <Routes>
-                {routes.map((route) => (
-                  <Route
-                    key={route.path}
-                    path={route.path}
-                    element={route.element}
-                  />
-                ))}
+                {!isLoggedIn
+                  ? routes.map((route) => (
+                      <Route
+                        key={route.path}
+                        path={route.path}
+                        element={route.element}
+                      />
+                    ))
+                  : privateRoutes.map((route) => (
+                      <Route
+                        key={route.path}
+                        path={route.path}
+                        element={route.element}
+                      />
+                    ))}
 
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

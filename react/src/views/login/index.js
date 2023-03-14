@@ -13,7 +13,7 @@ const Login = () => {
   const onClickLogin = async (values) => {
     try {
       await dispatch(loginHandler(values));
-      navigate("/home");
+      navigate("/");
     } catch (apiError) {
       console.log(apiError);
     }

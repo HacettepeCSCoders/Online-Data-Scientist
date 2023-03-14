@@ -12,14 +12,9 @@ import logo from "../../../assets/logo1.png";
 
 const { Header } = Layout;
 
-const TopBar = () => {
+const TopBar = ({ name, isLoggedIn }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const { name, isLoggedIn } = useSelector((store) => ({
-    name: store.name,
-    isLoggedIn: store.isLoggedIn,
-  }));
 
   useEffect(() => {
     console.log(isLoggedIn);

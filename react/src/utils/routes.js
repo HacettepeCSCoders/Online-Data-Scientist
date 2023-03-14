@@ -1,8 +1,8 @@
 import React from "react";
-import MainPage from "../views/mainPage";
-import ProfilePage from "../views/profilePage";
-import Settings from "../views/settings";
 
+const MainPage = React.lazy(() => import("../views/mainPage"));
+const ProfilePage = React.lazy(() => import("../views/profilePage"));
+const Settings = React.lazy(() => import("../views/settings"));
 const Login = React.lazy(() => import("../views/login"));
 const Signup = React.lazy(() => import("../views/signup"));
 const HomePage = React.lazy(() => import("../views/homePage"));
@@ -11,45 +11,38 @@ const AllWorkspaces = React.lazy(() => import("../views/allWorkpages"));
 
 export const routes = [
   {
+    path: "/",
+    element: <MainPage />,
+  },
+  {
     path: "/login",
     element: <Login />,
-    isPrivate: false,
   },
   {
     path: "/signup",
     element: <Signup />,
-    isPrivate: false,
   },
+];
+
+export const privateRoutes = [
   {
-    path: "/home",
+    path: "/",
     element: <HomePage />,
-    isPrivate: true,
   },
   {
     path: "/workspace/:workspaceId",
     element: <Workspace />,
-    isPrivate: true,
   },
   {
     path: "/workspace",
     element: <AllWorkspaces />,
-    isPrivate: true,
   },
   {
     path: "/settings",
     element: <Settings />,
-    isPrivate: true,
   },
   {
-    path: "/",
-    element: <MainPage />,
-    isPrivate: false,
-  },
-  {
-    path: "/:profileName",
+    path: "/profile/:profileName",
     element: <ProfilePage />,
-    isPrivate: true,
   },
 ];
-
-export const privateRoutes = [];
