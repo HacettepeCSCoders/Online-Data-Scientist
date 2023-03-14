@@ -29,6 +29,11 @@
     height: 150px;
 }
 
+.logo-size-topbar {
+    width: 60px;
+    height: 60px;
+}
+
 .ant-menu.ant-menu-dark .ant-menu-item-selected.customclass {
     background-color: #475841; /*Overriden property*/
 }
@@ -118,6 +123,18 @@
     margin-left: 800px;
     background-color: #475841;
 }
+
+.dark-backgorund{
+  background-color: #475841;
+  border-color: #475841;
+  color: #9FB8AD;
+}
+
+.dark-backgorund:hover{
+    color: aliceblue !important;
+    border-color:aliceblue !important;
+}
+
 
 /* .workspace-nextButton:hover{
     background-color: #475841;
