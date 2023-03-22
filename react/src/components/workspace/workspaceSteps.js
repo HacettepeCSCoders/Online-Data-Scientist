@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Button, Layout, Tag, Steps, message } from "antd";
+import { Button, Layout, Tag, Steps, message, Modal, Result, Spin } from "antd";
 import { steps } from "../../utils/workspace/steps";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { startProcess } from "../../services/processService";
+import { useNavigate } from "react-router-dom";
 
 const { Content, Sider } = Layout;
 
@@ -13,15 +14,13 @@ const WorkspaceSteps = () => {
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails } = useData();
   const { processingDetails } = useProcessing();
-  const [messageApi, contextHolder] = message.useMessage();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  let navigate = useNavigate();
 
-  const success = () => {
-    messageApi.open({
-      type: "success",
-      content: "Processing successfully started",
-    });
+  const showModal = () => {
+    setIsModalOpen(true);
   };
 
   const prevMesage = () => {
@@ -72,11 +71,14 @@ const WorkspaceSteps = () => {
 
   const onClickStart = async () => {
     try {
+      showModal();
       const response = await startProcess(processingDetails, dataDetails);
+      setTimeout(() => {
+        navigate("/", { replace: true }); // must go to result page, component or modal
+      }, 10000);
     } catch {
       console.error();
     }
-    success();
   };
 
   const next = () => {
@@ -104,7 +106,6 @@ const WorkspaceSteps = () => {
     <>
       {nextMessageApiContext}
       {prevMessageApiContext}
-      {contextHolder}
       <Content className="content-nav">
         <Tag color="#9FB8AD">workspace2</Tag>
         <div>
@@ -131,6 +132,19 @@ const WorkspaceSteps = () => {
       <Sider className="workspace-sider">
         <Steps direction="vertical" current={current} items={items}></Steps>
       </Sider>
+      <Modal
+        open={isModalOpen}
+        cancelButtonProps={{ style: { display: "none" } }}
+        okButtonProps={{ style: { display: "none" } }}
+        closable={false}
+      >
+        <Result
+          status="info"
+          title="Your processes have started"
+          subTitle="Please waiting the results!"
+          extra={[<Spin />]}
+        />
+      </Modal>
     </>
   );
 };
