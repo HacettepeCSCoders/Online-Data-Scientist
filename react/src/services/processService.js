@@ -1,3 +1,3 @@
-export const startProcess = (processes, data) => {
-    //   return axios.post();
+export const startProcess = (dataAndProcess) => {
+  //   return axios.post();
 };

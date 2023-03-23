@@ -72,7 +72,12 @@ const WorkspaceSteps = () => {
   const onClickStart = async () => {
     try {
       showModal();
-      const response = await startProcess(processingDetails, dataDetails);
+      console.log("requestStartProcess");
+      const dataAndProcess = {
+        data: dataDetails,
+        processes: processingDetails,
+      };
+      const response = await startProcess(dataAndProcess);
       setTimeout(() => {
         navigate("/", { replace: true }); // must go to result page, component or modal
       }, 10000);
