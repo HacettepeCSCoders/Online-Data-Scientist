@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Layout, Skeleton } from "antd";
 import { DataProvider } from "../../hocs/dataProvider";
 import { ProcessingProvider } from "../../hocs/proccesingProvider";
@@ -7,6 +8,9 @@ import { StepProvider } from "../../hocs/stepProvider";
 import WorkspaceSteps from "../../components/workspace/workspaceSteps";
 
 const Workspace = () => {
+  const routeParams = useParams();
+  const pathId = routeParams.workspaceId;
+
   useEffect(() => {
     const unloadCallback = (event) => {
       event.preventDefault();
@@ -27,7 +31,7 @@ const Workspace = () => {
               <StepProvider>
                 <Layout className="layout-background">
                   <Layout>
-                    <WorkspaceSteps></WorkspaceSteps>
+                    <WorkspaceSteps workspaceId={pathId} />
                   </Layout>
                 </Layout>
               </StepProvider>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Layout, Tag, Steps, message, Modal, Result, Spin } from "antd";
 import { steps } from "../../utils/workspace/steps";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 const { Content, Sider } = Layout;
 
-const WorkspaceSteps = () => {
+const WorkspaceSteps = ({ workspaceId }) => {
   const [current, setCurrent] = useState(0);
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails } = useData();
@@ -72,14 +72,13 @@ const WorkspaceSteps = () => {
   const onClickStart = async () => {
     try {
       showModal();
-      console.log("requestStartProcess");
       const dataAndProcess = {
         data: dataDetails,
         processes: processingDetails,
       };
       const response = await startProcess(dataAndProcess);
       setTimeout(() => {
-        navigate("/", { replace: true }); // must go to result page, component or modal
+        navigate("/result", { replace: true }); // must go to result page, component or modal
       }, 10000);
     } catch {
       console.error();
@@ -112,7 +111,7 @@ const WorkspaceSteps = () => {
       {nextMessageApiContext}
       {prevMessageApiContext}
       <Content className="content-nav">
-        <Tag color="#9FB8AD">workspace2</Tag>
+        <Tag color="#9FB8AD">{workspaceId}</Tag>
         <div>
           {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
           {current < steps.length - 1 && (
