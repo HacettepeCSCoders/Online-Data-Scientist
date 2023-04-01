@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Button, Layout, Tag, Steps, message, Modal, Result, Spin } from "antd";
+import { CSVLink, CSVDownload } from "react-csv";
 import { steps } from "../../utils/workspace/steps";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { startProcess } from "../../services/processService";
+import DataTable from "./dataTable/dataTable";
 import { useNavigate } from "react-router-dom";
+import ResultModal from "./modal/resultModal";
+import WaitingModal from "./modal/waitingModal";
 
 const { Content, Sider } = Layout;
 
@@ -16,11 +20,16 @@ const WorkspaceSteps = ({ workspaceId }) => {
   const { processingDetails } = useProcessing();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  let navigate = useNavigate();
+  const [isWaitingModalOpen, setIsModalOpen] = useState(false);
+  const [isResultModal, setResultModal] = useState(false);
+  // let navigate = useNavigate();
 
   const showModal = () => {
     setIsModalOpen(true);
+  };
+
+  const handleResultCancel = () => {
+    setResultModal(false);
   };
 
   const prevMesage = () => {
@@ -78,7 +87,10 @@ const WorkspaceSteps = ({ workspaceId }) => {
       };
       const response = await startProcess(dataAndProcess);
       setTimeout(() => {
-        navigate("/result", { replace: true }); // must go to result page, component or modal
+        // navigate("/result", { replace: true });
+        // must go to result page, component or modal
+        setIsModalOpen(false);
+        setResultModal(true);
       }, 10000);
     } catch {
       console.error();
@@ -136,19 +148,12 @@ const WorkspaceSteps = ({ workspaceId }) => {
       <Sider className="workspace-sider">
         <Steps direction="vertical" current={current} items={items}></Steps>
       </Sider>
-      <Modal
-        open={isModalOpen}
-        cancelButtonProps={{ style: { display: "none" } }}
-        okButtonProps={{ style: { display: "none" } }}
-        closable={false}
-      >
-        <Result
-          status="info"
-          title="Your processes have started"
-          subTitle="Please waiting the results!"
-          extra={[<Spin />]}
-        />
-      </Modal>
+      <WaitingModal isWaitingModalOpen={isWaitingModalOpen} />
+      <ResultModal
+        handleResultCancel={handleResultCancel}
+        isResultModal={isResultModal}
+        dataDetails={dataDetails}
+      />
     </>
   );
 };

@@ -136,6 +136,11 @@
     margin-left: 800px;
 }
 
+.result-modal{
+    background-color: white;
+    overflow: scroll;
+}
+
 
 
 
