@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Button, Layout, Tag, Steps, message, Modal, Result, Spin } from "antd";
-import { CSVLink, CSVDownload } from "react-csv";
+import React, { useState } from "react";
+import { Button, Layout, Tag, Steps, message } from "antd";
 import { steps } from "../../utils/workspace/steps";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { startProcess } from "../../services/processService";
-import DataTable from "./dataTable/dataTable";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
 
@@ -22,11 +20,10 @@ const WorkspaceSteps = ({ workspaceId }) => {
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
-  // let navigate = useNavigate();
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
+  const { userId } = useSelector((store) => ({
+    userId: store.id,
+  }));
 
   const handleResultCancel = () => {
     setResultModal(false);
@@ -80,18 +77,17 @@ const WorkspaceSteps = ({ workspaceId }) => {
 
   const onClickStart = async () => {
     try {
-      showModal();
+      setIsModalOpen(true);
       const dataAndProcess = {
+        userId: userId,
         data: dataDetails,
         processes: processingDetails,
+        workspaceId: workspaceId,
       };
+      console.log(dataAndProcess);
       const response = await startProcess(dataAndProcess);
-      setTimeout(() => {
-        // navigate("/result", { replace: true });
-        // must go to result page, component or modal
-        setIsModalOpen(false);
-        setResultModal(true);
-      }, 10000);
+      setIsModalOpen(false);
+      setResultModal(true);
     } catch {
       console.error();
     }

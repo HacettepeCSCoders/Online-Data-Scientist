@@ -3,7 +3,6 @@ import { LOGOUT_SUCCESS } from "./actions/types";
 
 const INITIAL_STATE = {
   isLoggedIn: false,
-  username: undefined,
 };
 
 export default (state = { ...INITIAL_STATE }, action) => {

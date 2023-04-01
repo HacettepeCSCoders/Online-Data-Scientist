@@ -13,7 +13,6 @@ const getStateFromStorage = () => {
   const hoaxAuth = securels.get("hoax-auth");
   let stateInLocalStorage = {
     isLoggedIn: false,
-    name: undefined,
   };
   if (hoaxAuth) {
     try {
@@ -28,7 +27,7 @@ const updateStateInStorage = (newState) => {
 };
 const configureStore = () => {
   const initalState = getStateFromStorage();
-  // setAuthorizationHeader(initalState);
+  setAuthorizationHeader(initalState);
   const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   const store = createStore(
@@ -38,7 +37,7 @@ const configureStore = () => {
   );
   store.subscribe(() => {
     updateStateInStorage(store.getState());
-    // setAuthorizationHeader(store.getState());
+    setAuthorizationHeader(store.getState());
   });
   return store;
 };
