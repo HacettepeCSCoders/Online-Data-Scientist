@@ -15,7 +15,7 @@ const SideBar = () => {
 
   const onClickPlus = () => {
     const workspaceId = Date.now();
-    navigate(`/workspace/${workspaceId}`);
+    navigate(`/workspace/${workspaceId}/new`);
   };
 
   return (

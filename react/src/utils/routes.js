@@ -31,7 +31,7 @@ export const privateRoutes = [
     element: <HomePage />,
   },
   {
-    path: "/workspace/:workspaceId",
+    path: "/workspace/:workspaceId/new",
     element: <Workspace />,
   },
   {

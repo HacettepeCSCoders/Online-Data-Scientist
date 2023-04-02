@@ -4,14 +4,14 @@ import { getAllUsers } from "../../services/userServices";
 const { Content } = Layout;
 
 const HomePage = () => {
-  const [allWorkspaces, setAllWorkspaces] = useState();
+  const [allUsers, setAllUsers] = useState();
 
   useEffect(() => {
     const getAll = async () => {
       try {
-        const response = await getAllUsers(); // must be getAllWorkspaces by login user
+        const response = await getAllUsers();
         console.log(response);
-        setAllWorkspaces(response.data);
+        setAllUsers(response.data);
       } catch (e) {
         console.log(e);
       }
@@ -21,10 +21,11 @@ const HomePage = () => {
   return (
     <>
       <Content className="content-nav">
-        {allWorkspaces ? (
+        <div> All Users</div>
+        {allUsers ? (
           <List
             itemLayout="horizontal"
-            dataSource={allWorkspaces || []}
+            dataSource={allUsers || []}
             renderItem={(item, index) => (
               <List.Item>
                 {/* <List.Item.Meta
