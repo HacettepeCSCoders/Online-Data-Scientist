@@ -55,12 +55,12 @@ const TopBar = ({ name, isLoggedIn }) => {
         </div>
       </Col>
       <Col offset={18}>
-        <Button className="dark-backgorund" onClick={() => navigate(`/signup`)}>
+        <Button className="dark-background" onClick={() => navigate(`/signup`)}>
           Sign Up
         </Button>
       </Col>
       <Col>
-        <Button className="dark-backgorund" onClick={() => navigate(`/login`)}>
+        <Button className="dark-background" onClick={() => navigate(`/login`)}>
           Login
         </Button>
       </Col>

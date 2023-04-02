@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export const setAuthorizationHeader = ({ isLoggedIn, token }) => {
+export const setAuthorizationHeader = ({ isLoggedIn, access_token }) => {
   if (isLoggedIn) {
-    axios.defaults.headers["Authorization"] = `Bearer ${token}`;
+    axios.defaults.headers["Authorization"] = `Bearer ${access_token}`;
   } else {
     delete axios.defaults.headers["Authorization"];
   }
@@ -16,12 +16,10 @@ export const login = async (creds) => {
       data: creds,
       config: { headers: { "Content-Type": "multipart/form-data" } },
     });
-    //handle success
     console.log(response);
     return response;
-  } catch (response_1) {
-    //handle error
-    console.log(response_1);
+  } catch (e) {
+    console.log(e);
   }
 };
 
@@ -33,11 +31,9 @@ export const signup = async (creds) => {
       data: creds,
       config: { headers: { "Content-Type": "multipart/form-data" } },
     });
-    //handle success
     console.log(response);
     return response;
-  } catch (response_1) {
-    //handle error
-    console.log(response_1);
+  } catch (e) {
+    console.log(e);
   }
 };

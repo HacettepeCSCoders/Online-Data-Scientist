@@ -119,26 +119,28 @@
     margin-bottom: 100px;
 }
 
-.workspace-nextButton {
-    margin-left: 800px;
-    background-color: #475841;
-}
 
-.dark-backgorund{
+
+.dark-background{
   background-color: #475841;
   border-color: #475841;
   color: #9FB8AD;
 }
 
-.dark-backgorund:hover{
+.dark-background:hover{
     color: aliceblue !important;
     border-color:aliceblue !important;
 }
 
+.workspace-nextButton {
+    margin-left: 800px;
+}
 
-/* .workspace-nextButton:hover{
-    background-color: #475841;
-} */
+.result-modal{
+    background-color: white;
+    overflow: scroll;
+}
+
 
 
 

@@ -8,6 +8,7 @@ const Signup = React.lazy(() => import("../views/signup"));
 const HomePage = React.lazy(() => import("../views/homePage"));
 const Workspace = React.lazy(() => import("../views/workspace"));
 const AllWorkspaces = React.lazy(() => import("../views/allWorkpages"));
+const Result = React.lazy(() => import("../views/result"));
 
 export const routes = [
   {
@@ -30,7 +31,7 @@ export const privateRoutes = [
     element: <HomePage />,
   },
   {
-    path: "/workspace/:workspaceId",
+    path: "/workspace/:workspaceId/new",
     element: <Workspace />,
   },
   {
@@ -45,4 +46,9 @@ export const privateRoutes = [
     path: "/profile/:profileName",
     element: <ProfilePage />,
   },
+  { path: "/result", element: <Result /> },
 ];
+
+const generateRandom = () => {
+  return Date.now();
+};
