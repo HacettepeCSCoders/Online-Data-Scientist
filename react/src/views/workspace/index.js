@@ -30,9 +30,7 @@ const Workspace = () => {
             <ProcessingProvider>
               <StepProvider>
                 <Layout className="layout-background">
-                  <Layout>
-                    <WorkspaceSteps workspaceId={pathId} />
-                  </Layout>
+                  <WorkspaceSteps workspaceId={pathId} />
                 </Layout>
               </StepProvider>
             </ProcessingProvider>
