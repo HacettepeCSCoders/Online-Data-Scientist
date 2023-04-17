@@ -13,6 +13,12 @@ class FillStrategy(Enum):
     ZERO = 'zero'
 
 
+class Processes(BaseModel):
+    to_drop_columns: list = []
+    to_drop_rows: list = []
+    fill_missing_strategy: FillStrategy = FillStrategy.NONE
+
+
 # BaseModel for database connection parameters
 class DatabaseConnectionParams(BaseModel):
     username: str
@@ -24,11 +30,11 @@ class DatabaseConnectionParams(BaseModel):
 
 # BaseModel for insertion parameters
 class InsertionParams(BaseModel):
-    db_connection_params: DatabaseConnectionParams
-    schema_name: str
-    table_name: str
+    data: str
+    processes: Processes
     conflict_resolution_strategy: str = 'replace'  # default value
-    ## TODO add dropRows and dropColumns and fillMissing
+    user_id: int
+    workspace_id: int
 
 
 # BaseModel for dataframe manipulation parameters
@@ -39,3 +45,5 @@ class ManipulationParams(BaseModel):
     to_drop_columns: list = []
     to_drop_rows: list = []
     fill_missing_strategy: FillStrategy = FillStrategy.NONE
+
+
