@@ -11,7 +11,7 @@ import WaitingModal from "./modal/waitingModal";
 
 const { Content, Sider } = Layout;
 
-const ExistWorkspaceSteps = ({ workspaceId }) => {
+const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
@@ -20,10 +20,6 @@ const ExistWorkspaceSteps = ({ workspaceId }) => {
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
-
-  const { userId } = useSelector((store) => ({
-    userId: store.id,
-  }));
 
   const handleResultCancel = () => {
     setResultModal(false);
