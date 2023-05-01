@@ -1,15 +1,15 @@
 import React, { Suspense, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Layout, Skeleton } from "antd";
 import { DataProvider } from "../../hocs/dataProvider";
 import { ProcessingProvider } from "../../hocs/proccesingProvider";
 import { WorkspaceTypeProvider } from "../../hocs/workspaceTypeProvider";
-import WorkspaceSteps from "../../components/workspace/workspaceSteps";
+import ExistWorkspaceSteps from "../../components/workspace/existWorkspaceSteps";
 
-const Workspace = () => {
+const ExistWorkspace = () => {
   const routeParams = useParams();
   const pathId = routeParams.workspaceId;
-
+  let navigate = useNavigate();
   useEffect(() => {
     const unloadCallback = (event) => {
       event.preventDefault();
@@ -18,6 +18,9 @@ const Workspace = () => {
     };
 
     window.addEventListener("beforeunload", unloadCallback);
+    // if (pathId != 1) {
+    //   navigate("/");
+    // }
     return () => window.removeEventListener("beforeunload", unloadCallback);
   }, []);
 
@@ -28,7 +31,7 @@ const Workspace = () => {
           <DataProvider>
             <ProcessingProvider>
               <Layout className="layout-background">
-                <WorkspaceSteps workspaceId={pathId} />
+                <ExistWorkspaceSteps workspaceId={pathId} />
               </Layout>
             </ProcessingProvider>
           </DataProvider>
@@ -37,4 +40,5 @@ const Workspace = () => {
     </>
   );
 };
-export default Workspace;
+
+export default ExistWorkspace;
