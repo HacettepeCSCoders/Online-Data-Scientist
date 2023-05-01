@@ -141,6 +141,32 @@
     overflow: scroll;
 }
 
+.list-allworkspace{
+    width: 500px;
+    margin-left: 100px;
+    margin-top: 20px;
+}
+
+.pageHeader-workspace{
+    background-color: #E6E8E6;
+    color: aliceblue !important;
+    border-color:aliceblue !important;
+}
+
+.button-allWorkspace{
+    margin-left: 250px;
+}
+
+.red-color{
+    color: red;
+}
+
+.nav-color{
+    color: #475841;
+}
+
+
+
 
 
 
