@@ -183,10 +183,6 @@
     margin-left: 30px;
 }
 
-.back{
-    background-color: #062846;
-}
-
 .ant-table-thead .ant-table-cell {
     background-color: #F5F5F5 !important; 
   }
@@ -195,6 +191,11 @@
     font-size: 2em !important;
     margin-right: 10px;
     margin-top: 10px;
+}
+
+.id-column-background{
+    background-color: #F5F5F5 !important;
+    width: 10px;
 }
 
 
