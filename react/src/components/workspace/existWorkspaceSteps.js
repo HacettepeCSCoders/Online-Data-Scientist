@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Layout, Tag, Steps, message } from "antd";
+import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
@@ -8,6 +8,7 @@ import { existSteps } from "../../utils/workspace/existSteps";
 import { useSelector } from "react-redux";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
+import { PageHeader } from "@ant-design/pro-layout";
 
 const { Content, Sider } = Layout;
 
@@ -98,7 +99,9 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   };
 
   const prev = () => {
-    prevMesage();
+    if (current !== 0) {
+      prevMesage();
+    }
   };
 
   useEffect(() => {
@@ -115,26 +118,38 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
       {nextMessageApiContext}
       {prevMessageApiContext}
       <Content className="content-nav">
-        <Tag color="#9FB8AD">{workspaceId}</Tag>
-        <div>
-          {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
-          {current < existSteps.length - 1 && (
-            <Button
-              className="dark-background workspace-nextButton"
-              onClick={() => next()}
-            >
-              Next
-            </Button>
-          )}
-          {current === existSteps.length - 1 && (
-            <Button
-              className="dark-background workspace-nextButton"
-              onClick={() => next()}
-            >
-              Start
-            </Button>
-          )}
+        <div className="div-workspaceSteps">
+          <Tag color="#9FB8AD">{workspaceId}</Tag>
+          <div>
+            {current < existSteps.length - 1 && (
+              <Button
+                className="dark-background workspace-nextButton"
+                onClick={() => next()}
+              >
+                Next
+              </Button>
+            )}
+            {current === existSteps.length - 1 && (
+              <Button
+                className="dark-background workspace-nextButton"
+                onClick={() => next()}
+              >
+                Start
+              </Button>
+            )}
+          </div>
         </div>
+        <PageHeader
+          className="pageHeader-workspace"
+          title={existSteps[current].title}
+          onBack={prev}
+        >
+          <Descriptions>
+            <Descriptions.Item>
+              {existSteps[current].subTitle}
+            </Descriptions.Item>
+          </Descriptions>
+        </PageHeader>
         <div>{existSteps[current].content}</div>
       </Content>
       <Sider className="workspace-sider">

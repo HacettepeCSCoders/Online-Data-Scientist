@@ -8,13 +8,13 @@ const DataManipulationForm = ({ setValues }) => {
 
   const onFinish = (values) => {
     if (!missingValueEnabled) {
-      values.fillMissingValues = undefined;
+      values.fill_missing_strategy = undefined;
     }
     if (!dropColumnEnabled) {
-      values.dropColumn = undefined;
+      values.to_drop_columns = undefined;
     }
     if (!dropRowEnabled) {
-      values.dropRow = undefined;
+      values.to_drop_rows = undefined;
     }
     setValues(values);
   };

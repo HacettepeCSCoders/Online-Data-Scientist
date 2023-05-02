@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Layout, Tag, Steps, message } from "antd";
+import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
 import { steps } from "../../utils/workspace/steps";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
@@ -8,6 +8,8 @@ import { startProcess } from "../../services/processService";
 import { useSelector } from "react-redux";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
+import { PageHeader } from "@ant-design/pro-layout";
+import { Header } from "antd/es/layout/layout";
 
 const { Content, Sider } = Layout;
 
@@ -109,8 +111,27 @@ const WorkspaceSteps = ({ workspaceId }) => {
   };
 
   const prev = () => {
-    prevMesage();
+    if (current != 0) {
+      prevMesage();
+    }
   };
+
+  const titles = [
+    {
+      title: "Welcome the Workspace",
+      subTitle:
+        "After this stage, we will help you make the best use of the data wehave. First of all, please select the field for which you will use the data you have.",
+    },
+    {
+      title: "Upload File",
+      subTitle: "Upload the file you want to process",
+    },
+    {
+      title: "Visualize Data",
+    },
+    { title: "Select Processing" },
+    { title: "Start Processing" },
+  ];
 
   const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
@@ -118,38 +139,49 @@ const WorkspaceSteps = ({ workspaceId }) => {
     <>
       {nextMessageApiContext}
       {prevMessageApiContext}
-      <Content className="content-nav">
-        <Tag color="#9FB8AD">{workspaceId}</Tag>
-        <div>
-          {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
-          {current < steps.length - 1 && (
-            <Button
-              className="dark-background workspace-nextButton"
-              onClick={() => next()}
-            >
-              Next
-            </Button>
-          )}
-          {current === steps.length - 1 && (
-            <Button
-              className="dark-background workspace-nextButton"
-              onClick={() => next()}
-            >
-              Start
-            </Button>
-          )}
-        </div>
-        <div>{steps[current].content}</div>
-      </Content>
-      <Sider className="workspace-sider">
-        <Steps direction="vertical" current={current} items={items}></Steps>
-      </Sider>
       <WaitingModal isWaitingModalOpen={isWaitingModalOpen} />
       <ResultModal
         handleResultCancel={handleResultCancel}
         isResultModal={isResultModal}
         dataDetails={dataDetails}
       />
+
+      <Content className="content-nav">
+        <div className="div-workspaceSteps">
+          <Tag color="#9FB8AD">{workspaceId}</Tag>
+          <div>
+            {current < steps.length - 1 && (
+              <Button
+                className="dark-background workspace-nextButton"
+                onClick={() => next()}
+              >
+                Next
+              </Button>
+            )}
+            {current === steps.length - 1 && (
+              <Button
+                className="dark-background workspace-nextButton"
+                onClick={() => next()}
+              >
+                Start
+              </Button>
+            )}
+          </div>
+          <PageHeader
+            className="pageHeader-workspace"
+            title={titles[current].title}
+            onBack={prev}
+          >
+            <Descriptions>
+              <Descriptions.Item>{titles[current].subTitle}</Descriptions.Item>
+            </Descriptions>
+          </PageHeader>
+        </div>
+        <div>{steps[current].content}</div>
+      </Content>
+      <Sider className="workspace-sider">
+        <Steps direction="vertical" current={current} items={items}></Steps>
+      </Sider>
     </>
   );
 };

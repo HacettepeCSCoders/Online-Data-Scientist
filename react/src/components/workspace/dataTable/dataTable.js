@@ -27,12 +27,7 @@ const DataTable = ({ dataDetails }) => {
   });
   return (
     <>
-      <Table
-        dataSource={result}
-        columns={columns}
-        bordered={true}
-        size={"small"}
-      ></Table>
+      <Table dataSource={result} columns={columns} size={"small"}></Table>
     </>
   );
 };
