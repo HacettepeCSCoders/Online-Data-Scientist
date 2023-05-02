@@ -1,5 +1,6 @@
 import React from "react";
 
+const Panel = React.lazy(() => import("../views/panel/panel"));
 const ExistWorkspace = React.lazy(() => import("../views/existWorkspace"));
 const MainPage = React.lazy(() => import("../views/mainPage"));
 const ProfilePage = React.lazy(() => import("../views/profilePage"));
@@ -54,5 +55,9 @@ export const privateRoutes = [
   {
     path: "/workspace/:workspaceId",
     element: <ExistWorkspace />,
+  },
+  {
+    path: "/panel",
+    element: <Panel />,
   },
 ];

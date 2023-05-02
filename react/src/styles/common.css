@@ -191,7 +191,11 @@
     background-color: #F5F5F5 !important; 
   }
 
-
+.icon-font{
+    font-size: 2em !important;
+    margin-right: 10px;
+    margin-top: 10px;
+}
 
 
 
