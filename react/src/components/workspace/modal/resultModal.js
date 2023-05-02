@@ -3,7 +3,12 @@ import { Modal } from "antd";
 import { CSVLink } from "react-csv";
 import DataTable from "../dataTable/dataTable";
 
-const ResultModal = ({ handleResultCancel, isResultModal, dataDetails }) => {
+const ResultModal = ({
+  handleResultCancel,
+  isResultModal,
+  dataDetails,
+  fileName,
+}) => {
   return (
     <>
       <Modal
@@ -15,7 +20,7 @@ const ResultModal = ({ handleResultCancel, isResultModal, dataDetails }) => {
       >
         <div>
           <DataTable dataDetails={dataDetails}></DataTable>
-          <CSVLink filename="manipulationData" data={dataDetails}>
+          <CSVLink filename={fileName + "Updated"} data={dataDetails}>
             Download CSV File
           </CSVLink>
         </div>

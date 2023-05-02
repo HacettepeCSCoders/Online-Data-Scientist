@@ -1,33 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
-import { steps } from "../../utils/workspace/steps";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
-import { useFileName } from "../../hocs/fileNameProvider";
 import { startProcess } from "../../services/processService";
+import { existSteps } from "../../utils/workspace/existSteps";
 import { useSelector } from "react-redux";
-import { createWorkspace } from "../../services/workspaceService";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
 
 const { Content, Sider } = Layout;
 
-const WorkspaceSteps = ({ workspaceId }) => {
+const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
   const { workspaceTypeDetails } = useWorkspaceType();
-  const { dataDetails } = useData();
+  const { dataDetails, setDataDetails } = useData();
   const { processingDetails } = useProcessing();
-  const { fileNameDetails, setFileNameDetails } = useFileName();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
-
-  const { userId } = useSelector((store) => ({
-    userId: store.id,
-  }));
 
   const handleResultCancel = () => {
     setResultModal(false);
@@ -58,19 +51,13 @@ const WorkspaceSteps = ({ workspaceId }) => {
   };
 
   const nextMessage = () => {
-    if (current === 0) {
+    if (current === 1) {
       nextMessageApi.open({
         type: "error",
         content: <>Please select which process you want to continue with?</>,
         duration: 2,
       });
-    } else if (current === 1) {
-      nextMessageApi.open({
-        type: "error",
-        content: <>Please upload Excel or CSV file</>,
-        duration: 2,
-      });
-    } else if (current === 3) {
+    } else if (current === 2) {
       nextMessageApi.open({
         type: "error",
         content: <>Please select the processes you want to do?</>,
@@ -88,15 +75,7 @@ const WorkspaceSteps = ({ workspaceId }) => {
         processes: processingDetails,
         workspaceId: workspaceId,
       };
-
-      const fileNameAndIds = {
-        userId: userId,
-        workspaceId: workspaceId,
-        fileName: fileNameDetails,
-      };
-
       console.log(dataAndProcess);
-      await createWorkspace(fileNameAndIds);
       const response = await startProcess(dataAndProcess);
       setIsModalOpen(false);
       setResultModal(true);
@@ -107,13 +86,12 @@ const WorkspaceSteps = ({ workspaceId }) => {
 
   const next = () => {
     if (
-      (current === 0 && workspaceTypeDetails == null) ||
-      (current === 1 && dataDetails == null) ||
-      (current === 3 && processingDetails == null)
+      (current === 1 && workspaceTypeDetails == null) ||
+      (current === 2 && processingDetails == null)
     ) {
       nextMessage();
       return;
-    } else if (current === 4) {
+    } else if (current === 3) {
       onClickStart();
       return;
     }
@@ -121,30 +99,29 @@ const WorkspaceSteps = ({ workspaceId }) => {
   };
 
   const prev = () => {
-    if (current != 0) {
+    if (current !== 0) {
       prevMesage();
     }
   };
 
-  const items = steps.map((item) => ({ key: item.title, title: item.title }));
+  useEffect(() => {
+    setDataDetails("abc,sa\nas,sa,12");
+  }, []);
+
+  const items = existSteps.map((item) => ({
+    key: item.title,
+    title: item.title,
+  }));
 
   return (
     <>
       {nextMessageApiContext}
       {prevMessageApiContext}
-      <WaitingModal isWaitingModalOpen={isWaitingModalOpen} />
-      <ResultModal
-        handleResultCancel={handleResultCancel}
-        isResultModal={isResultModal}
-        dataDetails={dataDetails}
-        fileName={fileNameDetails}
-      />
-
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>
           <div>
-            {current < steps.length - 1 && (
+            {current < existSteps.length - 1 && (
               <Button
                 className="dark-background workspace-nextButton"
                 onClick={() => next()}
@@ -152,7 +129,7 @@ const WorkspaceSteps = ({ workspaceId }) => {
                 Next
               </Button>
             )}
-            {current === steps.length - 1 && (
+            {current === existSteps.length - 1 && (
               <Button
                 className="dark-background workspace-nextButton"
                 onClick={() => next()}
@@ -161,30 +138,31 @@ const WorkspaceSteps = ({ workspaceId }) => {
               </Button>
             )}
           </div>
-          <PageHeader
-            className="pageHeader-workspace"
-            title={steps[current].title}
-            onBack={prev}
-          >
-            <Descriptions>
-              <Descriptions.Item span={4}>
-                {steps[current].subTitle}
-              </Descriptions.Item>
-              {current === 2 && (
-                <Descriptions.Item>
-                  <Tag color="#9FB8AD"> {fileNameDetails}</Tag>
-                </Descriptions.Item>
-              )}
-            </Descriptions>
-          </PageHeader>
         </div>
-        <div>{steps[current].content}</div>
+        <PageHeader
+          className="pageHeader-workspace"
+          title={existSteps[current].title}
+          onBack={prev}
+        >
+          <Descriptions>
+            <Descriptions.Item>
+              {existSteps[current].subTitle}
+            </Descriptions.Item>
+          </Descriptions>
+        </PageHeader>
+        <div>{existSteps[current].content}</div>
       </Content>
       <Sider className="workspace-sider">
         <Steps direction="vertical" current={current} items={items}></Steps>
       </Sider>
+      <WaitingModal isWaitingModalOpen={isWaitingModalOpen} />
+      <ResultModal
+        handleResultCancel={handleResultCancel}
+        isResultModal={isResultModal}
+        dataDetails={dataDetails}
+      />
     </>
   );
 };
 
-export default WorkspaceSteps;
+export default ExistWorkspaceSteps;

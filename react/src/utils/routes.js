@@ -1,5 +1,6 @@
 import React from "react";
 
+const ExistWorkspace = React.lazy(() => import("../views/existWorkspace"));
 const MainPage = React.lazy(() => import("../views/mainPage"));
 const ProfilePage = React.lazy(() => import("../views/profilePage"));
 const Settings = React.lazy(() => import("../views/settings"));
@@ -46,9 +47,12 @@ export const privateRoutes = [
     path: "/profile/:profileName",
     element: <ProfilePage />,
   },
-  { path: "/result", element: <Result /> },
+  {
+    path: "/result",
+    element: <Result />,
+  },
+  {
+    path: "/workspace/:workspaceId",
+    element: <ExistWorkspace />,
+  },
 ];
-
-const generateRandom = () => {
-  return Date.now();
-};

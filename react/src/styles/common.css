@@ -1,5 +1,5 @@
 .layout-background {
-    background-color: #E6E8E6;
+    background-color: #ffffff !important; 
 }
 
 .content-nav {
@@ -73,6 +73,11 @@
 }
 
 .workspace-table-content {
+    height: 500px;
+    width: 700px;
+}
+
+.visualize-table {
     height: 100vh;
 }
 
@@ -139,7 +144,56 @@
 .result-modal{
     background-color: white;
     overflow: scroll;
+    width: 1000px !important;
 }
+
+.list-allworkspace{
+    width: 500px;
+    margin-left: 100px;
+    margin-top: 20px;
+}
+
+.pageHeader-workspace{
+    background-color: #E6E8E6;
+    color: aliceblue !important;
+    border-color:aliceblue !important;
+}
+
+.button-allWorkspace{
+    margin-left: 250px;
+}
+
+.red-color{
+    color: red;
+}
+
+.nav-color{
+    color: #475841;
+}
+
+.div-workspaceSteps{
+    background-color: #E6E8E6;
+    color: aliceblue !important;
+    border-color:aliceblue !important;
+    
+}
+
+.div-work{
+    margin-top: 30px;
+    margin-left: 30px;
+}
+
+.back{
+    background-color: #062846;
+}
+
+.ant-table-thead .ant-table-cell {
+    background-color: #F5F5F5 !important; 
+  }
+
+
+
+
 
 
 
