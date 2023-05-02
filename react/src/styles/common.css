@@ -77,6 +77,10 @@
     width: 700px;
 }
 
+.visualize-table {
+    height: 100vh;
+}
+
 .workspace-button-margin {
     margin-top: 10px;
 }

@@ -12,7 +12,7 @@ const VisualizeData = () => {
     <>
       <Suspense fallback={<Skeleton active />}>
         {dataDetails && (
-          <Content className="workspace-table-content csv-table-overflow ">
+          <Content className="visualize-table csv-table-overflow ">
             <DataTable dataDetails={dataDetails}></DataTable>
           </Content>
         )}

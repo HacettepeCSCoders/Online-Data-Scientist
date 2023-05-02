@@ -2,6 +2,10 @@ import axios from "axios";
 
 export const getAllWorkspaces = (userId) => {};
 
+export const createWorkspace = (creds) => {
+  console.log(creds);
+};
+
 export const deleteWorkspace = (workspaceId) => {};
 
 export const getWorkspace = (userId, workspaceId) => {

@@ -9,10 +9,13 @@ export const steps = [
   {
     title: "Welcome to Workspace",
     content: <WelcomeWorkspace />,
+    subTitle:
+      "After this stage, we will help you make the best use of the data wehave. First of all, please select the field for which you will use the data you have.",
   },
   {
     title: "Upload CSV or Excel File",
     content: <UploadFile />,
+    subTitle: "Upload the file you want to process",
   },
   {
     title: "Visualize Data",
@@ -25,5 +28,7 @@ export const steps = [
   {
     title: "Start Processing",
     content: <StartProcessing />,
+    subTitle:
+      "Check the selected data and processings. If the informations is correct, start processing.",
   },
 ];

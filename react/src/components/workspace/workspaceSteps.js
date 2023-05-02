@@ -4,12 +4,13 @@ import { steps } from "../../utils/workspace/steps";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
+import { useFileName } from "../../hocs/fileNameProvider";
 import { startProcess } from "../../services/processService";
 import { useSelector } from "react-redux";
+import { createWorkspace } from "../../services/workspaceService";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
-import { Header } from "antd/es/layout/layout";
 
 const { Content, Sider } = Layout;
 
@@ -18,6 +19,7 @@ const WorkspaceSteps = ({ workspaceId }) => {
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails } = useData();
   const { processingDetails } = useProcessing();
+  const { fileNameDetails, setFileNameDetails } = useFileName();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
@@ -86,7 +88,15 @@ const WorkspaceSteps = ({ workspaceId }) => {
         processes: processingDetails,
         workspaceId: workspaceId,
       };
+
+      const fileNameAndIds = {
+        userId: userId,
+        workspaceId: workspaceId,
+        fileName: fileNameDetails,
+      };
+
       console.log(dataAndProcess);
+      await createWorkspace(fileNameAndIds);
       const response = await startProcess(dataAndProcess);
       setIsModalOpen(false);
       setResultModal(true);
@@ -116,23 +126,6 @@ const WorkspaceSteps = ({ workspaceId }) => {
     }
   };
 
-  const titles = [
-    {
-      title: "Welcome the Workspace",
-      subTitle:
-        "After this stage, we will help you make the best use of the data wehave. First of all, please select the field for which you will use the data you have.",
-    },
-    {
-      title: "Upload File",
-      subTitle: "Upload the file you want to process",
-    },
-    {
-      title: "Visualize Data",
-    },
-    { title: "Select Processing" },
-    { title: "Start Processing" },
-  ];
-
   const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
   return (
@@ -144,6 +137,7 @@ const WorkspaceSteps = ({ workspaceId }) => {
         handleResultCancel={handleResultCancel}
         isResultModal={isResultModal}
         dataDetails={dataDetails}
+        fileName={fileNameDetails}
       />
 
       <Content className="content-nav">
@@ -169,11 +163,18 @@ const WorkspaceSteps = ({ workspaceId }) => {
           </div>
           <PageHeader
             className="pageHeader-workspace"
-            title={titles[current].title}
+            title={steps[current].title}
             onBack={prev}
           >
             <Descriptions>
-              <Descriptions.Item>{titles[current].subTitle}</Descriptions.Item>
+              <Descriptions.Item span={4}>
+                {steps[current].subTitle}
+              </Descriptions.Item>
+              {current === 2 && (
+                <Descriptions.Item>
+                  <Tag color="#9FB8AD"> {fileNameDetails}</Tag>
+                </Descriptions.Item>
+              )}
             </Descriptions>
           </PageHeader>
         </div>
