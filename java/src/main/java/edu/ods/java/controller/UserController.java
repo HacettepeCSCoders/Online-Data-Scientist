@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import edu.ods.java.dto.UserDTO;
 import edu.ods.java.dto.UserUpdateDTO;
+import edu.ods.java.dto.WorkspaceDTO;
+import edu.ods.java.model.Workspace;
 import edu.ods.java.service.UserService;
+import edu.ods.java.service.WorkspaceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
+
+	private final WorkspaceService workspaceService;
 
 	@PostMapping("")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -103,6 +108,28 @@ public class UserController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<Boolean> existsByUsername(@PathVariable(name = "username") String email) {
 		return ResponseEntity.ok(userService.userExists(email));
+	}
+
+	@GetMapping("/{userId}/workspaces")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<List<Workspace>> getAllWorkspacesByUserId(@PathVariable(value = "userId") long userId) {
+		return ResponseEntity.ok(workspaceService.getAllWorkspacesByUserId(userId));
+	}
+
+	@PostMapping("/{userId}/workspaces")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<WorkspaceDTO> createWorkspace(@PathVariable(value = "userId") long userId,
+			@RequestBody WorkspaceDTO workspaceDTO) {
+		return ResponseEntity.ok(workspaceService.createWorkspace(userId, workspaceDTO));
+
+	}
+
+	@DeleteMapping("/{userId}/workspaces")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<String> deleteAllWorkspacesOfUser(@PathVariable(value = "userId") long userId) {
+		workspaceService.deleteAllWorkspacesOfUser(userId);
+		return new ResponseEntity<>("User deleted permanently!", HttpStatus.OK);
+
 	}
 
 }
