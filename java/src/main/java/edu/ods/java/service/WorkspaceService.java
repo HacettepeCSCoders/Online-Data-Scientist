@@ -21,8 +21,7 @@ public class WorkspaceService {
 
 	private final UserRepository userRepository;
 
-	public WorkspaceDTO createWorkspace(long userId, WorkspaceDTO workspaceDTO) {
-
+	public WorkspaceDTO createWorkspace(WorkspaceDTO workspaceDTO) {
 		Workspace workspace = mapToEntity(workspaceDTO);
 		return mapToDTO(workspaceRepository.save(workspace));
 	}
@@ -31,8 +30,18 @@ public class WorkspaceService {
 		return workspaceRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
 	}
 
+	public WorkspaceDTO getById(long id) {
+		return mapToDTO(workspaceRepository.findById(id)
+				.orElseThrow(() -> new WorkspaceNotFoundException("Workspace could not be found")));
+	}
+
 	public WorkspaceDTO getByFileName(String fileName) {
 		return mapToDTO(workspaceRepository.findByFileName(fileName)
+				.orElseThrow(() -> new WorkspaceNotFoundException("Workspace could not be found")));
+	}
+
+	public WorkspaceDTO getByFileNameAndUserId(String fileName, long userId) {
+		return mapToDTO(workspaceRepository.findByFileNameAndUserId(fileName, userId)
 				.orElseThrow(() -> new WorkspaceNotFoundException("Workspace could not be found")));
 	}
 
@@ -41,15 +50,21 @@ public class WorkspaceService {
 				.collect(Collectors.toList());
 	}
 
-	public WorkspaceDTO getById(long id) {
-		return mapToDTO(workspaceRepository.findById(id)
-				.orElseThrow(() -> new WorkspaceNotFoundException("Workspace could not be found")));
+	public List<Workspace> getAllByUserId(long userId) {
+		if (!userRepository.existsById(userId)) {
+			throw new UserNotFoundException("Not found user with id = " + userId);
+		}
+		return workspaceRepository.findAllByUserId(userId);
 	}
 
 	public WorkspaceDTO updateWorkspace(long id, WorkspaceUpdateDTO workspaceUpdateDTO) {
 
 		Workspace workspace = workspaceRepository.findById(id)
 				.orElseThrow(() -> new WorkspaceNotFoundException("Workspace could not be updated"));
+
+		if (workspaceUpdateDTO.getId() != 0) {
+			workspace.setId(workspaceUpdateDTO.getId());
+		}
 
 		if (workspaceUpdateDTO.getFileName() != null) {
 			workspace.setFileName(workspaceUpdateDTO.getFileName());
@@ -95,23 +110,17 @@ public class WorkspaceService {
 
 	private WorkspaceDTO mapToDTO(Workspace workspace) {
 		WorkspaceDTO workspaceDTO = new WorkspaceDTO();
+		workspaceDTO.setId(workspace.getId());
 		workspaceDTO.setFileName(workspace.getFileName());
-		workspaceDTO.setUserId(workspace.getUser().getId());
 		return workspaceDTO;
 	}
 
 	private Workspace mapToEntity(WorkspaceDTO workspaceDTO) {
 		Workspace workspace = new Workspace();
+		workspace.setId(workspaceDTO.getId());
 		workspace.setFileName(workspaceDTO.getFileName());
 		workspace.setUser(userRepository.findById(workspaceDTO.getUserId()).get());
 		return workspace;
-	}
-
-	public List<Workspace> getAllWorkspacesByUserId(long userId) {
-		if (!userRepository.existsById(userId)) {
-			throw new UserNotFoundException("Not found user with id = " + userId);
-		}
-		return workspaceRepository.findAllByUserId(userId);
 	}
 
 }

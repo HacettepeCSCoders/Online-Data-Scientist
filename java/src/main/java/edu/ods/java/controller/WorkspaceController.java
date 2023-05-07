@@ -1,5 +1,7 @@
 package edu.ods.java.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +24,25 @@ public class WorkspaceController {
 	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
 	public ResponseEntity<WorkspaceDTO> getWorkspace(@PathVariable(name = "workspaceId") long id) {
 		return ResponseEntity.ok(workspaceService.getById(id));
+	}
+
+	@GetMapping("")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<List<WorkspaceDTO>> getAllWorkspaces() {
+		return ResponseEntity.ok(workspaceService.getAllWorkspaces());
+	}
+
+	@GetMapping("/get-by-file-name/{fileName}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<WorkspaceDTO> getWorkspaceByFileName(@PathVariable(name = "fileName") String fileName) {
+		return ResponseEntity.ok(workspaceService.getByFileName(fileName));
+	}
+
+	@GetMapping("/get-all-by-file-name/{fileName}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<List<WorkspaceDTO>> getAllWorkspacesByFileName(
+			@PathVariable(name = "fileName") String fileName) {
+		return ResponseEntity.ok(workspaceService.getAllByFileName(fileName));
 	}
 
 	@PutMapping("/{workspaceId}")

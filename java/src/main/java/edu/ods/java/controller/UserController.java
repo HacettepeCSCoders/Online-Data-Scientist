@@ -113,15 +113,21 @@ public class UserController {
 	@GetMapping("/{userId}/workspaces")
 	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
 	public ResponseEntity<List<Workspace>> getAllWorkspacesByUserId(@PathVariable(value = "userId") long userId) {
-		return ResponseEntity.ok(workspaceService.getAllWorkspacesByUserId(userId));
+		return ResponseEntity.ok(workspaceService.getAllByUserId(userId));
 	}
 
 	@PostMapping("/{userId}/workspaces")
 	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
-	public ResponseEntity<WorkspaceDTO> createWorkspace(@PathVariable(value = "userId") long userId,
-			@RequestBody WorkspaceDTO workspaceDTO) {
-		return ResponseEntity.ok(workspaceService.createWorkspace(userId, workspaceDTO));
+	public ResponseEntity<WorkspaceDTO> createWorkspace(@RequestBody WorkspaceDTO workspaceDTO) {
+		return ResponseEntity.ok(workspaceService.createWorkspace(workspaceDTO));
 
+	}
+
+	@GetMapping("/{userId}/workspaces/{fileName}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<WorkspaceDTO> getWorkspaceByUserIdAndFileName(@PathVariable(name = "userId") long userId,
+			@PathVariable(name = "fileName") String fileName) {
+		return ResponseEntity.ok(workspaceService.getByFileNameAndUserId(fileName, userId));
 	}
 
 	@DeleteMapping("/{userId}/workspaces")

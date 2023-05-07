@@ -16,8 +16,12 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
 
 	Optional<Workspace> findByFileName(String fileName);
 
+	Optional<Workspace> findById(long id);
+
 	@Transactional
 	void deleteByUserId(long userId);
+
+	Optional<Workspace> findByFileNameAndUserId(String fileName, long userId);
 
 	List<Workspace> findByFileNameContaining(String fileName);
 

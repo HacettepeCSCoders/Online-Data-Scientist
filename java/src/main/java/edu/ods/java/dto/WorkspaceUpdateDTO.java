@@ -7,6 +7,8 @@ import lombok.Data;
 
 public class WorkspaceUpdateDTO {
 
+	private long id;
+
 	@Size(max = 255, min = 1, message = "Please enter a valid file name")
 	private String fileName;
 

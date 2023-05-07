@@ -13,6 +13,10 @@ import lombok.Setter;
 @Table(name = "WORKSPACES")
 public class Workspace extends EntityBase {
 
+	@Id
+	@Column(name = "ID", nullable = false)
+	private long id;
+
 	@Column(name = "FILE_NAME")
 	private String fileName;
 
