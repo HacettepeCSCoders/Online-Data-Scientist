@@ -61,6 +61,7 @@ const UploadFile = () => {
           multiple={false}
           beforeUpload={(file) => {
             const fileName = file.name;
+            console.log(file);
             const fileNameArray = fileName.split(".");
             setFileNameDetails(fileNameArray[0]);
             const fileExtension = fileNameArray[1];

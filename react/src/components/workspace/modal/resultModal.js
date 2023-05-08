@@ -17,6 +17,7 @@ const ResultModal = ({
         cancelButtonProps={{ style: { display: "none" } }}
         okButtonProps={{ style: { display: "none" } }}
         onCancel={handleResultCancel}
+        closable={false}
       >
         <div>
           <DataTable dataDetails={dataDetails}></DataTable>

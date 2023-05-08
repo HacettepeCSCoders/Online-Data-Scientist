@@ -75,7 +75,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
         processes: processingDetails,
         workspaceId: workspaceId,
       };
-      console.log(dataAndProcess);
+      // const fileNameAndIds = { userId: userId, fileName: fileNameDetails };
       const response = await startProcess(dataAndProcess);
       setIsModalOpen(false);
       setResultModal(true);

@@ -148,7 +148,8 @@
 }
 
 .list-allworkspace{
-    width: 500px;
+    width: auto;
+    max-width: 1500px;
     margin-left: 100px;
     margin-top: 20px;
 }
@@ -196,6 +197,11 @@
 .id-column-background{
     background-color: #F5F5F5 !important;
     width: 10px;
+}
+
+.render-table{
+    font-family: Inter,sans-serif;
+    font-size: 0.8em;
 }
 
 
