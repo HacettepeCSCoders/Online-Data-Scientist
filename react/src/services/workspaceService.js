@@ -8,16 +8,19 @@ export const getAllWorkspaces = (userId) => {
 };
 
 export const createWorkspace = (creds, userId) => {
-  console.log(creds);
   return axios({
     method: "post",
     url: `http://localhost:8080/api/v1/users/${userId}/workspaces`,
     data: creds,
-    config: { headers: { "Content-Type": "multipart/form-data" } },
   });
 };
 
-export const deleteWorkspace = (workspaceId) => {};
+export const removeWorkspace = (workspaceId) => {
+  return axios({
+    method: "post",
+    url: `http://localhost:8080/api/v1/workspaces/deactivate/${workspaceId}`,
+  });
+};
 
 export const getWorkspace = (userId, workspaceId) => {
   return axios({
