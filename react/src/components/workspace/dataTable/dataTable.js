@@ -9,22 +9,6 @@ const DataTable = ({ dataDetails }) => {
 
   rows.pop();
 
-  const items = [
-    {
-      key: "1",
-      label: <div> Signed as </div>,
-      disabled: true,
-    },
-    {
-      key: "2",
-      label: <a href="/settings">Settings</a>,
-    },
-    {
-      key: "3",
-      label: <a href="/burakdag">Your Profile</a>,
-    },
-  ];
-
   const columns = cols.map((col, idx) => {
     const res = {
       title: col,
@@ -51,6 +35,10 @@ const DataTable = ({ dataDetails }) => {
     vals.unshift(count);
     return vals.reduce((res, val, idx) => {
       const prop = cols[idx];
+      if (val === "") {
+        res[prop] = "<null>";
+        return res;
+      }
       res[prop] = val;
       return res;
     }, {});
@@ -58,7 +46,12 @@ const DataTable = ({ dataDetails }) => {
 
   return (
     <>
-      <Table dataSource={result} columns={columns} size={"small"}></Table>
+      <Table
+        rowClassName="render-table"
+        dataSource={result}
+        columns={columns}
+        size={"small"}
+      ></Table>
     </>
   );
 };

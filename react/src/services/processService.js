@@ -2,13 +2,16 @@ import axios from "axios";
 
 export const startProcess = async (dataAndProcess) => {
   try {
-    const response = await axios({
-      method: "post",
-      url: "http://localhost:8080/api/v1/auth/login", // not correct must be write correct API
+    const response = axios({
+      method: "POST",
+      // url: `http://localhost:8000/insert`,
+      url: "http://localhost:8080/api/v1/auth/login",
       data: dataAndProcess,
-      config: { headers: { "Content-Type": "multipart/form-data" } },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/octet-stream",
+      },
     });
-    console.log(response);
     return response;
   } catch (e) {
     console.log(e);

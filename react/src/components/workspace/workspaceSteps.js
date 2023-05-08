@@ -14,20 +14,16 @@ import { PageHeader } from "@ant-design/pro-layout";
 
 const { Content, Sider } = Layout;
 
-const WorkspaceSteps = ({ workspaceId }) => {
+const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails } = useData();
   const { processingDetails } = useProcessing();
-  const { fileNameDetails, setFileNameDetails } = useFileName();
+  const { fileNameDetails } = useFileName();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
-
-  const { userId } = useSelector((store) => ({
-    userId: store.id,
-  }));
 
   const handleResultCancel = () => {
     setResultModal(false);
@@ -83,20 +79,23 @@ const WorkspaceSteps = ({ workspaceId }) => {
     try {
       setIsModalOpen(true);
       const dataAndProcess = {
-        userId: userId,
-        data: dataDetails,
-        processes: processingDetails,
-        workspaceId: workspaceId,
+        insertion_params: {
+          user_id: userId,
+          data: dataDetails,
+          processes: processingDetails,
+          workspace_id: workspaceId,
+        },
+        file: dataDetails,
       };
 
       const fileNameAndIds = {
         userId: userId,
-        workspaceId: workspaceId,
         fileName: fileNameDetails,
+        id: workspaceId,
       };
 
       console.log(dataAndProcess);
-      await createWorkspace(fileNameAndIds);
+      await createWorkspace(fileNameAndIds, userId);
       const response = await startProcess(dataAndProcess);
       setIsModalOpen(false);
       setResultModal(true);

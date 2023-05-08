@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Layout, Skeleton } from "antd";
 import { DataProvider } from "../../hocs/dataProvider";
 import { ProcessingProvider } from "../../hocs/proccesingProvider";
@@ -10,6 +11,10 @@ import WorkspaceSteps from "../../components/workspace/workspaceSteps";
 const Workspace = () => {
   const routeParams = useParams();
   const pathId = routeParams.workspaceId;
+
+  const { userId } = useSelector((store) => ({
+    userId: store.id,
+  }));
 
   useEffect(() => {
     const unloadCallback = (event) => {
@@ -30,7 +35,7 @@ const Workspace = () => {
             <DataProvider>
               <ProcessingProvider>
                 <Layout className="layout-background">
-                  <WorkspaceSteps workspaceId={pathId} />
+                  <WorkspaceSteps workspaceId={pathId} userId={userId} />
                 </Layout>
               </ProcessingProvider>
             </DataProvider>

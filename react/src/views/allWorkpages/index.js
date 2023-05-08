@@ -1,17 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, List, Layout, Skeleton, Descriptions, Button } from "antd";
+import {
+  Avatar,
+  List,
+  Layout,
+  Skeleton,
+  Button,
+  Table,
+  Descriptions,
+  Space,
+  Typography,
+} from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import {
   getAllWorkspaces,
   deleteWorkspace,
 } from "../../services/workspaceService";
 import { dummyAllWorkspaces } from "../../utils/dummyData"; // dummyData
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+const { Text } = Typography;
 const { Content } = Layout;
 
 const AllWorkspaces = () => {
   const [allWorkspaces, setAllWorkspaces] = useState();
   let navigate = useNavigate();
+
+  const { userId } = useSelector((store) => ({
+    userId: store.id,
+  }));
 
   const onClickPlus = () => {
     const workspaceId = Date.now();
@@ -23,22 +39,71 @@ const AllWorkspaces = () => {
     deleteWorkspace(workspaceId);
   };
 
+  const onClickGoToWorkspace = (workspaceId) => {
+    navigate(`/workspace/${workspaceId}`);
+  };
+
   const onClickAddColab = () => {};
 
   useEffect(() => {
-    // const getAll = async () => {
-    //   try {
-    //     const response = await getAllWorkspaces();
-    //     console.log(response);
-    //     setAllWorkspaces(response.data);
-    //   } catch (e) {
-    //     console.log(e);
-    //   }
-    // };
-    // getAll();
-
-    setAllWorkspaces(dummyAllWorkspaces); // dummy code
+    const getAll = async () => {
+      try {
+        const response = await getAllWorkspaces(userId);
+        console.log(response);
+        setAllWorkspaces(response.data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    getAll();
   }, []);
+
+  const columns = [
+    {
+      title: "",
+      dataIndex: "goToWork",
+      key: "action1",
+      render: (_, record) => (
+        <Space>
+          <Button
+            onClick={() => {
+              onClickGoToWorkspace(record.id);
+            }}
+          >
+            Go to Workspace
+          </Button>
+        </Space>
+      ),
+    },
+    {
+      title: "Workspace Id",
+      dataIndex: "id",
+      render: (text) => <Text keyboard> {text}</Text>,
+    },
+    {
+      title: "File Name",
+      dataIndex: "fileName",
+      render: (text) => <Text keyboard> {text}</Text>,
+    },
+    {
+      title: "",
+      dataIndex: "delete",
+      key: "action2",
+      render: (_, record) => (
+        <Space>
+          <Button
+            className="red-color"
+            onClick={() => {
+              onClickDelete(record.id);
+            }}
+          >
+            Delete
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <>
       <PageHeader
@@ -55,47 +120,28 @@ const AllWorkspaces = () => {
       </PageHeader>
       <Content className="content-nav">
         {allWorkspaces ? (
-          <List
-            className="list-allworkspace"
-            itemLayout="horizontal"
-            dataSource={allWorkspaces || []}
-            renderItem={(item, index) => (
-              <List.Item
-                actions={[
-                  <a className="nav-color" onClick={onClickAddColab}>
-                    Add Colab
-                  </a>,
-                  <a
-                    onClick={() => {
-                      onClickDelete(item.workspaceId);
-                    }}
-                    className="red-color"
-                  >
-                    Delete
-                  </a>,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      src={`https://joesch.moe/api/v1/random?key=${index}`} // change this find good avatar for workspaces
-                    />
-                  }
-                  title={
-                    <a
-                      onClick={() => {
-                        navigate(`/workspace/${item.workspaceId}`);
-                      }}
-                    >
-                      {item.fileName}
-                    </a>
-                  }
-                  description={<div>{item.workspaceId}</div>}
-                />
-                <div> {item.createdDate}</div>
-              </List.Item>
-            )}
-          />
+          <>
+            <Table
+              columns={columns}
+              dataSource={allWorkspaces}
+              rowKey={"id"}
+              expandable={{
+                expandedRowRender: (a, record) => {
+                  console.log(a);
+                  return (
+                    <Descriptions bordered>
+                      <Descriptions.Item label="Create Date">
+                        {a.createDate}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Update Date">
+                        {a.updateDate}
+                      </Descriptions.Item>
+                    </Descriptions>
+                  );
+                },
+              }}
+            ></Table>
+          </>
         ) : (
           <Skeleton active />
         )}
