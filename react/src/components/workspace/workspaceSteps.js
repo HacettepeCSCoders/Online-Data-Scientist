@@ -11,6 +11,7 @@ import { createWorkspace } from "../../services/workspaceService";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
+import ErrorModal from "./modal/errorModal";
 
 const { Content, Sider } = Layout;
 
@@ -24,6 +25,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
+  const [isErrorModal, setErrorModal] = useState(false);
 
   const handleResultCancel = () => {
     setResultModal(false);
@@ -97,10 +99,13 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
       console.log(dataAndProcess);
       await createWorkspace(fileNameAndIds, userId);
       const response = await startProcess(dataAndProcess);
+      console.log(response);
       setIsModalOpen(false);
       setResultModal(true);
     } catch {
       console.error();
+      setIsModalOpen(false);
+      setErrorModal(true);
     }
   };
 
@@ -138,7 +143,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
         dataDetails={dataDetails}
         fileName={fileNameDetails}
       />
-
+      <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>
