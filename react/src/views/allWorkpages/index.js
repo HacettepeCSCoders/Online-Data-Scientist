@@ -14,6 +14,7 @@ import { PageHeader } from "@ant-design/pro-layout";
 import {
   getAllWorkspaces,
   deleteWorkspace,
+  removeWorkspace,
 } from "../../services/workspaceService";
 import { dummyAllWorkspaces } from "../../utils/dummyData"; // dummyData
 import { useSelector } from "react-redux";
@@ -34,9 +35,29 @@ const AllWorkspaces = () => {
     navigate(`/workspace/${workspaceId}/new`);
   };
 
-  const onClickDelete = (workspaceId) => {
-    console.log(workspaceId);
-    deleteWorkspace(workspaceId);
+  const onClickDelete = async (workspaceId) => {
+    try {
+      await removeWorkspace(workspaceId);
+    } catch {
+      console.error();
+    }
+    const getAll = async () => {
+      try {
+        const response = await getAllWorkspaces(userId);
+        console.log(response);
+        let arr = [];
+        for (let i = 0; i < response.data.length; i++) {
+          if (response.data[i].active !== false) {
+            arr.push(response.data[i]);
+          }
+        }
+        console.log(arr);
+        setAllWorkspaces(arr);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    getAll();
   };
 
   const onClickGoToWorkspace = (workspaceId) => {
@@ -49,8 +70,14 @@ const AllWorkspaces = () => {
     const getAll = async () => {
       try {
         const response = await getAllWorkspaces(userId);
-        console.log(response);
-        setAllWorkspaces(response.data);
+        let arr = [];
+        for (let i = 0; i < response.data.length; i++) {
+          if (response.data[i].active !== false) {
+            arr.push(response.data[i]);
+          }
+        }
+        console.log(arr);
+        setAllWorkspaces(arr);
       } catch (e) {
         console.log(e);
       }
