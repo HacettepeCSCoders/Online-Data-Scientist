@@ -112,6 +112,7 @@ public class WorkspaceService {
 		WorkspaceDTO workspaceDTO = new WorkspaceDTO();
 		workspaceDTO.setId(workspace.getId());
 		workspaceDTO.setFileName(workspace.getFileName());
+		workspaceDTO.setUserId(workspace.getUser().getId());
 		return workspaceDTO;
 	}
 
