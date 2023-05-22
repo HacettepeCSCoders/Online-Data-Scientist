@@ -1,22 +1,22 @@
 import { Button, Checkbox, Form, Input, Radio } from "antd";
 import React, { useState } from "react";
+import DropColumnSelect from "./processSelect/dropColumnSelect";
 
 const DataManipulationForm = ({ setValues }) => {
   const [missingValueEnabled, setMissingValueEnabled] = useState(false);
   const [dropColumnEnabled, setDropColumnEnabled] = useState(false);
   const [dropRowEnabled, setDropRowEnabled] = useState(false);
+  const [columnArray, setColumnArray] = useState([]);
 
   const onFinish = (values) => {
-    if (!missingValueEnabled) {
-      values.fill_missing_strategy = undefined;
-    }
-    if (!dropColumnEnabled) {
-      values.to_drop_columns = undefined;
-    }
-    if (!dropRowEnabled) {
-      values.to_drop_rows = undefined;
-    }
+    !missingValueEnabled && (values.fill_missing_strategy = undefined);
+    !dropColumnEnabled
+      ? (values.to_drop_columns = undefined)
+      : (values.to_drop_columns = columnArray);
+    !dropRowEnabled && (values.to_drop_rows = undefined);
+
     setValues(values);
+    console.log(values.to_drop_columns);
   };
 
   return (
@@ -62,10 +62,14 @@ const DataManipulationForm = ({ setValues }) => {
         </Checkbox>
         <Form.Item
           name="to_drop_columns"
-          label="Column Name"
+          label="Select Columns"
           wrapperCol={{ offset: 0, span: 3 }}
         >
-          <Input disabled={!dropColumnEnabled} />
+          <DropColumnSelect
+            disabledDropColumn={!dropColumnEnabled}
+            columnArray={columnArray}
+            setColumnArray={setColumnArray}
+          />
         </Form.Item>
         <Checkbox
           checked={dropRowEnabled}

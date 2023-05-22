@@ -3,6 +3,7 @@ import { Col, Layout, List, Row, Skeleton } from "antd";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { useData } from "../../hocs/dataProvider";
 import DataTable from "./dataTable/dataTable";
+import getColumnsStruct from "../../utils/workspace/getColumnsStruct";
 
 const { Content } = Layout;
 
@@ -13,6 +14,8 @@ const StartProcessing = () => {
   const [processingValuesShow, setProcessingValueShow] = useState();
   const { dataDetails } = useData();
 
+  const colArr = getColumnsStruct(dataDetails);
+
   useEffect(() => {
     if (processingDetails !== undefined) {
       setProcessingKeys(Object.keys(processingDetails));
@@ -22,7 +25,21 @@ const StartProcessing = () => {
         if (Object.values(processingDetails)[i] === undefined) {
           arr[i] = "not selected";
         } else {
-          arr[i] = Object.values(processingDetails)[i];
+          if (Object.keys(processingDetails)[i] === "to_drop_columns") {
+            let arrToDropColumns = [];
+            Object.values(processingDetails)[i].forEach((element) => {
+              console.log("Element ", element);
+              colArr.forEach((item) => {
+                if (element === item.id) {
+                  arrToDropColumns.push(item.name);
+                  console.log(element, item.id, item.name);
+                }
+              });
+            });
+            arr[i] = arrToDropColumns;
+          } else {
+            arr[i] = Object.values(processingDetails)[i];
+          }
         }
       }
       setProcessingValueShow(arr);
@@ -51,6 +68,7 @@ const StartProcessing = () => {
         <Col span={4}>
           {processingValuesShow && (
             <List
+              className="list-processingKeys"
               dataSource={processingValuesShow}
               renderItem={(item) => <List.Item>{item}</List.Item>}
             />

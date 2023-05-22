@@ -204,6 +204,11 @@
     font-size: 0.8em;
 }
 
+.list-processingKeys{
+    width: auto;
+    overflow: auto;
+}
+
 
 
 
