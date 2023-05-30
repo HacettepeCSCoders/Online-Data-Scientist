@@ -7,6 +7,7 @@ import { ProcessingProvider } from "../../hocs/proccesingProvider";
 import { WorkspaceTypeProvider } from "../../hocs/workspaceTypeProvider";
 import { FileNameProvider } from "../../hocs/fileNameProvider";
 import WorkspaceSteps from "../../components/workspace/workspaceSteps";
+import { DataFileProvider } from "../../hocs/dataFileProvider";
 
 const Workspace = () => {
   const routeParams = useParams();
@@ -32,13 +33,15 @@ const Workspace = () => {
       <Suspense fallback={<Skeleton active />}>
         <WorkspaceTypeProvider>
           <FileNameProvider>
-            <DataProvider>
-              <ProcessingProvider>
-                <Layout className="layout-background">
-                  <WorkspaceSteps workspaceId={pathId} userId={userId} />
-                </Layout>
-              </ProcessingProvider>
-            </DataProvider>
+            <DataFileProvider>
+              <DataProvider>
+                <ProcessingProvider>
+                  <Layout className="layout-background">
+                    <WorkspaceSteps workspaceId={pathId} userId={userId} />
+                  </Layout>
+                </ProcessingProvider>
+              </DataProvider>
+            </DataFileProvider>
           </FileNameProvider>
         </WorkspaceTypeProvider>
       </Suspense>

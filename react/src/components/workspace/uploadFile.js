@@ -3,6 +3,7 @@ import { Upload } from "antd";
 import { useData } from "../../hocs/dataProvider";
 import { useFileName } from "../../hocs/fileNameProvider";
 import * as XLSX from "xlsx";
+import { useDataFiles } from "../../hocs/dataFileProvider";
 
 const { Dragger } = Upload;
 
@@ -10,6 +11,7 @@ const UploadFile = () => {
   const { setDataDetails } = useData();
   const { setFileNameDetails } = useFileName();
   const [data, setData] = useState();
+  const { storeFileData } = useDataFiles();
 
   const readExcel = (file) => {
     const promise = new Promise((resolve, reject) => {
@@ -30,7 +32,6 @@ const UploadFile = () => {
         reject(error);
       };
     });
-
     promise.then((d) => {
       console.log(d);
       setData(d);
@@ -39,8 +40,8 @@ const UploadFile = () => {
 
   const readCSV = (file) => {
     const reader = new FileReader();
+    storeFileData(file);
     reader.onload = (e) => {
-      console.log(e.target.result);
       setData(e.target.result);
     };
     reader.readAsText(file);
