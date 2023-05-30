@@ -12,6 +12,7 @@ import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
 import ErrorModal from "./modal/errorModal";
+import { useDataFiles } from "../../hocs/dataFileProvider";
 
 const { Content, Sider } = Layout;
 
@@ -21,6 +22,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   const { dataDetails } = useData();
   const { processingDetails } = useProcessing();
   const { fileNameDetails } = useFileName();
+  const { dataFileDetails } = useDataFiles();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
@@ -80,15 +82,17 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   const onClickStart = async () => {
     try {
       setIsModalOpen(true);
-      const dataAndProcess = {
-        insertion_params: {
-          user_id: userId,
-          data: dataDetails,
-          processes: processingDetails,
-          workspace_id: workspaceId,
-        },
-        file: dataDetails,
-      };
+
+      const insertion_params = JSON.stringify({
+        user_id: userId,
+        data: dataDetails,
+        processes: processingDetails,
+        workspace_id: workspaceId,
+      });
+
+      const formData = new FormData();
+      formData.append("file", dataFileDetails);
+      formData.append("insertion_params", insertion_params);
 
       const fileNameAndIds = {
         userId: userId,
@@ -96,14 +100,12 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
         id: workspaceId,
       };
 
-      console.log(dataAndProcess);
       await createWorkspace(fileNameAndIds, userId);
-      const response = await startProcess(dataAndProcess);
-      console.log(response);
+      const response = await startProcess(formData);
       setIsModalOpen(false);
       setResultModal(true);
-    } catch {
-      console.error();
+    } catch (e) {
+      console.error(e);
       setIsModalOpen(false);
       setErrorModal(true);
     }
