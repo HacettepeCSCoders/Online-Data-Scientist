@@ -1,11 +1,15 @@
 import io
 
+import numpy as np
 import pandas as pd
 import sqlalchemy as db
 from fastapi import FastAPI, UploadFile, File, Response
 from pandas.core.dtypes.common import is_datetime64tz_dtype
 from pydantic import Json
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR
+from fastapi.middleware.cors import CORSMiddleware
+
+from scipy.stats import shapiro, normaltest, anderson, pearsonr
 
 import Model
 
@@ -14,6 +18,17 @@ import Model
 
 # initialize app
 app = FastAPI()
+
+origins = ['http://localhost:3000']
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Base URL for app
 BASE_URL = 'http://localhost:8000'  # url for app comprised of host and port
@@ -41,6 +56,7 @@ DTYPE_MAP = {
     'object': VARCHAR
 }
 
+##################### -DATA PREPROCESS- #####################
 
 @app.get('/get-table')
 def get_table(
@@ -165,6 +181,105 @@ async def insert(
 
     return "Created table"
 
+##################### -STATISTICAL TESTS- #####################
+
+# Normality tests
+@app.get('/normality-test/shapiro-wilk')
+def shapiro_wilk_test(
+        user_id: str,
+        workspace_id: str,
+        column_name: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data = df[column_name].values.tolist()
+    stat, p = shapiro(data)
+    if p > 0.05:
+        return 'Probably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+    else:
+        return 'Probably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+
+@app.get('/normality-test/dagostino-k2')
+def dagostino_k2_test(
+        user_id: str,
+        workspace_id: str,
+        column_name: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data = df[column_name].values.tolist()
+    stat, p = normaltest(data)
+    if p > 0.05:
+        return 'Probably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+    else:
+        return 'Probably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+
+@app.get('/normality-test/anderson-darling')
+def anderson_darling_test(
+        user_id: str,
+        workspace_id: str,
+        column_name: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data = df[column_name].values.tolist()
+    result = anderson(data)
+    for i in range(len(result.critical_values)):
+        sl, cv = result.significance_level[i], result.critical_values[i]
+        if result.statistic < cv:
+            return 'Probably Gaussian in column %s at the %.1f%% level' % (column_name, sl)
+        else:
+            return 'Probably not Gaussian in column %s at the %.1f%% level' % (column_name, sl)
+
+# Correlation tests
+@app.get('/correlation-test/pearson')
+def pearson_correlation_test(
+        user_id: str,
+        workspace_id: str,
+        column_name_1: str,
+        column_name_2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name_1].values.tolist()
+    data2 = df[column_name_2].values.tolist()
+    stat, p = pearsonr(data1, data2)
+    if p > 0.05:
+        return 'Probably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+    else:
+        return 'Probably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
 # function for inserting dataframe to database
 def __insert__(schema_name, table_name, df, con):

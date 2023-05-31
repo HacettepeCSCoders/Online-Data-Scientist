@@ -30,7 +30,6 @@ class DatabaseConnectionParams(BaseModel):
 
 # BaseModel for insertion parameters
 class InsertionParams(BaseModel):
-    data: str
     processes: Processes
     conflict_resolution_strategy: str = 'replace'  # default value
     user_id: int
