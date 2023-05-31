@@ -9,7 +9,9 @@ from pydantic import Json
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR
 from fastapi.middleware.cors import CORSMiddleware
 
-from scipy.stats import shapiro, normaltest, anderson, pearsonr
+from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kendalltau, chi2_contingency, ttest_ind, \
+    ttest_rel, f_oneway, mannwhitneyu, wilcoxon, kruskal, friedmanchisquare
+from statsmodels.tsa.stattools import adfuller, kpss
 
 import Model
 
@@ -130,7 +132,6 @@ async def insert(
     insertion_params = insertion_params.dict()
 
     # get data from request
-    data = insertion_params['data']
     to_drop_columns_indices = insertion_params['processes']['to_drop_columns']
     to_drop_rows_indices = insertion_params['processes']['to_drop_rows']
     fill_missing_strategy = insertion_params['processes']['fill_missing_strategy']
@@ -203,9 +204,9 @@ def shapiro_wilk_test(
     data = df[column_name].values.tolist()
     stat, p = shapiro(data)
     if p > 0.05:
-        return 'Probably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'SHAPIRO-WILK TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
     else:
-        return 'Probably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'SHAPIRO-WILK TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
 @app.get('/normality-test/dagostino-k2')
 def dagostino_k2_test(
@@ -226,9 +227,9 @@ def dagostino_k2_test(
     data = df[column_name].values.tolist()
     stat, p = normaltest(data)
     if p > 0.05:
-        return 'Probably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
     else:
-        return 'Probably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
 @app.get('/normality-test/anderson-darling')
 def anderson_darling_test(
@@ -251,9 +252,9 @@ def anderson_darling_test(
     for i in range(len(result.critical_values)):
         sl, cv = result.significance_level[i], result.critical_values[i]
         if result.statistic < cv:
-            return 'Probably Gaussian in column %s at the %.1f%% level' % (column_name, sl)
+            return 'ANDERSON-DARLING TEST RESULT: \nProbably Gaussian in column %s at the %.1f%% level' % (column_name, sl)
         else:
-            return 'Probably not Gaussian in column %s at the %.1f%% level' % (column_name, sl)
+            return 'ANDERSON-DARLING TEST RESULT: \nProbably not Gaussian in column %s at the %.1f%% level' % (column_name, sl)
 
 # Correlation tests
 @app.get('/correlation-test/pearson')
@@ -277,9 +278,335 @@ def pearson_correlation_test(
     data2 = df[column_name_2].values.tolist()
     stat, p = pearsonr(data1, data2)
     if p > 0.05:
-        return 'Probably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'PEARSON`S CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
     else:
-        return 'Probably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'PEARSON`S CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+
+@app.get('/correlation-test/spearman')
+def spearmans_rank_correlation_test(
+        user_id: str,
+        workspace_id: str,
+        column_name_1: str,
+        column_name_2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name_1].values.tolist()
+    data2 = df[column_name_2].values.tolist()
+    stat, p = spearmanr(data1, data2)
+    if p > 0.05:
+        return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+    else:
+        return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+
+@app.get('/correlation-test/kendall')
+def kendalls_rank_correlation_test(
+        user_id: str,
+        workspace_id: str,
+        column_name_1: str,
+        column_name_2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name_1].values.tolist()
+    data2 = df[column_name_2].values.tolist()
+    stat, p = kendalltau(data1, data2)
+    if p > 0.05:
+        return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+    else:
+        return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+
+@app.get('/correlation-test/chi-square')
+def chi_squared_correlation_test(
+        user_id: str,
+        workspace_id: str,
+        column_name_1: str,
+        column_name_2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name_1].values.tolist()
+    data2 = df[column_name_2].values.tolist()
+    all_data = [data1, data2]
+    stat, p, dof, expected = chi2_contingency(all_data)
+    if p > 0.05:
+        return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+    else:
+        return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+
+# Stationary Tests
+
+@app.get('/stationary-test/augmented-dickey-fuller')
+def augmented_dickey_fuller_stationary_test(
+        user_id: str,
+        workspace_id: str,
+        column_name: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data = df[column_name].values.tolist()
+    stat, p, lags, obs, crit, t = adfuller(data)
+    if p > 0.05:
+        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+@app.get('/stationary-test/kwiatkowski')
+def kwiatkowski_stationary_test(
+        user_id: str,
+        workspace_id: str,
+        column_name: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data = df[column_name].values.tolist()
+    stat, p, lags, crit = kpss(data)
+    if p > 0.05:
+        return 'KWIAKOWSKI-PHILLIPS-SCHMIDT-SHIN TEST RESULT: \nProbably not stationary for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'KWIAKOWSKI-PHILLIPS-SCHMIDT-SHIN TEST RESULT: \nProbably stationary for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+# Parametric Statistical Hypothesis Tests
+@app.get('/parametric-test/student-t')
+def student_t_parametric_test(
+        user_id: str,
+        workspace_id: str,
+        column_name1: str,
+        column_name2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name1].values.tolist()
+    data2 = df[column_name2].values.tolist()
+    stat, p = ttest_ind(data1, data2)
+    if p > 0.05:
+        return 'STUDENT`S T-TEST RESULT: \nProbably the same distribution for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'STUDENT`S T-TEST RESULT: \nProbably different distributions for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+@app.get('/parametric-test/paired-student-t')
+def paired_student_t_parametric_test(
+        user_id: str,
+        workspace_id: str,
+        column_name1: str,
+        column_name2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name1].values.tolist()
+    data2 = df[column_name2].values.tolist()
+    stat, p = ttest_rel(data1, data2)
+    if p > 0.05:
+        return 'PAIRED STUDENT`S T-TEST RESULT: \nProbably the same distribution for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'PAIRED STUDENT`S T-TEST RESULT: \nProbably different distributions for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+@app.get('/parametric-test/analysis-of-variance')
+def analysis_of_variance_parametric_test(
+        user_id: str,
+        workspace_id: str,
+        column_name1: str,
+        column_name2: str,
+        column_name3: str,
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name1].values.tolist()
+    data2 = df[column_name2].values.tolist()
+    data3 = df[column_name3].values.tolist()
+    stat, p = f_oneway(data1, data2, data3)
+    if p > 0.05:
+        return 'ANALYSIS OF VARIANCE TEST RESULT: \nProbably the same distribution for values in columns ' + column_name1 + ', ' + column_name2 + ' and ' + column_name3 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'ANALYSIS OF VARIANCE TEST RESULT: \nProbably different distributions for values in columns ' + column_name1 + ', ' + column_name2 + ' and ' + column_name3 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+# Nonparametric Statistical Hypothesis Tests
+@app.get('/nonparametric-test/mann-whitney-u')
+def mann_whitney_u_nonparametric_test(
+        user_id: str,
+        workspace_id: str,
+        column_name1: str,
+        column_name2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name1].values.tolist()
+    data2 = df[column_name2].values.tolist()
+    stat, p = mannwhitneyu(data1, data2)
+    if p > 0.05:
+        return 'MANN-WHITNEY U TEST RESULT: \nProbably the same distribution for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'MANN-WHITNEY U TEST RESULT: \nProbably different distributions for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+@app.get('/nonparametric-test/wilcoxon-signed-rank')
+def wilcoxon_signed_rank_nonparametric_test(
+        user_id: str,
+        workspace_id: str,
+        column_name1: str,
+        column_name2: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name1].values.tolist()
+    data2 = df[column_name2].values.tolist()
+    stat, p, zstat = wilcoxon(data1, data2)
+    if p > 0.05:
+        return 'WILCOXON SIGNED-RANK TEST RESULT: \nProbably the same distribution for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'WILCOXON SIGNED-RANK TEST RESULT: \nProbably different distributions for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+@app.get('/nonparametric-test/kruskal-wallis')
+def kruskal_wallis_nonparametric_test(
+        user_id: str,
+        workspace_id: str,
+        column_name1: str,
+        column_name2: str,
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name1].values.tolist()
+    data2 = df[column_name2].values.tolist()
+    stat, p = kruskal(data1, data2)
+    if p > 0.05:
+        return 'KRUSKAL-WALLIS TEST RESULT: \nProbably the same distribution for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'KRUSKAL-WALLIS TEST RESULT: \nProbably different distributions for values in columns ' + column_name1 + ' and ' + column_name2 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+@app.get('/nonparametric-test/friedman')
+def friedman_nonparametric_test(
+        user_id: str,
+        workspace_id: str,
+        column_name1: str,
+        column_name2: str,
+        column_name3: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    data1 = df[column_name1].values.tolist()
+    data2 = df[column_name2].values.tolist()
+    data3 = df[column_name3].values.tolist()
+    stat, p = friedmanchisquare(data1, data2, data3)
+    if p > 0.05:
+        return 'FRIEDMAN CHI-SQUARE TEST RESULT: \nProbably the same distribution for values in columns ' + column_name1 + ', ' + column_name2 + ' and ' + column_name3 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+    else:
+        return 'FRIEDMAN CHI-SQUARE TEST RESULT: \nProbably different distributions for values in columns ' + column_name1 + ', ' + column_name2 + ' and ' + column_name3 + ' with stat = %.3f, p-value = %.3f' % (
+        stat, p)
+
+
+##################### -PRIVATE FUNCTIONS- #####################
 
 # function for inserting dataframe to database
 def __insert__(schema_name, table_name, df, con):
