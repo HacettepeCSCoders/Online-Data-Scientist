@@ -16,6 +16,7 @@ class FillStrategy(Enum):
 class Processes(BaseModel):
     to_drop_columns: list = []
     to_drop_rows: list = []
+    non_num_cols: list = []
     fill_missing_strategy: FillStrategy = FillStrategy.NONE
 
 
