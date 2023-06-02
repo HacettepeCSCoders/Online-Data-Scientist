@@ -18,7 +18,7 @@ export const existSteps = [
   },
   {
     title: "Select Processing",
-    content: <SelectProcessing />,
+    content: <SelectProcessing newWorkspace={false} />,
     subTitle: "",
   },
   {

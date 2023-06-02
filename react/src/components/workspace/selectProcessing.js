@@ -3,43 +3,55 @@ import { Tabs } from "antd";
 import DataManipulationForm from "./processingTabs/dataManipulationForm";
 import StatisticalProcessingForm from "./processingTabs/statisticalProcessingForm";
 import { useProcessing } from "../../hocs/proccesingProvider";
-import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 
-const SelectProcessing = () => {
+const SelectProcessing = (newWorkspace) => {
   const [values, setValues] = useState();
-  const { processingDetails, setProcessingDetails } = useProcessing();
-  const { workspaceTypeDetails } = useWorkspaceType();
+  const { setProcessingDetails } = useProcessing();
 
   useEffect(() => {
-    setProcessingDetails(values);
-    onClickSave();
+    let check = false;
+    if (values !== undefined) {
+      for (const [key, value] of Object.entries(values)) {
+        console.log(value);
+        if (value !== undefined) {
+          check = true;
+          break;
+        }
+      }
+    }
+    check && setProcessingDetails(values);
   }, [values]);
 
-  const onClickSave = () => {
-    console.log(values);
-    console.log(processingDetails);
-  };
-
-  const processingTabs = [
-    {
-      key: "1",
-      label: `Data Manipulation`,
-      children: <DataManipulationForm values={values} setValues={setValues} />,
-    },
-    {
-      key: "2",
-      label: `Statistical`,
-      children: <StatisticalProcessingForm />,
-    },
-  ];
-
-  const machineLearningTabs = [
-    {
-      key: "1",
-      label: "Machine Learning",
-      children: <div> sag</div>,
-    },
-  ];
+  let processingTabs = [];
+  newWorkspace
+    ? (processingTabs = [
+        {
+          key: "1",
+          label: `Data Manipulation`,
+          children: (
+            <DataManipulationForm values={values} setValues={setValues} />
+          ),
+        },
+      ])
+    : (processingTabs = [
+        {
+          key: "1",
+          label: `Data Manipulation`,
+          children: (
+            <DataManipulationForm values={values} setValues={setValues} />
+          ),
+        },
+        {
+          key: "2",
+          label: `Statistical`,
+          children: <StatisticalProcessingForm />,
+        },
+        {
+          key: "3",
+          label: "Machine Learning",
+          children: <div> sag</div>,
+        },
+      ]);
 
   return (
     <>

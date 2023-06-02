@@ -23,7 +23,7 @@ export const steps = [
   },
   {
     title: "Select Processing",
-    content: <SelectProcessing />,
+    content: <SelectProcessing newWorkspace={true} />,
   },
   {
     title: "Start Processing",

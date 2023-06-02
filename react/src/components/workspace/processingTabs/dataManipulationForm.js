@@ -6,7 +6,9 @@ const DataManipulationForm = ({ setValues }) => {
   const [missingValueEnabled, setMissingValueEnabled] = useState(false);
   const [dropColumnEnabled, setDropColumnEnabled] = useState(false);
   const [dropRowEnabled, setDropRowEnabled] = useState(false);
+  const [nonNumColEnabled, setNonNumColEnabled] = useState(false);
   const [columnArray, setColumnArray] = useState([]);
+  const [nonNumColArray, setNonNumColArray] = useState([]);
 
   const onFinish = (values) => {
     !missingValueEnabled && (values.fill_missing_strategy = undefined);
@@ -14,9 +16,12 @@ const DataManipulationForm = ({ setValues }) => {
       ? (values.to_drop_columns = undefined)
       : (values.to_drop_columns = columnArray);
     !dropRowEnabled && (values.to_drop_rows = undefined);
+    !nonNumColEnabled
+      ? (values.non_num_cols = undefined)
+      : (values.non_num_cols = nonNumColArray);
 
     setValues(values);
-    console.log(values.to_drop_columns);
+    console.log(values);
   };
 
   return (
@@ -69,6 +74,7 @@ const DataManipulationForm = ({ setValues }) => {
             disabledDropColumn={!dropColumnEnabled}
             columnArray={columnArray}
             setColumnArray={setColumnArray}
+            colNameOrId={"id"}
           />
         </Form.Item>
         <Checkbox
@@ -83,6 +89,24 @@ const DataManipulationForm = ({ setValues }) => {
           wrapperCol={{ offset: 0, span: 3 }}
         >
           <Input disabled={!dropRowEnabled} />
+        </Form.Item>
+        <Checkbox
+          checked={nonNumColEnabled}
+          onChange={(e) => setNonNumColEnabled(e.target.checked)}
+        >
+          Non-Numeric Columns
+        </Checkbox>
+        <Form.Item
+          name="non_num_cols"
+          label="Convert to Numerical Values"
+          wrapperCol={{ offset: 0, span: 3 }}
+        >
+          <DropColumnSelect
+            disabledDropColumn={!nonNumColEnabled}
+            columnArray={nonNumColArray}
+            setColumnArray={setNonNumColArray}
+            colNameOrId={"name"}
+          />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
           <Button

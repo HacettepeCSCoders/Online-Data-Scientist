@@ -1,14 +1,39 @@
 import React from "react";
-import { Modal } from "antd";
-import { CSVLink } from "react-csv";
-import DataTable from "../dataTable/dataTable";
+import { Modal, Tabs } from "antd";
+import DataTab from "./resultModalTabs/dataTab";
+import SelectedProcesses from "./resultModalTabs/selectedProcesses";
+import ResultTab from "./resultModalTabs/resultTab";
 
 const ResultModal = ({
   handleResultCancel,
   isResultModal,
   dataDetails,
   fileName,
+  processingDetails,
 }) => {
+  const resultTabs = [
+    {
+      key: 1,
+      label: "Data",
+      children: <DataTab dataDetails={dataDetails} fileName={fileName} />,
+    },
+    {
+      key: 2,
+      label: "Selected Processes",
+      children: (
+        <SelectedProcesses
+          dataDetails={dataDetails}
+          processingDetails={processingDetails}
+        />
+      ),
+    },
+    {
+      key: 3,
+      label: "Result",
+      children: <ResultTab />,
+    },
+  ];
+
   return (
     <>
       <Modal
@@ -19,12 +44,7 @@ const ResultModal = ({
         onCancel={handleResultCancel}
         closable={false}
       >
-        <div>
-          <DataTable dataDetails={dataDetails}></DataTable>
-          <CSVLink filename={fileName + "Updated"} data={dataDetails}>
-            Download CSV File
-          </CSVLink>
-        </div>
+        <Tabs defaultActiveKey="1" type="card" items={resultTabs} />
       </Modal>
     </>
   );
