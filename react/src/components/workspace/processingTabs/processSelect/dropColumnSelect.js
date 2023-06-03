@@ -4,7 +4,12 @@ import { useData } from "../../../../hocs/dataProvider";
 import getColumnsStruct from "../../../../utils/workspace/getColumnsStruct";
 const { Option } = Select;
 
-const DropColumnSelect = ({ disabledDropColumn, setColumnArray }) => {
+const DropColumnSelect = ({
+  disabledDropColumn,
+  setColumnArray,
+  colNameOrId,
+  mode,
+}) => {
   const { dataDetails } = useData();
   const colArr = getColumnsStruct(dataDetails);
 
@@ -14,7 +19,7 @@ const DropColumnSelect = ({ disabledDropColumn, setColumnArray }) => {
   return (
     <>
       <Select
-        mode="multiple"
+        mode={mode}
         style={{
           width: "100%",
         }}
@@ -25,7 +30,10 @@ const DropColumnSelect = ({ disabledDropColumn, setColumnArray }) => {
         {colArr &&
           colArr.map((col) => {
             return (
-              <Option value={col.id} label={col.name}>
+              <Option
+                value={colNameOrId == "name" ? col.name : col.id}
+                label={col.name}
+              >
                 <Space>{col.name}</Space>
               </Option>
             );

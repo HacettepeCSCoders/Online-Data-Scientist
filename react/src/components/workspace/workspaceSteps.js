@@ -13,6 +13,7 @@ import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
 import ErrorModal from "./modal/errorModal";
 import { useDataFiles } from "../../hocs/dataFileProvider";
+import { useNavigate } from "react-router-dom";
 
 const { Content, Sider } = Layout;
 
@@ -24,13 +25,38 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   const { fileNameDetails } = useFileName();
   const { dataFileDetails } = useDataFiles();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
+  const [cancelMessageApi, cancelMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
   const [isErrorModal, setErrorModal] = useState(false);
+  let navigate = useNavigate();
 
   const handleResultCancel = () => {
-    setResultModal(false);
+    const cancelMessage = () => {
+      cancelMessageApi.open({
+        type: "info",
+        content: (
+          <>
+            Do you really close result page?
+            <div>
+              <Button
+                onClick={() => {
+                  setResultModal(false);
+                  navigate("/workspace");
+                  return;
+                }}
+              >
+                Yes
+              </Button>
+              <Button>No</Button>
+            </div>
+          </>
+        ),
+        duration: 1.25,
+      });
+    };
+    cancelMessage();
   };
 
   const prevMesage = () => {
@@ -138,12 +164,14 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
     <>
       {nextMessageApiContext}
       {prevMessageApiContext}
+      {cancelMessageApiContext}
       <WaitingModal isWaitingModalOpen={isWaitingModalOpen} />
       <ResultModal
         handleResultCancel={handleResultCancel}
         isResultModal={isResultModal}
         dataDetails={dataDetails}
         fileName={fileNameDetails}
+        processingDetails={processingDetails}
       />
       <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
       <Content className="content-nav">

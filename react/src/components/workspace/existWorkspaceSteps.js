@@ -5,10 +5,11 @@ import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { startProcess } from "../../services/processService";
 import { existSteps } from "../../utils/workspace/existSteps";
-import { useSelector } from "react-redux";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
+import ErrorModal from "./modal/errorModal";
+import { useNavigate } from "react-router-dom";
 
 const { Content, Sider } = Layout;
 
@@ -19,11 +20,37 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   const { processingDetails } = useProcessing();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
+  const [cancelMessageApi, cancelMessageApiContext] = message.useMessage();
+  const [isErrorModal, setErrorModal] = useState(false);
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
+  let navigate = useNavigate();
 
   const handleResultCancel = () => {
-    setResultModal(false);
+    const cancelMessage = () => {
+      cancelMessageApi.open({
+        type: "info",
+        content: (
+          <>
+            Do you really close result page?
+            <div>
+              <Button
+                onClick={() => {
+                  setResultModal(false);
+                  navigate("/workspace");
+                  return;
+                }}
+              >
+                Yes
+              </Button>
+              <Button>No</Button>
+            </div>
+          </>
+        ),
+        duration: 1.25,
+      });
+    };
+    cancelMessage();
   };
 
   const prevMesage = () => {
@@ -71,7 +98,6 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
       setIsModalOpen(true);
       const dataAndProcess = {
         userId: userId,
-        data: dataDetails,
         processes: processingDetails,
         workspaceId: workspaceId,
       };
@@ -117,6 +143,16 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
     <>
       {nextMessageApiContext}
       {prevMessageApiContext}
+      {cancelMessageApiContext}
+      <WaitingModal isWaitingModalOpen={isWaitingModalOpen} />
+      <ResultModal
+        handleResultCancel={handleResultCancel}
+        isResultModal={isResultModal}
+        dataDetails={dataDetails}
+        fileName="a" // fileName Details
+        processingDetails={processingDetails}
+      />
+      <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>
@@ -155,12 +191,6 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
       <Sider className="workspace-sider">
         <Steps direction="vertical" current={current} items={items}></Steps>
       </Sider>
-      <WaitingModal isWaitingModalOpen={isWaitingModalOpen} />
-      <ResultModal
-        handleResultCancel={handleResultCancel}
-        isResultModal={isResultModal}
-        dataDetails={dataDetails}
-      />
     </>
   );
 };
