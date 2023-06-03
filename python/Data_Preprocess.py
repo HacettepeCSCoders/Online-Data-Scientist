@@ -75,8 +75,7 @@ def get_table(
 
     if df is None:
         return "Table not found."
-
-    return df.to_json()
+    return df.to_json(orient='records')
 
 
 @app.post('/python/manipulate')
