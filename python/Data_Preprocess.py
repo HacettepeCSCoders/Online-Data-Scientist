@@ -6,8 +6,6 @@ from fastapi import FastAPI, UploadFile, File, Response
 from pandas.core.dtypes.common import is_datetime64tz_dtype
 from pydantic import Json
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR
-from fastapi.middleware.cors import CORSMiddleware
-
 
 import Model
 
@@ -17,17 +15,6 @@ import Model
 # initialize app
 app = FastAPI()
 
-origins = ['http://localhost:3000']
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 # Base URL for app
 BASE_URL = 'http://localhost:8000'  # url for app comprised of host and port
 # headers for request
@@ -35,8 +22,6 @@ headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/octet-stream'
 }
-
-
 
 DB_CONNECTION_PARAMS = {
     'db_user': 'postgres',
@@ -59,26 +44,25 @@ DTYPE_MAP = {
 
 @app.get('/get-table')
 def get_table(
-
+        db_user: str,
+        db_password: str,
+        db_host: str,
+        db_port: int,
+        db_name: str,
+        schema_name: str,
+        table_name: str
 ):
     # retrieve getting params as dictionary
+    db_user = db_user
+    db_password = db_password
+    db_host = db_host
+    db_port = db_port
+    db_name = db_name
+    schema_name = schema_name
+    table_name = table_name
 
-    db_user = DB_CONNECTION_PARAMS['db_user'],
-    db_password = DB_CONNECTION_PARAMS['db_password'],
-    db_host = DB_CONNECTION_PARAMS['db_host'],
-    db_port =  DB_CONNECTION_PARAMS['db_port'],
-    db_name = DB_CONNECTION_PARAMS['db_name']
-
-
-    con = __connect_to_db__(
-        DB_CONNECTION_PARAMS['db_user'],
-        DB_CONNECTION_PARAMS['db_password'],
-        DB_CONNECTION_PARAMS['db_host'],
-        DB_CONNECTION_PARAMS['db_port'],
-        DB_CONNECTION_PARAMS['db_name']
-    )
-    df = __get_table_from_sql__("1685445195202"
-, "4", con)
+    con = __connect_to_db__(db_user, db_password, db_host, db_port, db_name)
+    df = __get_table_from_sql__(table_name, schema_name, con)
     con.close()
 
     if df is None:
@@ -172,30 +156,14 @@ async def insert(
         response.status_code = 201
 
     # return response
-    # if df.empty:
-    #     return "No data was inserted."
-    #
-    # if df.isnull().values.any():
-    #     return "There were missing values in the data. Created table with missing values.<br>" \
-    #            "Missing values are in the following columns: " + str(df.columns[df.isnull().any()].tolist())
+    if df.empty:
+        return "No data was inserted."
 
+    if df.isnull().values.any():
+        return "There were missing values in the data. Created table with missing values.<br>" \
+               "Missing values are in the following columns: " + str(df.columns[df.isnull().any()].tolist())
 
-    con = __connect_to_db__(
-        DB_CONNECTION_PARAMS['db_user'],
-        DB_CONNECTION_PARAMS['db_password'],
-        DB_CONNECTION_PARAMS['db_host'],
-        DB_CONNECTION_PARAMS['db_port'],
-        DB_CONNECTION_PARAMS['db_name']
-    )
-    df = __get_table_from_sql__(workspace_id
-                                , user_id, con)
-    con.close()
-
-    if df is None:
-        return "Table not found."
-
-    return Response(content=df.to_json(), media_type="application/xml")
-
+    return "Created table"
 
 
 # function for inserting dataframe to database
