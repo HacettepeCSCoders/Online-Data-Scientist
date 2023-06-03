@@ -1,11 +1,11 @@
 import io
 
-import numpy as np
 import pandas as pd
 import sqlalchemy as db
 from fastapi import FastAPI, UploadFile, File, Response
 from pandas.core.dtypes.common import is_datetime64tz_dtype
 from pydantic import Json
+from sklearn.preprocessing import OrdinalEncoder
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,8 +14,6 @@ from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kend
 from statsmodels.tsa.stattools import adfuller, kpss
 
 import Model
-
-# TODO: db connection params out of parameters each of the endpoints?
 
 
 # initialize app
@@ -60,36 +58,27 @@ DTYPE_MAP = {
 
 ##################### -DATA PREPROCESS- #####################
 
-@app.get('/get-table')
+@app.get('/python/get-table')
 def get_table(
-        db_user: str,
-        db_password: str,
-        db_host: str,
-        db_port: int,
-        db_name: str,
-        schema_name: str,
-        table_name: str
+        user_id: str,
+        workspace_id: str
 ):
-    # retrieve getting params as dictionary
-    db_user = db_user
-    db_password = db_password
-    db_host = db_host
-    db_port = db_port
-    db_name = db_name
-    schema_name = schema_name
-    table_name = table_name
-
-    con = __connect_to_db__(db_user, db_password, db_host, db_port, db_name)
-    df = __get_table_from_sql__(table_name, schema_name, con)
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
 
     if df is None:
         return "Table not found."
+    return df.to_json(orient='records')
 
-    return df.to_json()
 
-
-@app.post('/manipulate')
+@app.post('/python/manipulate')
 def manipulate_table(
         manipulation_params: Json[Model.ManipulationParams]
 ):
@@ -122,7 +111,7 @@ def manipulate_table(
 
 
 # Inserting dataframe to database
-@app.post('/insert')
+@app.post('/python/insert')
 async def insert(
         response: Response,
         insertion_params: Json[Model.InsertionParams],
@@ -135,6 +124,7 @@ async def insert(
     to_drop_columns_indices = insertion_params['processes']['to_drop_columns']
     to_drop_rows_indices = insertion_params['processes']['to_drop_rows']
     fill_missing_strategy = insertion_params['processes']['fill_missing_strategy']
+    non_num_cols = list(map(int, insertion_params['processes']['non_num_cols']))
     user_id = str(insertion_params['user_id'])
     workspace_id = str(insertion_params['workspace_id'])
     conflict_resolution_strategy = insertion_params['conflict_resolution_strategy']
@@ -147,7 +137,18 @@ async def insert(
                 df = pd.read_csv(data, sep=';')
             else:
                 df = pd.read_csv(data, sep=',')
-    df = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
+    df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
+
+    ret_old_non_num = []
+    # encoding non-numerical columns
+    ord_enc = OrdinalEncoder()
+    for col in non_num_cols:
+        first = pd.DataFrame(df[df.columns[col]].unique())
+        sec = pd.DataFrame(ord_enc.fit_transform(first[[0]]).astype(int))
+        first = first.rename(columns={0: 'old_name'})
+        sec = sec.rename(columns={0: 'encoded'})
+        df[df.columns[col]] = ord_enc.fit_transform(df[[df.columns[col]]]).astype(int)
+        ret_old_non_num.append(pd.concat([first, sec], axis=1).sort_values(by=['encoded']).to_dict(orient='records'))
 
     # connect to db
     con = __connect_to_db__(
@@ -180,14 +181,16 @@ async def insert(
 
     if df.isnull().values.any():
         return "There were missing values in the data. Created table with missing values.<br>" \
-               "Missing values are in the following columns: " + str(df.columns[df.isnull().any()].tolist())
+               "Missing values are in the following columns: " + str(df.columns[df.isnull().any()].tolist()), \
+            ret_old_non_num
 
-    return "Created table"
+    return "Created table", \
+        ret_old_non_num
 
 ##################### -STATISTICAL TESTS- #####################
 
 # Normality tests
-@app.get('/normality-test/shapiro-wilk')
+@app.get('/python/normality-test/shapiro-wilk')
 def shapiro_wilk_test(
         user_id: str,
         workspace_id: str,
@@ -210,7 +213,7 @@ def shapiro_wilk_test(
     else:
         return 'SHAPIRO-WILK TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
-@app.get('/normality-test/dagostino-k2')
+@app.get('/python/normality-test/dagostino-k2')
 def dagostino_k2_test(
         user_id: str,
         workspace_id: str,
@@ -233,7 +236,7 @@ def dagostino_k2_test(
     else:
         return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
-@app.get('/normality-test/anderson-darling')
+@app.get('/python/normality-test/anderson-darling')
 def anderson_darling_test(
         user_id: str,
         workspace_id: str,
@@ -259,7 +262,7 @@ def anderson_darling_test(
             return 'ANDERSON-DARLING TEST RESULT: \nProbably not Gaussian in column %s at the %.1f%% level' % (column_name, sl)
 
 # Correlation tests
-@app.get('/correlation-test/pearson')
+@app.get('/python/correlation-test/pearson')
 def pearson_correlation_test(
         user_id: str,
         workspace_id: str,
@@ -284,7 +287,7 @@ def pearson_correlation_test(
     else:
         return 'PEARSON`S CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
-@app.get('/correlation-test/spearman')
+@app.get('/python/correlation-test/spearman')
 def spearmans_rank_correlation_test(
         user_id: str,
         workspace_id: str,
@@ -309,7 +312,7 @@ def spearmans_rank_correlation_test(
     else:
         return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
-@app.get('/correlation-test/kendall')
+@app.get('/python/correlation-test/kendall')
 def kendalls_rank_correlation_test(
         user_id: str,
         workspace_id: str,
@@ -334,7 +337,7 @@ def kendalls_rank_correlation_test(
     else:
         return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
 
-@app.get('/correlation-test/chi-square')
+@app.get('/python/correlation-test/chi-square')
 def chi_squared_correlation_test(
         user_id: str,
         workspace_id: str,
@@ -362,7 +365,7 @@ def chi_squared_correlation_test(
 
 # Stationary Tests
 
-@app.get('/stationary-test/augmented-dickey-fuller')
+@app.get('/python/stationary-test/augmented-dickey-fuller')
 def augmented_dickey_fuller_stationary_test(
         user_id: str,
         workspace_id: str,
@@ -387,7 +390,7 @@ def augmented_dickey_fuller_stationary_test(
         return 'AUGMENTED DICKEY FULLER TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
         stat, p)
 
-@app.get('/stationary-test/kwiatkowski')
+@app.get('/python/stationary-test/kwiatkowski')
 def kwiatkowski_stationary_test(
         user_id: str,
         workspace_id: str,
@@ -413,7 +416,7 @@ def kwiatkowski_stationary_test(
         stat, p)
 
 # Parametric Statistical Tests
-@app.get('/parametric-test/student-t')
+@app.get('/python/parametric-test/student-t')
 def student_t_parametric_test(
         user_id: str,
         workspace_id: str,
@@ -440,7 +443,7 @@ def student_t_parametric_test(
         return 'STUDENT`S T-TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
         stat, p)
 
-@app.get('/parametric-test/paired-student-t')
+@app.get('/python/parametric-test/paired-student-t')
 def paired_student_t_parametric_test(
         user_id: str,
         workspace_id: str,
@@ -467,7 +470,7 @@ def paired_student_t_parametric_test(
         return 'PAIRED STUDENT`S T-TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
         stat, p)
 
-@app.get('/parametric-test/analysis-of-variance')
+@app.get('/python/parametric-test/analysis-of-variance')
 def analysis_of_variance_parametric_test(
         user_id: str,
         workspace_id: str,
@@ -497,7 +500,7 @@ def analysis_of_variance_parametric_test(
         stat, p)
 
 # Nonparametric Statistical Hypothesis Tests
-@app.get('/nonparametric-test/mann-whitney-u')
+@app.get('/python/nonparametric-test/mann-whitney-u')
 def mann_whitney_u_nonparametric_test(
         user_id: str,
         workspace_id: str,
@@ -524,7 +527,7 @@ def mann_whitney_u_nonparametric_test(
         return 'MANN-WHITNEY U TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
         stat, p)
 
-@app.get('/nonparametric-test/wilcoxon-signed-rank')
+@app.get('/python/nonparametric-test/wilcoxon-signed-rank')
 def wilcoxon_signed_rank_nonparametric_test(
         user_id: str,
         workspace_id: str,
@@ -551,7 +554,7 @@ def wilcoxon_signed_rank_nonparametric_test(
         return 'WILCOXON SIGNED-RANK TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
         stat, p)
 
-@app.get('/nonparametric-test/kruskal-wallis')
+@app.get('/python/nonparametric-test/kruskal-wallis')
 def kruskal_wallis_nonparametric_test(
         user_id: str,
         workspace_id: str,
@@ -578,7 +581,7 @@ def kruskal_wallis_nonparametric_test(
         return 'KRUSKAL-WALLIS TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
         stat, p)
 
-@app.get('/nonparametric-test/friedman')
+@app.get('/python/nonparametric-test/friedman')
 def friedman_nonparametric_test(
         user_id: str,
         workspace_id: str,
