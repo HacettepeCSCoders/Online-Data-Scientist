@@ -75,6 +75,7 @@ const DataManipulationForm = ({ setValues }) => {
             columnArray={columnArray}
             setColumnArray={setColumnArray}
             colNameOrId={"id"}
+            mode="multiple"
           />
         </Form.Item>
         <Checkbox
@@ -106,6 +107,7 @@ const DataManipulationForm = ({ setValues }) => {
             columnArray={nonNumColArray}
             setColumnArray={setNonNumColArray}
             colNameOrId={"name"}
+            mode="multiple"
           />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 6, span: 16 }}>

@@ -8,6 +8,7 @@ const DropColumnSelect = ({
   disabledDropColumn,
   setColumnArray,
   colNameOrId,
+  mode,
 }) => {
   const { dataDetails } = useData();
   const colArr = getColumnsStruct(dataDetails);
@@ -18,7 +19,7 @@ const DropColumnSelect = ({
   return (
     <>
       <Select
-        mode="multiple"
+        mode={mode}
         style={{
           width: "100%",
         }}

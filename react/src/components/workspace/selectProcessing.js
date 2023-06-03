@@ -4,7 +4,7 @@ import DataManipulationForm from "./processingTabs/dataManipulationForm";
 import StatisticalProcessingForm from "./processingTabs/statisticalProcessingForm";
 import { useProcessing } from "../../hocs/proccesingProvider";
 
-const SelectProcessing = (newWorkspace) => {
+const SelectProcessing = ({ newWorkspace }) => {
   const [values, setValues] = useState();
   const { setProcessingDetails } = useProcessing();
 
@@ -23,6 +23,8 @@ const SelectProcessing = (newWorkspace) => {
   }, [values]);
 
   let processingTabs = [];
+  console.log(newWorkspace);
+
   newWorkspace
     ? (processingTabs = [
         {
