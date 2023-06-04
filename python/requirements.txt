@@ -5,3 +5,4 @@ sqlalchemy
 scipy
 statsmodels
 sklearn
+json

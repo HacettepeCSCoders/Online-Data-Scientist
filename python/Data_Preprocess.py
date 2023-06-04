@@ -1,4 +1,5 @@
 import io
+import json
 
 import pandas as pd
 import sqlalchemy as db
@@ -67,7 +68,10 @@ def get_table(
 
     if df is None:
         return "Table not found."
-    return df.to_json(orient='records')
+
+    res = df.to_json(orient='records')
+    parsed = json.loads(res)
+    return parsed
 
 
 @app.post('/python/manipulate')
