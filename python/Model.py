@@ -17,7 +17,7 @@ class Processes(BaseModel):
     to_drop_columns: list = []
     to_drop_rows: list = []
     non_num_cols: list = []
-    fill_missing_strategy: FillStrategy = FillStrategy.NONE
+    fill_missing_strategy: FillStrategy = FillStrategy.NONE # Default value
 
 
 # BaseModel for database connection parameters
@@ -39,11 +39,8 @@ class InsertionParams(BaseModel):
 
 # BaseModel for dataframe manipulation parameters
 class ManipulationParams(BaseModel):
-    db_connection_params: DatabaseConnectionParams
-    schema_name: str
-    table_name: str
-    to_drop_columns: list = []
-    to_drop_rows: list = []
-    fill_missing_strategy: FillStrategy = FillStrategy.NONE
+    processes: Processes
+    user_id: int
+    workspace_id: int
 
 
