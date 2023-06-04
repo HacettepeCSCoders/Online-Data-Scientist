@@ -102,9 +102,6 @@ async def manipulate(
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
 
-    if df is None:
-        raise Exception("Table not found.")
-
     # manipulate dataframe
     df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
 
