@@ -79,35 +79,42 @@ def get_table(
 
 
 @app.post('/python/manipulate')
-def manipulate_table(
+async def manipulate(
         manipulation_params: Json[Model.ManipulationParams]
 ):
-    # # retrieve manipulation params as dictionary
-    # getting_params = manipulation_params.dict()
-    # db_user = getting_params['db_connection_params']['username']
-    # db_password = getting_params['db_connection_params']['password']
-    # db_host = getting_params['db_connection_params']['host']
-    # db_port = getting_params['db_connection_params']['port']
-    # db_name = getting_params['db_connection_params']['database_name']
-    # schema_name = getting_params['schema_name']
-    # table_name = getting_params['table_name']
-    # to_drop_columns_indices = getting_params['to_drop_columns']
-    # to_drop_rows_indices = getting_params['to_drop_rows']
-    # fill_missing_strategy = getting_params['fill_missing_strategy']
-    #
-    # # connect to database
-    # con = __connect_to_db__(db_user, db_password, db_host, db_port, db_name)
-    # df = __get_table_from_sql__(table_name, schema_name, con)
-    # con.close()
-    #
-    # # manipulate dataframe
-    # df = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
-    #
-    # con = __connect_to_db__(db_user, db_password, db_host, db_port, db_name)
-    # __insert__(schema_name, table_name, df, con)
-    # con.close()
-    #
-    return "OK"
+    # retrieve insertion params as dictionary
+    manipulation_params = manipulation_params.dict()
+
+    # get data from request
+    to_drop_columns_indices = manipulation_params['processes']['to_drop_columns']
+    to_drop_rows_indices = manipulation_params['processes']['to_drop_rows']
+    fill_missing_strategy = manipulation_params['processes']['fill_missing_strategy']
+    non_num_cols = list(map(int, manipulation_params['processes']['non_num_cols']))
+    user_id = str(manipulation_params['user_id'])
+    workspace_id = str(manipulation_params['workspace_id'])
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+
+    # manipulate dataframe
+    df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
+
+    # encode categorical data
+    df, ret_old_non_num = __encode_categorical_data__(df, non_num_cols)
+    con.commit()
+    # manipulate dataframe
+    __insert__(user_id, workspace_id, df, con)
+    con.close()
+
+    return ret_old_non_num
 
 
 # Inserting dataframe to database
@@ -139,16 +146,7 @@ async def insert(
                 df = pd.read_csv(data, sep=',')
     df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
 
-    ret_old_non_num = []
-    # encoding non-numerical columns
-    ord_enc = OrdinalEncoder()
-    for col in non_num_cols:
-        first = pd.DataFrame(df[df.columns[col]].unique())
-        sec = pd.DataFrame(ord_enc.fit_transform(first[[0]]).astype(int))
-        first = first.rename(columns={0: 'old_name'})
-        sec = sec.rename(columns={0: 'encoded'})
-        df[df.columns[col]] = ord_enc.fit_transform(df[[df.columns[col]]]).astype(int)
-        ret_old_non_num.append(pd.concat([first, sec], axis=1).sort_values(by=['encoded']).to_dict(orient='records'))
+    df, ret_old_non_num = __encode_categorical_data__(df, non_num_cols)
 
     # connect to db
     con = __connect_to_db__(
@@ -653,7 +651,6 @@ def __create_schema_if_not_exists__(con, schema_name):
 
 # function for creating table if it doesn't exist
 def __create_table_if_not_exists__(con, schema_name, table_name):
-    # con.execute(f"CREATE TABLE IF NOT EXISTS {schema_name}.{table_name} (id SERIAL PRIMARY KEY)")
     if not con.dialect.has_table(con, table_name, schema=schema_name):
         con.execute(db.schema.CreateTable(db.Table(table_name, db.MetaData(), schema=schema_name)))
         con.commit()
@@ -689,6 +686,20 @@ def __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, 
     df = df.drop(axis=1, columns=to_drop_columns)
 
     return df
+
+# function for encoding categorical data
+def __encode_categorical_data__(df, columns):
+    ret_old_non_num = []
+    # encoding non-numerical columns
+    ord_enc = OrdinalEncoder()
+    for col in columns:
+        first = pd.DataFrame(df[df.columns[col]].unique())
+        sec = pd.DataFrame(ord_enc.fit_transform(first[[0]]).astype(int))
+        first = first.rename(columns={0: 'old_name'})
+        sec = sec.rename(columns={0: 'encoded'})
+        df[df.columns[col]] = ord_enc.fit_transform(df[[df.columns[col]]]).astype(int)
+        ret_old_non_num.append(pd.concat([first, sec], axis=1).sort_values(by=['encoded']).to_dict(orient='records'))
+    return df, ret_old_non_num
 
 # function for validating successful request
 def __is_status_code_valid__(status_code):
