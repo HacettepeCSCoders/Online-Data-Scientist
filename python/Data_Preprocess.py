@@ -2,7 +2,8 @@ import io
 
 import pandas as pd
 import sqlalchemy as db
-from fastapi import FastAPI, UploadFile, File, Response
+import uvicorn
+from fastapi import FastAPI, UploadFile, File, Response, HTTPException
 from pandas.core.dtypes.common import is_datetime64tz_dtype
 from pydantic import Json
 from sklearn.preprocessing import OrdinalEncoder
@@ -28,15 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# Base URL for app
-BASE_URL = 'http://localhost:8000'  # url for app comprised of host and port
-# headers for request
-headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/octet-stream'
-}
 
 DB_CONNECTION_PARAMS = {
     'db_user': 'postgres',
@@ -94,15 +86,24 @@ async def manipulate(
     workspace_id = str(manipulation_params['workspace_id'])
 
     # connect to db
-    con = __connect_to_db__(
+
+    try:
+        con = __connect_to_db__(
         DB_CONNECTION_PARAMS['db_user'],
         DB_CONNECTION_PARAMS['db_password'],
         DB_CONNECTION_PARAMS['db_host'],
         DB_CONNECTION_PARAMS['db_port'],
         DB_CONNECTION_PARAMS['db_name']
-    )
+        )
+    except Exception as e:
+        print(e)
+        return "Database connection failed."
+
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
+
+    if df is None:
+        raise Exception("Table not found.")
 
     # manipulate dataframe
     df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
@@ -608,19 +609,24 @@ def friedman_nonparametric_test(
         return 'FRIEDMAN CHI-SQUARE TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ', ' + column_name_2 + ' and ' + column_name_3 + ' with stat = %.3f, p-value = %.3f' % (
         stat, p)
 
-
 ##################### -PRIVATE FUNCTIONS- #####################
 
 # function for inserting dataframe to database
 def __insert__(schema_name, table_name, df, con):
     dtypes = __get_pg_datatypes__(df)
-    df.to_sql(table_name, con=con.engine, schema=schema_name, if_exists='replace', index=False,
-              method='multi', dtype=dtypes)
+    try:
+        df.to_sql(table_name, con=con.engine, schema=schema_name, if_exists='replace', index=False,
+                  method='multi', dtype=dtypes)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't insert dataframe to database")
 
 
 # function for getting table from database
 def __get_table_from_sql__(table_name, schema_name, con):
-    df = pd.read_sql_table(table_name=table_name, schema=schema_name, con=con)
+    try:
+        df = pd.read_sql_table(table_name=table_name, schema=schema_name, con=con)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Table not found")
     return df
 
 
@@ -638,22 +644,32 @@ def __get_pg_datatypes__(df):
 # function for connecting to database
 def __connect_to_db__(user, password, host, port, name):
     db_uri = f'postgresql://{user}:{password}@{host}:{port}/{name}'
-    engine = db.create_engine(db_uri)
-    con = engine.connect()
+    try:
+        engine = db.create_engine(db_uri)
+        con = engine.connect()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't connect to database")
     return con
 
 
 # function for creating schema if it doesn't exist
 def __create_schema_if_not_exists__(con, schema_name):
     if not con.dialect.has_schema(con, schema_name):
-        con.execute(db.schema.CreateSchema(schema_name))
-        con.commit()
+        try:
+            con.execute(db.schema.CreateSchema(schema_name))
+            con.commit()
+        except Exception:
+            raise HTTPException(status_code=400, detail="Can't create schema")
+
 
 # function for creating table if it doesn't exist
 def __create_table_if_not_exists__(con, schema_name, table_name):
     if not con.dialect.has_table(con, table_name, schema=schema_name):
-        con.execute(db.schema.CreateTable(db.Table(table_name, db.MetaData(), schema=schema_name)))
-        con.commit()
+        try:
+            con.execute(db.schema.CreateTable(db.Table(table_name, db.MetaData(), schema=schema_name)))
+            con.commit()
+        except Exception:
+            raise HTTPException(status_code=400, detail="Can't create table")
 
 # manipulate dataframe helper function
 def __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy):
@@ -705,3 +721,8 @@ def __encode_categorical_data__(df, columns):
 def __is_status_code_valid__(status_code):
     if str(status_code).startswith('2'):
         return True
+
+
+##################### -MAIN FUNCTION- #####################
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8080)
