@@ -10,9 +10,7 @@ on:
     branches: [ master ]
 
 jobs:
-
   docker:
-
     name: Docker Build and Push
     runs-on: ubuntu-latest
 
