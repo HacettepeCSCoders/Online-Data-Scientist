@@ -11,41 +11,8 @@ on:
 
 jobs:
 
-  analyze_and_build:
-
-    name: Analyze and Build
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        language: [ 'java' ]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '18'
-          distribution: 'adopt'
-          java-package: jdk
-
-      # Initializes the CodeQL tools for scanning.
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-
-      - run: mvn -B package --file pom.xml
-        working-directory: ./java
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-
   docker:
 
-    needs: analyze_and_build
     name: Docker Build and Push
     runs-on: ubuntu-latest
 
