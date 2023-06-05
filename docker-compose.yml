@@ -1,25 +1,25 @@
 version: "3"
 services:
-  online-data-scientist-be:
-    #image: ugurcanerdogan/online-data-scientist-be:latest
-    build: ./java
+  be:
+    image: ugurcanerdogan/online-data-scientist-be:latest
+    #build: ./java
     container_name: "online-data-scientist-be"
       
-  online-data-scientist-py:
-    #image: ugurcanerdogan/online-data-scientist-py:latest
-    build: ./python
+  py:
+    image: ugurcanerdogan/online-data-scientist-py:latest
+    #build: ./python
     container_name: "online-data-scientist-py"
       
-  online-data-scientist-fe:
-    #image: ugurcanerdogan/online-data-scientist-fe:latest
-    build: ./react
+  fe:
+    image: ugurcanerdogan/online-data-scientist-fe:latest
+    #build: ./react
     container_name: "online-data-scientist-fe"
     depends_on:
-      - online-data-scientist-be
+      - be
 
   proxy:
-    #image: ugurcanerdogan/online-data-scientist-proxy:latest
-    build: ./nginx
+    image: ugurcanerdogan/online-data-scientist-proxy:latest
+    #build: ./nginx
     container_name: "online-data-scientist-proxy"
     restart: always
     ports:
