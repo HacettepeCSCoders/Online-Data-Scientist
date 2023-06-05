@@ -69,8 +69,7 @@ def get_table(
     if df is None:
         return "Table not found."
 
-    res = df.to_json(orient='records')
-    parsed = json.loads(res)
+    parsed = df.to_csv(index=False)
     return parsed
 
 
