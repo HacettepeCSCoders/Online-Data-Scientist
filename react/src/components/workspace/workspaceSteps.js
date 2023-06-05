@@ -5,7 +5,7 @@ import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { useFileName } from "../../hocs/fileNameProvider";
-import { startProcess } from "../../services/processService";
+import { getTable, startProcess } from "../../services/processService";
 import { useSelector } from "react-redux";
 import { createWorkspace } from "../../services/workspaceService";
 import ResultModal from "./modal/resultModal";
@@ -20,7 +20,7 @@ const { Content, Sider } = Layout;
 const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
   const { workspaceTypeDetails } = useWorkspaceType();
-  const { dataDetails } = useData();
+  const { dataDetails, setDataDetails } = useData();
   const { processingDetails } = useProcessing();
   const { fileNameDetails } = useFileName();
   const { dataFileDetails } = useDataFiles();
@@ -111,7 +111,6 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
 
       const insertion_params = JSON.stringify({
         user_id: userId,
-        data: dataDetails,
         processes: processingDetails,
         workspace_id: workspaceId,
       });
@@ -128,6 +127,9 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
 
       await createWorkspace(fileNameAndIds, userId);
       const response = await startProcess(formData);
+      const responseGetTable = await getTable(userId, workspaceId);
+      console.log(responseGetTable.data);
+      setDataDetails(responseGetTable.data);
       setIsModalOpen(false);
       setResultModal(true);
     } catch (e) {
