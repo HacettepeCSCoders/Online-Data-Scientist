@@ -3,10 +3,12 @@ import { Tabs } from "antd";
 import DataManipulationForm from "./processingTabs/dataManipulationForm";
 import StatisticalProcessingForm from "./processingTabs/statisticalProcessingForm";
 import { useProcessing } from "../../hocs/proccesingProvider";
+import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 
 const SelectProcessing = ({ newWorkspace }) => {
   const [values, setValues] = useState();
   const { setProcessingDetails } = useProcessing();
+  const { setWorkspaceTypeDetails } = useWorkspaceType();
 
   useEffect(() => {
     let check = false;
@@ -31,7 +33,11 @@ const SelectProcessing = ({ newWorkspace }) => {
           key: "1",
           label: `Data Manipulation`,
           children: (
-            <DataManipulationForm values={values} setValues={setValues} />
+            <DataManipulationForm
+              values={values}
+              setValues={setValues}
+              setWorkspaceTypeDetails={setWorkspaceTypeDetails}
+            />
           ),
         },
       ])
@@ -40,13 +46,23 @@ const SelectProcessing = ({ newWorkspace }) => {
           key: "1",
           label: `Data Manipulation`,
           children: (
-            <DataManipulationForm values={values} setValues={setValues} />
+            <DataManipulationForm
+              values={values}
+              setValues={setValues}
+              setWorkspaceTypeDetails={setWorkspaceTypeDetails}
+            />
           ),
         },
         {
           key: "2",
           label: `Statistical`,
-          children: <StatisticalProcessingForm />,
+          children: (
+            <StatisticalProcessingForm
+              values={values}
+              setValues={setValues}
+              setWorkspaceTypeDetails={setWorkspaceTypeDetails}
+            />
+          ),
         },
         {
           key: "3",

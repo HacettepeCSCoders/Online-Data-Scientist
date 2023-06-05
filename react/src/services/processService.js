@@ -12,15 +12,15 @@ export const startProcess = async (dataAndProcess) => {
   //   },
   // });
 
-  return fetch("http://localhost:8000/insert", {
+  return fetch("http://localhost:8000/python/insert", {
     method: "POST",
     body: dataAndProcess,
   });
 };
 
-export const getTable = async () => {
+export const getTable = async (user_id, workspace_id) => {
   return axios({
-    method: "get",
-    url: `http://localhost:8000/get-table`,
+    method: "GET",
+    url: `http://localhost:8000/python/get-table?user_id=${user_id}&workspace_id=${workspace_id}`,
   });
 };

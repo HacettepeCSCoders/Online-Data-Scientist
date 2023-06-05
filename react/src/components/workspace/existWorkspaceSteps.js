@@ -3,7 +3,7 @@ import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
-import { startProcess } from "../../services/processService";
+import { getTable } from "../../services/processService";
 import { existSteps } from "../../utils/workspace/existSteps";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
@@ -96,13 +96,10 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   const onClickStart = async () => {
     try {
       setIsModalOpen(true);
-      const dataAndProcess = {
-        userId: userId,
-        processes: processingDetails,
-        workspaceId: workspaceId,
-      };
-      // const fileNameAndIds = { userId: userId, fileName: fileNameDetails };
-      const response = await startProcess(dataAndProcess);
+
+      if (workspaceTypeDetails == "dataManipulation") {
+      }
+
       setIsModalOpen(false);
       setResultModal(true);
     } catch {
@@ -131,7 +128,15 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   };
 
   useEffect(() => {
-    setDataDetails("abc,sa\nas,sa,12");
+    const getData = async () => {
+      try {
+        const response = await getTable(userId, workspaceId);
+        setDataDetails(response.data);
+      } catch (e) {
+        console.log();
+      }
+    };
+    getData();
   }, []);
 
   const items = existSteps.map((item) => ({
