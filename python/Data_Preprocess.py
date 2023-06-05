@@ -503,7 +503,6 @@ def make_tests(
     )
 
     for test in test_list:
-        print(test)
 
         if test['test_name'] == 'shapiro_wilk':
             test_results[test['test_name']] = __shapiro_wilk_test__(user_id, workspace_id, con, test['column_1'])
