@@ -25,7 +25,7 @@ origins = ['http://localhost:3000']
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], # origins list
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,6 +48,10 @@ DTYPE_MAP = {
     'bool': BOOLEAN,
     'object': VARCHAR
 }
+
+@app.get('/python')
+def get_table():
+    return "Hello from Python!"
 
 ##################### -DATA PREPROCESS- #####################
 
