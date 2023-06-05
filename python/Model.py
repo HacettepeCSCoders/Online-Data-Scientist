@@ -43,4 +43,13 @@ class ManipulationParams(BaseModel):
     user_id: int
     workspace_id: int
 
+class StatisticalTest(BaseModel):
+    test_name: str
+    column_1: str
+    column_2: str = ""
+    column_3: str = ""
 
+class StatisticalTestList(BaseModel):
+    user_id: int
+    workspace_id: int
+    tests: list[StatisticalTest]
