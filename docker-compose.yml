@@ -1,0 +1,26 @@
+version: "3"
+services:
+  book-portal-be:
+    #image: ugurcanerdogan/book-portal-be:latest
+    build: ./java
+    container_name: "book-portal-be"
+      
+  book-portal-py:
+    #image: ugurcanerdogan/book-portal-py:latest
+    build: ./python
+    container_name: "book-portal-py"
+      
+  book-portal-fe:
+    #image: ugurcanerdogan/book-portal-fe:latest
+    build: ./react
+    container_name: "book-portal-fe"
+    depends_on:
+      - book-portal-be
+
+  proxy:
+    #image: ugurcanerdogan/book-portal-proxy:latest
+    build: ./nginx
+    container_name: "book-portal-proxy"
+    restart: always
+    ports:
+      - "80:80"
