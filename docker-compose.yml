@@ -1,26 +1,26 @@
 version: "3"
 services:
-  book-portal-be:
-    #image: ugurcanerdogan/book-portal-be:latest
+  online-data-scientist-be:
+    #image: ugurcanerdogan/online-data-scientist-be:latest
     build: ./java
-    container_name: "book-portal-be"
+    container_name: "online-data-scientist-be"
       
-  book-portal-py:
-    #image: ugurcanerdogan/book-portal-py:latest
+  online-data-scientist-py:
+    #image: ugurcanerdogan/online-data-scientist-py:latest
     build: ./python
-    container_name: "book-portal-py"
+    container_name: "online-data-scientist-py"
       
-  book-portal-fe:
-    #image: ugurcanerdogan/book-portal-fe:latest
+  online-data-scientist-fe:
+    #image: ugurcanerdogan/online-data-scientist-fe:latest
     build: ./react
-    container_name: "book-portal-fe"
+    container_name: "online-data-scientist-fe"
     depends_on:
-      - book-portal-be
+      - online-data-scientist-be
 
   proxy:
-    #image: ugurcanerdogan/book-portal-proxy:latest
+    #image: ugurcanerdogan/online-data-scientist-proxy:latest
     build: ./nginx
-    container_name: "book-portal-proxy"
+    container_name: "online-data-scientist-proxy"
     restart: always
     ports:
       - "80:80"

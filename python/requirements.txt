@@ -4,8 +4,7 @@ pandas~=2.0.2
 sqlalchemy~=1.4.39
 scipy~=1.9.1
 statsmodels~=0.13.2
-sklearn
-json
+python-multipart
 
 scikit-learn~=1.0.2
 uvicorn~=0.22.0
