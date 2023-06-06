@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Descriptions } from "antd";
+import { Button, Descriptions } from "antd";
 
-const ResultTab = () => {
+const ResultTab = ({ result, workspaceTypeDetails }) => {
   const printRef = React.useRef();
+  const [testArray, setTestArray] = useState();
 
   const generatePDF = async () => {
     const element = printRef.current;
@@ -19,22 +20,40 @@ const ResultTab = () => {
     pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("report.pdf");
   };
+
+  useEffect(() => {
+    let arr = [];
+    for (const [key, value] of Object.entries(result)) {
+      let obj = {};
+      obj.name = key;
+      obj.res = value;
+      arr.push(obj);
+    }
+    setTestArray(arr);
+  }, []);
+
   return (
     <>
       <div ref={printRef}>
-        Lorem Ipsum is simply dummy text of the printing and typesetting
-        industry. Lorem Ipsum has been the industry's standard dummy text ever
-        since the 1500s, when an unknown printer took a galley of type and
-        scrambled it to make a type specimen book. It has survived not only five
-        centuries, but also the leap into electronic typesetting, remaining
-        essentially unchanged. It was popularised in the 1960s with the release
-        of Letraset sheets containing Lorem Ipsum passages, and more recently
-        with desktop publishing software like Aldus PageMaker including versions
-        of Lorem Ipsum.
+        {workspaceTypeDetails == "statistical" && (
+          <Descriptions
+            title="Statistical Test"
+            size="middle"
+            layout="vertical"
+            bordered
+          >
+            {testArray &&
+              testArray.map((item) => (
+                <Descriptions.Item label={item.name}>
+                  {item.res}
+                </Descriptions.Item>
+              ))}
+          </Descriptions>
+        )}
       </div>
-      <button onClick={generatePDF} type="button">
+      <Button className="dark-background" onClick={generatePDF}>
         Export PDF
-      </button>
+      </Button>
     </>
   );
 };

@@ -47,10 +47,6 @@ DTYPE_MAP = {
 }
 
 
-@app.get('/python')
-def get_table():
-    return "Hello from Python!"
-
 
 ##################### -DATA PREPROCESS- #####################
 
@@ -627,11 +623,11 @@ def __get_pg_datatypes__(df):
 # function for connecting to database
 def __connect_to_db__(user, password, host, port, name):
     db_uri = f'postgresql://{user}:{password}@{host}:{port}/{name}'
-    try:
-        engine = db.create_engine(db_uri)
-        con = engine.connect()
-    except Exception:
-        raise HTTPException(status_code=400, detail="Can't connect to database")
+    # try:
+    engine = db.create_engine(db_uri)
+    con = engine.connect()
+    # except Exception:
+    #     raise HTTPException(status_code=400, detail="Can't connect to database")
     return con
 
 
