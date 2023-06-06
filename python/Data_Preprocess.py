@@ -1,22 +1,19 @@
 import io
-import json
 
 import pandas as pd
 import sqlalchemy as db
 import uvicorn
 from fastapi import FastAPI, UploadFile, File, Response, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pandas.core.dtypes.common import is_datetime64tz_dtype
 from pydantic import Json
-from sklearn.preprocessing import OrdinalEncoder
-from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR, Connection, text
-from fastapi.middleware.cors import CORSMiddleware
-
 from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kendalltau, chi2_contingency, ttest_ind, \
     ttest_rel, f_oneway, mannwhitneyu, wilcoxon, kruskal, friedmanchisquare
+from sklearn.preprocessing import OrdinalEncoder
+from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR
 from statsmodels.tsa.stattools import adfuller, kpss
 
 import Model
-
 
 # initialize app
 app = FastAPI()
@@ -48,6 +45,7 @@ DTYPE_MAP = {
     'bool': BOOLEAN,
     'object': VARCHAR
 }
+
 
 ##################### -DATA PREPROCESS- #####################
 
@@ -92,11 +90,11 @@ async def manipulate(
 
     try:
         con = __connect_to_db__(
-        DB_CONNECTION_PARAMS['db_user'],
-        DB_CONNECTION_PARAMS['db_password'],
-        DB_CONNECTION_PARAMS['db_host'],
-        DB_CONNECTION_PARAMS['db_port'],
-        DB_CONNECTION_PARAMS['db_name']
+            DB_CONNECTION_PARAMS['db_user'],
+            DB_CONNECTION_PARAMS['db_password'],
+            DB_CONNECTION_PARAMS['db_host'],
+            DB_CONNECTION_PARAMS['db_port'],
+            DB_CONNECTION_PARAMS['db_name']
         )
     except Exception as e:
         print(e)
@@ -106,7 +104,8 @@ async def manipulate(
     df = __get_table_from_sql__(workspace_id, user_id, con)
 
     # manipulate dataframe
-    df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
+    df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices,
+                                                fill_missing_strategy)
 
     # encode categorical data
     df, ret_old_non_num = __encode_categorical_data__(df, non_num_cols)
@@ -145,7 +144,8 @@ async def insert(
                 df = pd.read_csv(data, sep=';')
             else:
                 df = pd.read_csv(data, sep=',')
-    df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy)
+    df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices,
+                                                fill_missing_strategy)
 
     df, ret_old_non_num = __encode_categorical_data__(df, non_num_cols)
 
@@ -186,6 +186,7 @@ async def insert(
     return "Created table", \
         ret_old_non_num
 
+
 ##################### -STATISTICAL TESTS- #####################
 
 # Normality tests
@@ -195,15 +196,17 @@ def __shapiro_wilk_test__(
         con,
         column_name: str
 ):
-
     df = __get_table_from_sql__(workspace_id, user_id, con)
 
     data = df[column_name].values.tolist()
     stat, p = shapiro(data)
     if p > 0.05:
-        return 'SHAPIRO-WILK TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'SHAPIRO-WILK TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
     else:
-        return 'SHAPIRO-WILK TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'SHAPIRO-WILK TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
+
 
 def __dagostino_k2_test__(
         user_id: str,
@@ -216,9 +219,12 @@ def __dagostino_k2_test__(
     data = df[column_name].values.tolist()
     stat, p = normaltest(data)
     if p > 0.05:
-        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
     else:
-        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
+
 
 def __anderson_darling_test__(
         user_id: str,
@@ -233,9 +239,12 @@ def __anderson_darling_test__(
     for i in range(len(result.critical_values)):
         sl, cv = result.significance_level[i], result.critical_values[i]
         if result.statistic < cv:
-            return 'ANDERSON-DARLING TEST RESULT: \nProbably Gaussian in column %s at the %.1f%% level' % (column_name, sl)
+            return 'ANDERSON-DARLING TEST RESULT: \nProbably Gaussian in column %s at the %.1f%% level' % (
+                column_name, sl)
         else:
-            return 'ANDERSON-DARLING TEST RESULT: \nProbably not Gaussian in column %s at the %.1f%% level' % (column_name, sl)
+            return 'ANDERSON-DARLING TEST RESULT: \nProbably not Gaussian in column %s at the %.1f%% level' % (
+                column_name, sl)
+
 
 # Correlation tests
 def __pearson_correlation_test__(
@@ -251,9 +260,12 @@ def __pearson_correlation_test__(
     data2 = df[column_name_2].values.tolist()
     stat, p = pearsonr(data1, data2)
     if p > 0.05:
-        return 'PEARSON`S CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'PEARSON`S CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
     else:
-        return 'PEARSON`S CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'PEARSON`S CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
+
 
 def __spearmans_rank_correlation_test__(
         user_id: str,
@@ -268,9 +280,12 @@ def __spearmans_rank_correlation_test__(
     data2 = df[column_name_2].values.tolist()
     stat, p = spearmanr(data1, data2)
     if p > 0.05:
-        return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
     else:
-        return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
+
 
 def __kendalls_rank_correlation_test__(
         user_id: str,
@@ -285,9 +300,12 @@ def __kendalls_rank_correlation_test__(
     data2 = df[column_name_2].values.tolist()
     stat, p = kendalltau(data1, data2)
     if p > 0.05:
-        return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
     else:
-        return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
+
 
 def __chi_squared_correlation_test__(
         user_id: str,
@@ -303,9 +321,12 @@ def __chi_squared_correlation_test__(
     all_data = pd.crosstab(data1, data2)
     stat, p, dof, expected = chi2_contingency(all_data)
     if p > 0.05:
-        return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
     else:
-        return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (stat, p)
+        return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
+            stat, p)
+
 
 # Stationary Tests
 
@@ -321,10 +342,11 @@ def __augmented_dickey_fuller_stationary_test__(
     stat, p, lags, obs, crit, t = adfuller(data)
     if p > 0.05:
         return 'AUGMENTED DICKEY FULLER TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'AUGMENTED DICKEY FULLER TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 def __kwiatkowski_stationary_test__(
         user_id: str,
@@ -338,10 +360,11 @@ def __kwiatkowski_stationary_test__(
     stat, p, lags, crit = kpss(data)
     if p > 0.05:
         return 'KWIAKOWSKI-PHILLIPS-SCHMIDT-SHIN TEST RESULT: \nProbably not stationary for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'KWIAKOWSKI-PHILLIPS-SCHMIDT-SHIN TEST RESULT: \nProbably stationary for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 # Parametric Statistical Tests
 def __student_t_parametric_test__(
@@ -358,10 +381,11 @@ def __student_t_parametric_test__(
     stat, p = ttest_ind(data1, data2)
     if p > 0.05:
         return 'STUDENT`S T-TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'STUDENT`S T-TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 def __paired_student_t_parametric_test__(
         user_id: str,
@@ -377,10 +401,11 @@ def __paired_student_t_parametric_test__(
     stat, p = ttest_rel(data1, data2)
     if p > 0.05:
         return 'PAIRED STUDENT`S T-TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'PAIRED STUDENT`S T-TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 def __analysis_of_variance_parametric_test__(
         user_id: str,
@@ -398,10 +423,11 @@ def __analysis_of_variance_parametric_test__(
     stat, p = f_oneway(data1, data2, data3)
     if p > 0.05:
         return 'ANALYSIS OF VARIANCE TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ', ' + column_name_2 + ' and ' + column_name_3 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'ANALYSIS OF VARIANCE TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ', ' + column_name_2 + ' and ' + column_name_3 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 # Nonparametric Statistical Hypothesis Tests
 def __mann_whitney_u_nonparametric_test__(
@@ -418,10 +444,11 @@ def __mann_whitney_u_nonparametric_test__(
     stat, p = mannwhitneyu(data1, data2)
     if p > 0.05:
         return 'MANN-WHITNEY U TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'MANN-WHITNEY U TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 def __wilcoxon_signed_rank_nonparametric_test__(
         user_id: str,
@@ -437,10 +464,11 @@ def __wilcoxon_signed_rank_nonparametric_test__(
     stat, p = wilcoxon(data1, data2)
     if p > 0.05:
         return 'WILCOXON SIGNED-RANK TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'WILCOXON SIGNED-RANK TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 def __kruskal_wallis_nonparametric_test__(
         user_id: str,
@@ -451,16 +479,16 @@ def __kruskal_wallis_nonparametric_test__(
 ):
     df = __get_table_from_sql__(workspace_id, user_id, con)
 
-
     data1 = df[column_name_1].values.tolist()
     data2 = df[column_name_2].values.tolist()
     stat, p = kruskal(data1, data2)
     if p > 0.05:
         return 'KRUSKAL-WALLIS TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'KRUSKAL-WALLIS TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 def __friedman_nonparametric_test__(
         user_id: str,
@@ -472,17 +500,17 @@ def __friedman_nonparametric_test__(
 ):
     df = __get_table_from_sql__(workspace_id, user_id, con)
 
-
     data1 = df[column_name_1].values.tolist()
     data2 = df[column_name_2].values.tolist()
     data3 = df[column_name_3].values.tolist()
     stat, p = friedmanchisquare(data1, data2, data3)
     if p > 0.05:
         return 'FRIEDMAN CHI-SQUARE TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ', ' + column_name_2 + ' and ' + column_name_3 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'FRIEDMAN CHI-SQUARE TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ', ' + column_name_2 + ' and ' + column_name_3 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
+
 
 @app.post('/python/make-tests')
 def make_tests(
@@ -511,33 +539,48 @@ def make_tests(
         elif test['test_name'] == 'anderson_darling':
             test_results[test['test_name']] = __anderson_darling_test__(user_id, workspace_id, con, test['column_1'])
         elif test['test_name'] == 'pearson_correlation':
-            test_results[test['test_name']] = __pearson_correlation_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __pearson_correlation_test__(user_id, workspace_id, con, test['column_1'],
+                                                                           test['column_2'])
         elif test['test_name'] == 'spearman_correlation':
-            test_results[test['test_name']] = __spearmans_rank_correlation_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __spearmans_rank_correlation_test__(user_id, workspace_id, con,
+                                                                                  test['column_1'], test['column_2'])
         elif test['test_name'] == 'kendall_correlation':
-            test_results[test['test_name']] = __kendalls_rank_correlation_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __kendalls_rank_correlation_test__(user_id, workspace_id, con,
+                                                                                 test['column_1'], test['column_2'])
         elif test['test_name'] == 'chi_square':
-            test_results[test['test_name']] = __chi_squared_correlation_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __chi_squared_correlation_test__(user_id, workspace_id, con,
+                                                                               test['column_1'], test['column_2'])
         elif test['test_name'] == 'augmented_dickey_fuller':
-            test_results[test['test_name']] = __augmented_dickey_fuller_stationary_test__(user_id, workspace_id, con, test['column_1'])
+            test_results[test['test_name']] = __augmented_dickey_fuller_stationary_test__(user_id, workspace_id, con,
+                                                                                          test['column_1'])
         elif test['test_name'] == 'kwiatkowski':
-            test_results[test['test_name']] = __kwiatkowski_stationary_test__(user_id, workspace_id, con, test['column_1'])
+            test_results[test['test_name']] = __kwiatkowski_stationary_test__(user_id, workspace_id, con,
+                                                                              test['column_1'])
         elif test['test_name'] == 'student_t':
-            test_results[test['test_name']] = __student_t_parametric_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __student_t_parametric_test__(user_id, workspace_id, con,
+                                                                            test['column_1'], test['column_2'])
         elif test['test_name'] == 'paired_student_t':
-            test_results[test['test_name']] = __paired_student_t_parametric_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __paired_student_t_parametric_test__(user_id, workspace_id, con,
+                                                                                   test['column_1'], test['column_2'])
         elif test['test_name'] == 'analysis_of_variance':
-            test_results[test['test_name']] = __analysis_of_variance_parametric_test__(user_id, workspace_id, con, test['column_1'], test['column_2'],
-                                                     test['column_3'])
+            test_results[test['test_name']] = __analysis_of_variance_parametric_test__(user_id, workspace_id, con,
+                                                                                       test['column_1'],
+                                                                                       test['column_2'],
+                                                                                       test['column_3'])
         elif test['test_name'] == 'mann_whitney_u':
-            test_results[test['test_name']] = __mann_whitney_u_nonparametric_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __mann_whitney_u_nonparametric_test__(user_id, workspace_id, con,
+                                                                                    test['column_1'], test['column_2'])
         elif test['test_name'] == 'wilcoxon_signed_rank':
-            test_results[test['test_name']] = __wilcoxon_signed_rank_nonparametric_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __wilcoxon_signed_rank_nonparametric_test__(user_id, workspace_id, con,
+                                                                                          test['column_1'],
+                                                                                          test['column_2'])
         elif test['test_name'] == 'kruskal_wallis':
-            test_results[test['test_name']] = __kruskal_wallis_nonparametric_test__(user_id, workspace_id, con, test['column_1'], test['column_2'])
+            test_results[test['test_name']] = __kruskal_wallis_nonparametric_test__(user_id, workspace_id, con,
+                                                                                    test['column_1'], test['column_2'])
         elif test['test_name'] == 'friedman':
-            test_results[test['test_name']] = __friedman_nonparametric_test__(user_id, workspace_id, con, test['column_1'], test['column_2'],
-                                            test['column_3'])
+            test_results[test['test_name']] = __friedman_nonparametric_test__(user_id, workspace_id, con,
+                                                                              test['column_1'], test['column_2'],
+                                                                              test['column_3'])
         else:
             raise HTTPException(status_code=404, detail='Test undefined')
 
@@ -606,6 +649,7 @@ def __create_table_if_not_exists__(con, schema_name, table_name):
         except Exception:
             raise HTTPException(status_code=400, detail="Can't create table")
 
+
 # manipulate dataframe helper function
 def __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy):
     to_drop_columns = [df.columns[i] for i in to_drop_columns_indices]
@@ -638,6 +682,7 @@ def __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, 
 
     return df
 
+
 # function for encoding categorical data
 def __encode_categorical_data__(df, columns):
     ret_old_non_num = []
@@ -651,6 +696,7 @@ def __encode_categorical_data__(df, columns):
         df[df.columns[col]] = ord_enc.fit_transform(df[[df.columns[col]]]).astype(int)
         ret_old_non_num.append(pd.concat([first, sec], axis=1).sort_values(by=['encoded']).to_dict(orient='records'))
     return df, ret_old_non_num
+
 
 # function for validating successful request
 def __is_status_code_valid__(status_code):
