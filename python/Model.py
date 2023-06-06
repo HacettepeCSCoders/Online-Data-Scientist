@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 from pydantic import BaseModel
 from typing import List
@@ -18,7 +19,7 @@ class Processes(BaseModel):
     to_drop_columns: list = []
     to_drop_rows: list = []
     non_num_cols: list = []
-    fill_missing_strategy: FillStrategy = FillStrategy.NONE # Default value
+    fill_missing_strategy: FillStrategy = FillStrategy.NONE  # Default value
 
 
 # BaseModel for database connection parameters
@@ -44,11 +45,13 @@ class ManipulationParams(BaseModel):
     user_id: int
     workspace_id: int
 
+
 class StatisticalTest(BaseModel):
     test_name: str
     column_1: str
     column_2: str = ""
     column_3: str = ""
+
 
 class StatisticalTestList(BaseModel):
     user_id: int
