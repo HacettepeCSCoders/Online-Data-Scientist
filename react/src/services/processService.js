@@ -18,9 +18,9 @@ export const startProcess = async (dataAndProcess) => {
   });
 };
 
-export const getTable = async () => {
+export const getTable = async (user_id, workspace_id) => {
   return axios({
-    method: "get",
-    url: `/python/get-table`,
+    method: "GET",
+    url: `/python/get-table?user_id=${user_id}&workspace_id=${workspace_id}`,
   });
 };
