@@ -1,6 +1,7 @@
 from enum import Enum
 
 from pydantic import BaseModel
+from typing import List
 
 
 # Enum for fill strategy options
@@ -52,4 +53,4 @@ class StatisticalTest(BaseModel):
 class StatisticalTestList(BaseModel):
     user_id: int
     workspace_id: int
-    tests: list[StatisticalTest]
+    tests: List[StatisticalTest]
