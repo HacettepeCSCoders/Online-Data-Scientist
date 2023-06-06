@@ -2,7 +2,6 @@ from enum import Enum
 from typing import List
 
 from pydantic import BaseModel
-from typing import List
 
 
 # Enum for fill strategy options

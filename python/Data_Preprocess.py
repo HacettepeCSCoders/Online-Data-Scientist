@@ -207,10 +207,10 @@ def __shapiro_wilk_test__(
     stat, p = shapiro(data)
     if p > 0.05:
         return 'SHAPIRO-WILK TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'SHAPIRO-WILK TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
 
 
 def __dagostino_k2_test__(
@@ -225,10 +225,10 @@ def __dagostino_k2_test__(
     stat, p = normaltest(data)
     if p > 0.05:
         return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'D’AGOSTINO’S K^2 TEST RESULT: \nProbably not Gaussian for values in column ' + column_name + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
 
 
 def __anderson_darling_test__(
@@ -245,10 +245,10 @@ def __anderson_darling_test__(
         sl, cv = result.significance_level[i], result.critical_values[i]
         if result.statistic < cv:
             return 'ANDERSON-DARLING TEST RESULT: \nProbably Gaussian in column %s at the %.1f%% level' % (
-            column_name, sl)
+                column_name, sl)
         else:
             return 'ANDERSON-DARLING TEST RESULT: \nProbably not Gaussian in column %s at the %.1f%% level' % (
-            column_name, sl)
+                column_name, sl)
 
 
 # Correlation tests
@@ -266,10 +266,10 @@ def __pearson_correlation_test__(
     stat, p = pearsonr(data1, data2)
     if p > 0.05:
         return 'PEARSON`S CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'PEARSON`S CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
 
 
 def __spearmans_rank_correlation_test__(
@@ -286,10 +286,10 @@ def __spearmans_rank_correlation_test__(
     stat, p = spearmanr(data1, data2)
     if p > 0.05:
         return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'SPEARMAN`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
 
 
 def __kendalls_rank_correlation_test__(
@@ -306,10 +306,10 @@ def __kendalls_rank_correlation_test__(
     stat, p = kendalltau(data1, data2)
     if p > 0.05:
         return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'KENDALL`S RANK CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
 
 
 def __chi_squared_correlation_test__(
@@ -327,10 +327,10 @@ def __chi_squared_correlation_test__(
     stat, p, dof, expected = chi2_contingency(all_data)
     if p > 0.05:
         return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably independent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
     else:
         return 'CHI-SQUARED CORRELATION TEST RESULT: \nProbably dependent for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-        stat, p)
+            stat, p)
 
 
 # Stationary Tests
