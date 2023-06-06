@@ -10,6 +10,8 @@ const ResultModal = ({
   dataDetails,
   fileName,
   processingDetails,
+  result,
+  workspaceTypeDetails,
 }) => {
   const resultTabs = [
     {
@@ -24,13 +26,19 @@ const ResultModal = ({
         <SelectedProcesses
           dataDetails={dataDetails}
           processingDetails={processingDetails}
+          workspaceTypeDetails={workspaceTypeDetails}
         />
       ),
     },
     {
       key: 3,
       label: "Result",
-      children: <ResultTab />,
+      children: (
+        <ResultTab
+          result={result}
+          workspaceTypeDetails={workspaceTypeDetails}
+        />
+      ),
     },
   ];
 

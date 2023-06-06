@@ -6,11 +6,13 @@ import DataTable from "./dataTable/dataTable";
 import getColumnsStruct from "../../utils/workspace/getColumnsStruct";
 import SelectedProcesses from "./modal/resultModalTabs/selectedProcesses";
 import DataTab from "./modal/resultModalTabs/dataTab";
+import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 
 const { Content } = Layout;
 
 const StartProcessing = () => {
   const { processingDetails } = useProcessing();
+  const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails } = useData();
 
   const startTabs = [
@@ -21,6 +23,7 @@ const StartProcessing = () => {
         <SelectedProcesses
           dataDetails={dataDetails}
           processingDetails={processingDetails}
+          workspaceTypeDetails={workspaceTypeDetails}
         ></SelectedProcesses>
       ),
     },

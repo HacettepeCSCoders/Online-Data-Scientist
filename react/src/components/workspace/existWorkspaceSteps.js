@@ -3,7 +3,7 @@ import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
-import { getTable } from "../../services/processService";
+import { getTable, makeTest, manipulate } from "../../services/processService";
 import { existSteps } from "../../utils/workspace/existSteps";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
@@ -15,6 +15,7 @@ const { Content, Sider } = Layout;
 
 const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
+  const [result, setResult] = useState({});
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
   const { processingDetails } = useProcessing();
@@ -98,12 +99,31 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
       setIsModalOpen(true);
 
       if (workspaceTypeDetails == "dataManipulation") {
+        const body = {
+          user_id: userId,
+          workspace_id: workspaceId,
+          processes: processingDetails,
+        };
+        const response = await manipulate(JSON.stringify(body));
+        const responseGetTable = await getTable(userId, workspaceId);
+        setDataDetails(responseGetTable.data);
+        console.log(response);
+      } else if (workspaceTypeDetails == "statistical") {
+        const body = {
+          user_id: userId,
+          workspace_id: workspaceId,
+          tests: processingDetails,
+        };
+        console.log(body);
+        const response = await makeTest(JSON.stringify(body));
+        setResult(response.data);
       }
-
       setIsModalOpen(false);
       setResultModal(true);
-    } catch {
-      console.error();
+    } catch (e) {
+      console.error(e);
+      setIsModalOpen(false);
+      setErrorModal(true);
     }
   };
 
@@ -154,8 +174,10 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
         handleResultCancel={handleResultCancel}
         isResultModal={isResultModal}
         dataDetails={dataDetails}
+        workspaceTypeDetails={workspaceTypeDetails}
         fileName="a" // fileName Details
         processingDetails={processingDetails}
+        result={result}
       />
       <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
       <Content className="content-nav">

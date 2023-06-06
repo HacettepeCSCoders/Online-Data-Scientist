@@ -25,3 +25,51 @@ export const dummyAllWorkspaces = [
     createdDate: Date.now(),
   },
 ];
+
+export const dummyDataStatisticalTest = [
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+  {
+    title: "Sekiro",
+    explanation:
+      "SHAPIRO-WILK TEST RESULT: Probably Gaussian for values in column  with stat = %.3f, p-value = %.3f",
+  },
+];
