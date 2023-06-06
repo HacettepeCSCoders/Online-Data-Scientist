@@ -14,6 +14,7 @@ const SelectProcessing = ({ newWorkspace }) => {
     let check = false;
     if (values !== undefined) {
       for (const [key, value] of Object.entries(values)) {
+        console.log(key);
         console.log(value);
         if (value !== undefined) {
           check = true;
@@ -25,7 +26,6 @@ const SelectProcessing = ({ newWorkspace }) => {
   }, [values]);
 
   let processingTabs = [];
-  console.log(newWorkspace);
 
   newWorkspace
     ? (processingTabs = [

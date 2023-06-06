@@ -2,7 +2,7 @@ import { Button, Checkbox, Form, Input, Radio } from "antd";
 import React, { useState } from "react";
 import DropColumnSelect from "./processSelect/dropColumnSelect";
 
-const DataManipulationForm = ({ setValues }) => {
+const DataManipulationForm = ({ setValues, setWorkspaceTypeDetails }) => {
   const [missingValueEnabled, setMissingValueEnabled] = useState(false);
   const [dropColumnEnabled, setDropColumnEnabled] = useState(false);
   const [dropRowEnabled, setDropRowEnabled] = useState(false);
@@ -21,6 +21,7 @@ const DataManipulationForm = ({ setValues }) => {
       : (values.non_num_cols = nonNumColArray);
 
     setValues(values);
+    setWorkspaceTypeDetails("dataManipulation");
     console.log(values);
   };
 
