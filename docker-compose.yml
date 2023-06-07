@@ -1,26 +1,36 @@
-version: "3"
+version: '3'
 services:
   be:
-    image: ugurcanerdogan/online-data-scientist-be:latest
-    #build: ./java
-    container_name: "online-data-scientist-be"
-      
+    image: 'ugurcanerdogan/online-data-scientist-be:latest'
+    container_name: online-data-scientist-be
   py:
-    image: ugurcanerdogan/online-data-scientist-py:latest
-    #build: ./python
-    container_name: "online-data-scientist-py"
-      
+    image: 'ugurcanerdogan/online-data-scientist-py:latest'
+    container_name: online-data-scientist-py
+    depends_on:
+      - db
   fe:
-    image: ugurcanerdogan/online-data-scientist-fe:latest
-    #build: ./react
-    container_name: "online-data-scientist-fe"
+    image: 'ugurcanerdogan/online-data-scientist-fe:latest'
+    container_name: online-data-scientist-fe
     depends_on:
       - be
-
   proxy:
-    image: ugurcanerdogan/online-data-scientist-proxy:latest
-    #build: ./nginx
-    container_name: "online-data-scientist-proxy"
+    image: 'ugurcanerdogan/online-data-scientist-proxy:latest'
+    container_name: online-data-scientist-proxy
     restart: always
     ports:
-      - "80:80"
+      - '80:80'
+  db:
+    image: postgres
+    container_name: online-data-scientist-db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local
