@@ -125,10 +125,10 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
         id: workspaceId,
       };
 
-      await createWorkspace(fileNameAndIds, userId);
       const response = await startProcess(formData);
+      await createWorkspace(fileNameAndIds, userId);
       const responseGetTable = await getTable(userId, workspaceId);
-      console.log(responseGetTable.data);
+
       setDataDetails(responseGetTable.data);
       setIsModalOpen(false);
       setResultModal(true);
