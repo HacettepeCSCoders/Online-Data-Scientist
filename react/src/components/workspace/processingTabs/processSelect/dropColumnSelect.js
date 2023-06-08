@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Select, Space } from "antd";
 import { useData } from "../../../../hocs/dataProvider";
 import getColumnsStruct from "../../../../utils/workspace/getColumnsStruct";
@@ -26,6 +26,7 @@ const DropColumnSelect = ({
         placeholder="select columns"
         onChange={handleChange}
         disabled={disabledDropColumn}
+        className="select-column-width"
       >
         {colArr &&
           colArr.map((col) => {

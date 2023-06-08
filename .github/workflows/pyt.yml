@@ -3,11 +3,9 @@ name: Python CI
 on:
   push:
     branches:
-      - master
       - 'feature/**'
-      - 'fix/**'
   pull_request:
-    branches: [ master ]
+    branches: [ 'feature/**' ]
 
 jobs:
   docker:

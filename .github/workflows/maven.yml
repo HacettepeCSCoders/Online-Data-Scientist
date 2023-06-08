@@ -3,11 +3,9 @@ name: Java CI with Maven and CodeQL analyze
 on:
   push:
     branches:
-      - master
       - 'feature/**'
-      - 'fix/**'
   pull_request:
-    branches: [ master ]
+    branches: [ 'feature/**' ]
 
 jobs:
   docker:
