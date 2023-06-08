@@ -5,7 +5,7 @@ import {
   SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutSuccess } from "../../../reducers/actions/authActions";
 import logo from "../../../assets/logo1.png";
@@ -51,7 +51,11 @@ const TopBar = ({ name, isLoggedIn }) => {
     <Row gutter={16}>
       <Col>
         <div>
-          <img src={logo} className="logo-size-topbar" />
+          <img
+            src={logo}
+            className="logo-size-topbar"
+            onClick={() => navigate(`/`)}
+          />
         </div>
       </Col>
       <Col offset={18}>
