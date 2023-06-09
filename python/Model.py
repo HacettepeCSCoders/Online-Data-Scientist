@@ -15,9 +15,9 @@ class FillStrategy(Enum):
 
 
 class Processes(BaseModel):
-    to_drop_columns: List[int]
-    to_drop_rows: List[int]
-    non_num_cols: List[str]
+    to_drop_columns: List[int] = []
+    to_drop_rows: List[int] = []
+    non_num_cols: List[str] = []
     fill_missing_strategy: FillStrategy = FillStrategy.NONE  # Default value
 
 
