@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.ods.java.dto.UserChangePasswordDTO;
 import edu.ods.java.dto.UserDTO;
 import edu.ods.java.model.User;
 import edu.ods.java.security.JWTRequestModel;
@@ -28,6 +29,11 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<JWTResponseModel> login(@RequestBody JWTRequestModel request) throws Exception {
 		return ResponseEntity.ok(authService.createToken(request));
+	}
+
+	@PostMapping("/changePassword")
+	public ResponseEntity<User> changePassword(@RequestBody UserChangePasswordDTO request) throws Exception {
+		return ResponseEntity.ok(authService.changePassword(request));
 	}
 
 }

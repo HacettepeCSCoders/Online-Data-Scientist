@@ -91,6 +91,13 @@ public class UserService implements UserDetailsService {
 		return mapToDTO(userRepository.save(user));
 	}
 
+	public UserDTO removeUserByUsername(String email) {
+		User user = userRepository.findByUsername(email)
+				.orElseThrow(() -> new UserNotFoundException("User could not be found"));
+		user.setActive(false);
+		return mapToDTO(userRepository.save(user));
+	}
+
 	public UserDTO setUserActive(long id) {
 		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User could not be found"));
 		user.setActive(true);
@@ -99,6 +106,12 @@ public class UserService implements UserDetailsService {
 
 	public void deleteUser(long id) {
 		User user = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User could not be delete"));
+		userRepository.delete(user);
+	}
+
+	public void deleteUserByUsername(String username) {
+		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new UserNotFoundException("User could not be delete"));
 		userRepository.delete(user);
 	}
@@ -125,6 +138,7 @@ public class UserService implements UserDetailsService {
 		}
 		return isAdminRoleExists;
 	}
+
 	private UserDTO mapToDTO(User user) {
 		UserDTO userDTO = new UserDTO();
 		userDTO.setUsername(user.getUsername());
