@@ -3,6 +3,7 @@ package edu.ods.java.service;
 import edu.ods.java.dto.UserDTO;
 import edu.ods.java.dto.UserUpdateDTO;
 import edu.ods.java.exception.UserNotFoundException;
+import edu.ods.java.model.EntityBase;
 import edu.ods.java.model.Role;
 import edu.ods.java.model.User;
 import edu.ods.java.repository.RoleRepository;
@@ -46,7 +47,7 @@ public class UserService implements UserDetailsService {
 	}
 
 	public List<UserDTO> getAllUsers() {
-		return userRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+		return userRepository.findAll().stream().filter(EntityBase::isActive).map(this::mapToDTO).collect(Collectors.toList());
 	}
 
 	public UserDTO getByUsername(String username) {
