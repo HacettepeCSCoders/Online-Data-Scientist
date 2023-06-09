@@ -114,6 +114,17 @@ public class UserService implements UserDetailsService {
 		return userRepository.findByUsername(email).isPresent();
 	}
 
+	public boolean isAdmin(String username) {
+		Optional<User> user = userRepository.findByUsername(username);
+		boolean isAdminRoleExists = false;
+		for (Role role : user.get().getRoles()) {
+			if (role.getName().equals("ROLE_ADMIN")) {
+				isAdminRoleExists = true;
+				break;
+			}
+		}
+		return isAdminRoleExists;
+	}
 	private UserDTO mapToDTO(User user) {
 		UserDTO userDTO = new UserDTO();
 		userDTO.setUsername(user.getUsername());

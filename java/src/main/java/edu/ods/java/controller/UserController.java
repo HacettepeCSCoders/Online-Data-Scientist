@@ -138,4 +138,10 @@ public class UserController {
 
 	}
 
+	@GetMapping("/{username}/isAdmin")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<Boolean> isAdmin(@PathVariable(value = "username") String username) {
+		return new ResponseEntity<>(userService.isAdmin(username), HttpStatus.OK);
+	}
+
 }
