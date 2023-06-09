@@ -5,7 +5,6 @@ services:
     container_name: online-data-scientist-be
   py:
     image: 'ugurcanerdogan/online-data-scientist-py:latest'
-    container_name: online-data-scientist-py
     depends_on:
       - db
   fe:
@@ -17,6 +16,8 @@ services:
     image: 'ugurcanerdogan/online-data-scientist-proxy:latest'
     container_name: online-data-scientist-proxy
     restart: always
+    depends_on:
+      - py
     ports:
       - '80:80'
   db:
