@@ -6,7 +6,6 @@ import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { useFileName } from "../../hocs/fileNameProvider";
 import { getTable, startProcess } from "../../services/processService";
-import { useSelector } from "react-redux";
 import { createWorkspace } from "../../services/workspaceService";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
@@ -21,7 +20,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
-  const { processingDetails } = useProcessing();
+  const { processingDetails, setProcessingDetails } = useProcessing();
   const { fileNameDetails } = useFileName();
   const { dataFileDetails } = useDataFiles();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
@@ -64,11 +63,14 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
       type: "info",
       content: (
         <>
-          If you go prev, your changes on this page will be lost. Do you want to
-          go prev?
+          If you go previous page, your changes on this page will be lost. Do
+          you want to go previous page?
           <div>
             <Button
               onClick={() => {
+                if (current == 4) {
+                  setProcessingDetails(undefined);
+                }
                 setCurrent(current - 1);
                 return;
               }}
@@ -110,7 +112,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
       setIsModalOpen(true);
 
       const insertion_params = JSON.stringify({
-        user_id: userId,
+        user_id: userId.toString(),
         processes: processingDetails,
         workspace_id: workspaceId,
       });
@@ -120,7 +122,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
       formData.append("insertion_params", insertion_params);
 
       const fileNameAndIds = {
-        userId: userId,
+        userId: userId.toString(),
         fileName: fileNameDetails,
         id: workspaceId,
       };

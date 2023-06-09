@@ -10,7 +10,6 @@ import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
 import ErrorModal from "./modal/errorModal";
 import { useNavigate } from "react-router-dom";
-
 const { Content, Sider } = Layout;
 
 const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
@@ -18,7 +17,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   const [result, setResult] = useState({});
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
-  const { processingDetails } = useProcessing();
+  const { processingDetails, setProcessingDetails } = useProcessing();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
   const [nextMessageApi, nextMessageApiContext] = message.useMessage();
   const [cancelMessageApi, cancelMessageApiContext] = message.useMessage();
@@ -59,11 +58,14 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
       type: "info",
       content: (
         <>
-          If you go prev, your changes on this page will be lost. Do you want to
-          go prev?
+          If you go previous page, your changes on this page will be lost. Do
+          you want to go previous page?
           <div>
             <Button
               onClick={() => {
+                if (current == 2) {
+                  setProcessingDetails(undefined);
+                }
                 setCurrent(current - 1);
                 return;
               }}
@@ -82,12 +84,6 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
     if (current === 1) {
       nextMessageApi.open({
         type: "error",
-        content: <>Please select which process you want to continue with?</>,
-        duration: 2,
-      });
-    } else if (current === 2) {
-      nextMessageApi.open({
-        type: "error",
         content: <>Please select the processes you want to do?</>,
         duration: 2,
       });
@@ -100,7 +96,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
 
       if (workspaceTypeDetails == "dataManipulation") {
         const body = {
-          user_id: userId,
+          user_id: userId.toString(),
           workspace_id: workspaceId,
           processes: processingDetails,
         };
@@ -110,7 +106,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
         console.log(response);
       } else if (workspaceTypeDetails == "statistical") {
         const body = {
-          user_id: userId,
+          user_id: userId.toString(),
           workspace_id: workspaceId,
           tests: processingDetails,
         };
@@ -128,13 +124,10 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   };
 
   const next = () => {
-    if (
-      (current === 1 && workspaceTypeDetails == null) ||
-      (current === 2 && processingDetails == null)
-    ) {
+    if (current === 1 && processingDetails == null) {
       nextMessage();
       return;
-    } else if (current === 3) {
+    } else if (current === 2) {
       onClickStart();
       return;
     }
