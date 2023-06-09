@@ -46,6 +46,13 @@ const AllWorkspaces = () => {
             arr.push(response.data[i]);
           }
         }
+        for (let i = 0; i < arr.length; i++) {
+          arr[i].updateDate = new Date(arr[i].updateDate);
+          arr[i].createDate = new Date(arr[i].createDate);
+        }
+        arr.sort(function (a, b) {
+          return new Date(b.updateDate) - new Date(a.updateDate);
+        });
         setAllWorkspaces(arr);
       } catch (e) {
         console.log(e);

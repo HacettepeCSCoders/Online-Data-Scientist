@@ -14,6 +14,7 @@ const { Content, Sider } = Layout;
 
 const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
   const [result, setResult] = useState({});
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
@@ -91,6 +92,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
   };
 
   const onClickStart = async () => {
+    let response;
     try {
       setIsModalOpen(true);
 
@@ -100,7 +102,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
           workspace_id: workspaceId,
           processes: processingDetails,
         };
-        const response = await manipulate(JSON.stringify(body));
+        response = await manipulate(JSON.stringify(body));
         const responseGetTable = await getTable(userId, workspaceId);
         setDataDetails(responseGetTable.data);
         console.log(response);
@@ -111,13 +113,15 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
           tests: processingDetails,
         };
         console.log(body);
-        const response = await makeTest(JSON.stringify(body));
+        response = await makeTest(JSON.stringify(body));
         setResult(response.data);
       }
       setIsModalOpen(false);
       setResultModal(true);
-    } catch (e) {
-      console.error(e);
+    } catch (apiError) {
+      console.log("Hata var");
+      console.log(apiError);
+      setErrorMessage(apiError.response.data.detail);
       setIsModalOpen(false);
       setErrorModal(true);
     }
@@ -172,7 +176,11 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
         processingDetails={processingDetails}
         result={result}
       />
-      <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
+      <ErrorModal
+        isErrorModal={isErrorModal}
+        setErrorModal={setErrorModal}
+        errorMessage={errorMessage}
+      />
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>

@@ -18,6 +18,7 @@ const { Content, Sider } = Layout;
 
 const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
   const { processingDetails, setProcessingDetails } = useProcessing();
@@ -108,34 +109,44 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   };
 
   const onClickStart = async () => {
+    setIsModalOpen(true);
+
+    const insertion_params = JSON.stringify({
+      user_id: userId.toString(),
+      processes: processingDetails,
+      workspace_id: workspaceId,
+    });
+
+    const formData = new FormData();
+    formData.append("file", dataFileDetails);
+    formData.append("insertion_params", insertion_params);
+
+    const fileNameAndIds = {
+      userId: userId.toString(),
+      fileName: fileNameDetails,
+      id: workspaceId,
+    };
+    let response;
     try {
-      setIsModalOpen(true);
+      response = await startProcess(formData);
 
-      const insertion_params = JSON.stringify({
-        user_id: userId.toString(),
-        processes: processingDetails,
-        workspace_id: workspaceId,
-      });
-
-      const formData = new FormData();
-      formData.append("file", dataFileDetails);
-      formData.append("insertion_params", insertion_params);
-
-      const fileNameAndIds = {
-        userId: userId.toString(),
-        fileName: fileNameDetails,
-        id: workspaceId,
-      };
-
-      const response = await startProcess(formData);
+      if (response?.ok) {
+        console.log("Use the response here!");
+      } else {
+        throw "startError";
+      }
       await createWorkspace(fileNameAndIds, userId);
       const responseGetTable = await getTable(userId, workspaceId);
 
       setDataDetails(responseGetTable.data);
       setIsModalOpen(false);
       setResultModal(true);
-    } catch (e) {
-      console.error(e);
+    } catch (apiError) {
+      if (apiError === "startError") {
+        setErrorMessage(`HTTP Response Code: ${response?.status}`);
+      } else {
+        setErrorMessage(apiError.response.data.detail);
+      }
       setIsModalOpen(false);
       setErrorModal(true);
     }
@@ -177,7 +188,11 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
         fileName={fileNameDetails}
         processingDetails={processingDetails}
       />
-      <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
+      <ErrorModal
+        isErrorModal={isErrorModal}
+        setErrorModal={setErrorModal}
+        errorMessage={errorMessage}
+      />
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>
