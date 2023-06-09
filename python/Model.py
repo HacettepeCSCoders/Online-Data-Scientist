@@ -15,9 +15,9 @@ class FillStrategy(Enum):
 
 
 class Processes(BaseModel):
-    to_drop_columns: list = []
-    to_drop_rows: list = []
-    non_num_cols: list = []
+    to_drop_columns: List[int]
+    to_drop_rows: List[int]
+    non_num_cols: List[str]
     fill_missing_strategy: FillStrategy = FillStrategy.NONE  # Default value
 
 
@@ -48,8 +48,8 @@ class ManipulationParams(BaseModel):
 class StatisticalTest(BaseModel):
     test_name: str
     column_1: str
-    column_2: str = ""
-    column_3: str = ""
+    column_2: str = None
+    column_3: str = None
 
 
 class StatisticalTestList(BaseModel):
