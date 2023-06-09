@@ -148,6 +148,7 @@ async def insert(
                 df = pd.read_csv(data, sep=';')
             else:
                 df = pd.read_csv(data, sep=',')
+
     df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices,
                                                 fill_missing_strategy)
 
@@ -409,13 +410,14 @@ def __wilcoxon_signed_rank_nonparametric_test__(
 ):
     data1 = df[column_name_1].values.tolist()
     data2 = df[column_name_2].values.tolist()
-    stat, p = wilcoxon(data1, data2)
-    if p > 0.05:
+    result = wilcoxon(data1, data2)
+    print(result.pvalue)
+    if result.pvalue > 0.05:
         return 'WILCOXON SIGNED-RANK TEST RESULT: \nProbably the same distribution for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-            stat, p)
+            result.statistic, result.pvalue)
     else:
         return 'WILCOXON SIGNED-RANK TEST RESULT: \nProbably different distributions for values in columns ' + column_name_1 + ' and ' + column_name_2 + ' with stat = %.3f, p-value = %.3f' % (
-            stat, p)
+            result.statistic, result.pvalue)
 
 
 def __kruskal_wallis_nonparametric_test__(
