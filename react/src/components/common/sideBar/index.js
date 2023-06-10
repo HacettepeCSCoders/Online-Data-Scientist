@@ -5,7 +5,7 @@ import {
   PieChartOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import logo from "../../../assets/logo_transparent.png";
+import logo from "../../../assets/favicon_l.png";
 import { useNavigate } from "react-router-dom";
 import { RiAdminFill } from "react-icons/ri";
 

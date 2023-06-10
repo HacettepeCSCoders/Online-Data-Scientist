@@ -60,7 +60,7 @@ export const LoginForm = ({onClickLogin}) => {
                 />
             </Form.Item>
             <Form.Item wrapperCol={{offset: 4, span: 16}}>
-                <Link href="signup" title="Don't have a account?"></Link>
+                <Link href="signup" title="Don't have an account?"></Link>
             </Form.Item>
         </Form>
     );
