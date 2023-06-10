@@ -6,7 +6,6 @@ import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { useFileName } from "../../hocs/fileNameProvider";
 import { getTable, startProcess } from "../../services/processService";
-import { useSelector } from "react-redux";
 import { createWorkspace } from "../../services/workspaceService";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
@@ -19,9 +18,10 @@ const { Content, Sider } = Layout;
 
 const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
   const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
-  const { processingDetails } = useProcessing();
+  const { processingDetails, setProcessingDetails } = useProcessing();
   const { fileNameDetails } = useFileName();
   const { dataFileDetails } = useDataFiles();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
@@ -64,11 +64,14 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
       type: "info",
       content: (
         <>
-          If you go prev, your changes on this page will be lost. Do you want to
-          go prev?
+          If you go previous page, your changes on this page will be lost. Do
+          you want to go previous page?
           <div>
             <Button
               onClick={() => {
+                if (current == 4) {
+                  setProcessingDetails(undefined);
+                }
                 setCurrent(current - 1);
                 return;
               }}
@@ -106,34 +109,44 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   };
 
   const onClickStart = async () => {
+    setIsModalOpen(true);
+
+    const insertion_params = JSON.stringify({
+      user_id: userId.toString(),
+      processes: processingDetails,
+      workspace_id: workspaceId,
+    });
+
+    const formData = new FormData();
+    formData.append("file", dataFileDetails);
+    formData.append("insertion_params", insertion_params);
+
+    const fileNameAndIds = {
+      userId: userId.toString(),
+      fileName: fileNameDetails,
+      id: workspaceId,
+    };
+    let response;
     try {
-      setIsModalOpen(true);
+      response = await startProcess(formData);
 
-      const insertion_params = JSON.stringify({
-        user_id: userId,
-        processes: processingDetails,
-        workspace_id: workspaceId,
-      });
-
-      const formData = new FormData();
-      formData.append("file", dataFileDetails);
-      formData.append("insertion_params", insertion_params);
-
-      const fileNameAndIds = {
-        userId: userId,
-        fileName: fileNameDetails,
-        id: workspaceId,
-      };
-
-      const response = await startProcess(formData);
+      if (response?.ok) {
+        console.log("Use the response here!");
+      } else {
+        throw "startError";
+      }
       await createWorkspace(fileNameAndIds, userId);
       const responseGetTable = await getTable(userId, workspaceId);
 
       setDataDetails(responseGetTable.data);
       setIsModalOpen(false);
       setResultModal(true);
-    } catch (e) {
-      console.error(e);
+    } catch (apiError) {
+      if (apiError === "startError") {
+        setErrorMessage(`HTTP Response Code: ${response?.status}`);
+      } else {
+        setErrorMessage(apiError.response.data.detail);
+      }
       setIsModalOpen(false);
       setErrorModal(true);
     }
@@ -175,7 +188,11 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
         fileName={fileNameDetails}
         processingDetails={processingDetails}
       />
-      <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
+      <ErrorModal
+        isErrorModal={isErrorModal}
+        setErrorModal={setErrorModal}
+        errorMessage={errorMessage}
+      />
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>

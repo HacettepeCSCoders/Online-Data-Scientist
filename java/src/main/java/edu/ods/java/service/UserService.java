@@ -3,6 +3,7 @@ package edu.ods.java.service;
 import edu.ods.java.dto.UserDTO;
 import edu.ods.java.dto.UserUpdateDTO;
 import edu.ods.java.exception.UserNotFoundException;
+import edu.ods.java.model.EntityBase;
 import edu.ods.java.model.Role;
 import edu.ods.java.model.User;
 import edu.ods.java.repository.RoleRepository;
@@ -46,7 +47,7 @@ public class UserService implements UserDetailsService {
 	}
 
 	public List<UserDTO> getAllUsers() {
-		return userRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+		return userRepository.findAll().stream().filter(EntityBase::isActive).map(this::mapToDTO).collect(Collectors.toList());
 	}
 
 	public UserDTO getByUsername(String username) {
@@ -91,6 +92,13 @@ public class UserService implements UserDetailsService {
 		return mapToDTO(userRepository.save(user));
 	}
 
+	public UserDTO removeUserByUsername(String email) {
+		User user = userRepository.findByUsername(email)
+				.orElseThrow(() -> new UserNotFoundException("User could not be found"));
+		user.setActive(false);
+		return mapToDTO(userRepository.save(user));
+	}
+
 	public UserDTO setUserActive(long id) {
 		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User could not be found"));
 		user.setActive(true);
@@ -99,6 +107,12 @@ public class UserService implements UserDetailsService {
 
 	public void deleteUser(long id) {
 		User user = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User could not be delete"));
+		userRepository.delete(user);
+	}
+
+	public void deleteUserByUsername(String username) {
+		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new UserNotFoundException("User could not be delete"));
 		userRepository.delete(user);
 	}
@@ -112,6 +126,18 @@ public class UserService implements UserDetailsService {
 
 	public boolean userExists(String email) {
 		return userRepository.findByUsername(email).isPresent();
+	}
+
+	public boolean isAdmin(String username) {
+		Optional<User> user = userRepository.findByUsername(username);
+		boolean isAdminRoleExists = false;
+		for (Role role : user.get().getRoles()) {
+			if (role.getName().equals("ROLE_ADMIN")) {
+				isAdminRoleExists = true;
+				break;
+			}
+		}
+		return isAdminRoleExists;
 	}
 
 	private UserDTO mapToDTO(User user) {

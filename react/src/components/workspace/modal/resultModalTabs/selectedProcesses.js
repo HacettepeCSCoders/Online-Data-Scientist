@@ -33,6 +33,14 @@ const SelectedProcesses = ({
               processObject["value"] = arrToDropColumns.join(", ");
               arr.push(processObject);
               continue;
+            } else if (
+              Object.keys(processingDetails)[i] === "to_drop_rows" ||
+              Object.keys(processingDetails)[i] === "non_num_cols"
+            ) {
+              processObject["value"] =
+                Object.values(processingDetails)[i].join(", ");
+              arr.push(processObject);
+              continue;
             }
             processObject["value"] = Object.values(processingDetails)[i];
             arr.push(processObject);

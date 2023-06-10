@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Result } from "antd";
 
-const ErrorModal = ({ setErrorModal, isErrorModal }) => {
+const ErrorModal = ({ setErrorModal, isErrorModal, errorMessage }) => {
   return (
     <>
       <Modal
@@ -15,8 +15,8 @@ const ErrorModal = ({ setErrorModal, isErrorModal }) => {
       >
         <Result
           status="warning"
-          title="There are some problems with your operation"
-          subTitle="Please try again!"
+          title={`Error occured. Try Again!`}
+          subTitle={errorMessage}
         />
       </Modal>
     </>
