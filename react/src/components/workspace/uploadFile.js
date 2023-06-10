@@ -16,6 +16,7 @@ const UploadFile = () => {
   const readExcel = (file) => {
     const promise = new Promise((resolve, reject) => {
       const fileReader = new FileReader();
+      storeFileData(file);
       fileReader.readAsArrayBuffer(file);
 
       fileReader.onload = (e) => {

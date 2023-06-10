@@ -9,7 +9,7 @@ export default (state = { ...INITIAL_STATE }, action) => {
   if (action.type === LOGOUT_SUCCESS) return INITIAL_STATE;
   else if (action.type === LOGIN_SUCCESS) {
     return {
-      ...action.payload.data,
+      ...action.payload,
       isLoggedIn: true,
     };
   }

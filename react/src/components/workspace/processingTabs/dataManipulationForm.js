@@ -1,6 +1,7 @@
 import { Button, Checkbox, Form, Input, Radio } from "antd";
 import React, { useState } from "react";
 import DropColumnSelect from "./processSelect/dropColumnSelect";
+import DropRowSelect from "./processSelect/dropRowSelect";
 
 const DataManipulationForm = ({ setValues, setWorkspaceTypeDetails }) => {
   const [missingValueEnabled, setMissingValueEnabled] = useState(false);
@@ -9,16 +10,25 @@ const DataManipulationForm = ({ setValues, setWorkspaceTypeDetails }) => {
   const [nonNumColEnabled, setNonNumColEnabled] = useState(false);
   const [columnArray, setColumnArray] = useState([]);
   const [nonNumColArray, setNonNumColArray] = useState([]);
+  const [rowsArray, setRowsArray] = useState();
 
   const onFinish = (values) => {
     !missingValueEnabled && (values.fill_missing_strategy = undefined);
     !dropColumnEnabled
       ? (values.to_drop_columns = undefined)
-      : (values.to_drop_columns = columnArray);
-    !dropRowEnabled && (values.to_drop_rows = undefined);
+      : columnArray.length !== 0
+      ? (values.to_drop_columns = columnArray)
+      : (values.to_drop_columns = undefined);
     !nonNumColEnabled
       ? (values.non_num_cols = undefined)
-      : (values.non_num_cols = nonNumColArray);
+      : nonNumColArray.length !== 0
+      ? (values.non_num_cols = nonNumColArray)
+      : (values.non_num_cols = undefined);
+    !dropRowEnabled
+      ? (values.to_drop_rows = undefined)
+      : rowsArray.length !== 0
+      ? (values.to_drop_rows = rowsArray)
+      : (values.to_drop_rows = undefined);
 
     setValues(values);
     setWorkspaceTypeDetails("dataManipulation");
@@ -87,10 +97,13 @@ const DataManipulationForm = ({ setValues, setWorkspaceTypeDetails }) => {
         </Checkbox>
         <Form.Item
           name="to_drop_rows"
-          label="Row Name"
+          label="Select Rows"
           wrapperCol={{ offset: 0, span: 3 }}
         >
-          <Input disabled={!dropRowEnabled} />
+          <DropRowSelect
+            disabledDropRow={!dropRowEnabled}
+            setRowArray={setRowsArray}
+          />
         </Form.Item>
         <Checkbox
           checked={nonNumColEnabled}

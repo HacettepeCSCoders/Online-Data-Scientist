@@ -91,6 +91,12 @@ public class UserController {
 		return ResponseEntity.ok(userService.removeUser(id));
 	}
 
+	@PostMapping("/deactivateByUsername/{username}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<UserDTO> removeUserByUsername(@PathVariable(name = "username") String email) {
+		return ResponseEntity.ok(userService.removeUserByUsername(email));
+	}
+
 	@PostMapping("/activate/{userId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<UserDTO> setUserActive(@PathVariable(name = "userId") long id) {
@@ -101,6 +107,13 @@ public class UserController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<String> deleteUser(@PathVariable(name = "userId") long id) {
 		userService.deleteUser(id);
+		return new ResponseEntity<>("User deleted permanently!", HttpStatus.OK);
+	}
+
+	@DeleteMapping("/deleteByUsername/{username}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<String> deleteUserByUsername(@PathVariable(name = "username") String email) {
+		userService.deleteUserByUsername(email);
 		return new ResponseEntity<>("User deleted permanently!", HttpStatus.OK);
 	}
 
@@ -136,6 +149,12 @@ public class UserController {
 		workspaceService.deleteAllWorkspacesOfUser(userId);
 		return new ResponseEntity<>("User deleted permanently!", HttpStatus.OK);
 
+	}
+
+	@GetMapping("/{username}/isAdmin")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
+	public ResponseEntity<Boolean> isAdmin(@PathVariable(value = "username") String username) {
+		return new ResponseEntity<>(userService.isAdmin(username), HttpStatus.OK);
 	}
 
 }

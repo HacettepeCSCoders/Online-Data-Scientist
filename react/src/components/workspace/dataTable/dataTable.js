@@ -1,6 +1,5 @@
-import { Table, Dropdown } from "antd";
+import { Table } from "antd";
 import React from "react";
-import { PlusOutlined } from "@ant-design/icons";
 
 const DataTable = ({ dataDetails }) => {
   const rows = dataDetails.split("\n");

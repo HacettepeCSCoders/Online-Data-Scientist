@@ -1,8 +1,10 @@
 package edu.ods.java.service;
 
 import edu.ods.java.config.EmailValidator;
+import edu.ods.java.dto.UserChangePasswordDTO;
 import edu.ods.java.dto.UserDTO;
 import edu.ods.java.exception.UserNotFoundException;
+import edu.ods.java.model.Role;
 import edu.ods.java.model.User;
 import edu.ods.java.repository.RoleRepository;
 import edu.ods.java.repository.UserRepository;
@@ -15,6 +17,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +65,23 @@ public class AuthService {
 		throw new IllegalArgumentException("Email already taken");
 	}
 
+	public User changePassword(UserChangePasswordDTO request) {
+
+		boolean isValidEmail = emailValidator.test(request.getUsername());
+		if (!isValidEmail) {
+			throw new IllegalArgumentException("Not a valid email");
+		}
+		if (userRepository.existsByUsername(request.getUsername())) {
+			User user = userRepository.findByUsername(request.getUsername()).get();
+
+			if (user.getPassword().equals(request.getOldPassword())) {
+				user.setPassword(request.getNewPassword());
+			}
+			userRepository.save(user);
+		}
+		throw new IllegalArgumentException("Email is not registered!");
+	}
+
 	public JWTResponseModel createToken(JWTRequestModel request) throws Exception {
 		try {
 			authenticationManager.authenticate(
@@ -77,8 +98,16 @@ public class AuthService {
 		final UserDetailsAdapter userDetails = new UserDetailsAdapter(user);
 		final String jwtToken = jwtGenerator.generateJwtToken(userDetails);
 
+		boolean isAdmin = false;
+		for (Role role : userDetails.user().getRoles()) {
+			if (role.getName().equals("ROLE_ADMIN")) {
+				isAdmin = true;
+				break;
+			}
+		}
+
 		return new JWTResponseModel(jwtToken, userDetails.user().getId(), !userDetails.isEnabled(),
-				userDetails.user().getUsername());
+				userDetails.user().getUsername(), isAdmin);
 	}
 
 }

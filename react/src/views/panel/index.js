@@ -8,7 +8,7 @@ const Panel = () => {
       <PageHeader
         className="pageHeader-workspace"
         title="User List"
-        subTitle="see all users , delete  "
+        subTitle="You can view and delete users on this page."
       ></PageHeader>
       <UserList></UserList>
     </>

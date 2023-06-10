@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useProcessing } from "../../../../hocs/proccesingProvider";
-import { Descriptions } from "antd";
+import { Descriptions, Tag } from "antd";
 import getColumnsStruct from "../../../../utils/workspace/getColumnsStruct";
-import { useData } from "../../../../hocs/dataProvider";
 
 const SelectedProcesses = ({
   processingDetails,
@@ -35,6 +33,14 @@ const SelectedProcesses = ({
               processObject["value"] = arrToDropColumns.join(", ");
               arr.push(processObject);
               continue;
+            } else if (
+              Object.keys(processingDetails)[i] === "to_drop_rows" ||
+              Object.keys(processingDetails)[i] === "non_num_cols"
+            ) {
+              processObject["value"] =
+                Object.values(processingDetails)[i].join(", ");
+              arr.push(processObject);
+              continue;
             }
             processObject["value"] = Object.values(processingDetails)[i];
             arr.push(processObject);
@@ -43,6 +49,7 @@ const SelectedProcesses = ({
         }
       }
       setProcesses(arr);
+      console.log(arr);
     } else if (workspaceTypeDetails == "statistical") {
       setStatisticalTest(processingDetails);
     }
@@ -57,18 +64,36 @@ const SelectedProcesses = ({
         }
         size="middle"
         layout="vertical"
-        bordered
+        bordered={true}
+        column={1}
       >
         {processes &&
           processes.map((item) => (
-            <Descriptions.Item label={item.key}>{item.value}</Descriptions.Item>
-          ))}
-        {statisticalTest &&
-          statisticalTest.map((item) => (
-            <Descriptions.Item label={item.test_name}>
-              {item.column_1} {item.column_2} {item.column_3}
+            <Descriptions.Item
+              label={<Tag className="nav-background">{item.key} </Tag>}
+            >
+              {"Columns: "}
+              <Tag> {item.value}</Tag>
             </Descriptions.Item>
           ))}
+        {statisticalTest &&
+          statisticalTest.map((item) => {
+            return (
+              <>
+                <Descriptions.Item
+                  label={
+                    <Tag className="nav-background">{item.test_name} </Tag>
+                  }
+                >
+                  {"Columns: "}
+                  <Tag>{item.column_1} </Tag>
+                  {item.column_2 && <Tag>{item.column_2} </Tag>}
+                  {item.column_3 && <Tag>{item.column_3} </Tag>}
+                </Descriptions.Item>
+                <br />
+              </>
+            );
+          })}
       </Descriptions>
     </>
   );

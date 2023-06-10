@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
 import { steps } from "../../utils/workspace/steps";
-import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { useFileName } from "../../hocs/fileNameProvider";
 import { getTable, startProcess } from "../../services/processService";
-import { useSelector } from "react-redux";
 import { createWorkspace } from "../../services/workspaceService";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
@@ -19,9 +17,9 @@ const { Content, Sider } = Layout;
 
 const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
-  const { workspaceTypeDetails } = useWorkspaceType();
+  const [errorMessage, setErrorMessage] = useState("");
   const { dataDetails, setDataDetails } = useData();
-  const { processingDetails } = useProcessing();
+  const { processingDetails, setProcessingDetails } = useProcessing();
   const { fileNameDetails } = useFileName();
   const { dataFileDetails } = useDataFiles();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
@@ -64,11 +62,14 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
       type: "info",
       content: (
         <>
-          If you go prev, your changes on this page will be lost. Do you want to
-          go prev?
+          If you go previous page, your changes on this page will be lost. Do
+          you want to go previous page?
           <div>
             <Button
               onClick={() => {
+                if (current == 4) {
+                  setProcessingDetails(undefined);
+                }
                 setCurrent(current - 1);
                 return;
               }}
@@ -106,34 +107,44 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   };
 
   const onClickStart = async () => {
+    setIsModalOpen(true);
+
+    const insertion_params = JSON.stringify({
+      user_id: userId.toString(),
+      processes: processingDetails,
+      workspace_id: workspaceId,
+    });
+
+    const formData = new FormData();
+    formData.append("file", dataFileDetails);
+    formData.append("insertion_params", insertion_params);
+
+    const fileNameAndIds = {
+      userId: userId.toString(),
+      fileName: fileNameDetails,
+      id: workspaceId,
+    };
+    let response;
     try {
-      setIsModalOpen(true);
+      response = await startProcess(formData);
 
-      const insertion_params = JSON.stringify({
-        user_id: userId,
-        processes: processingDetails,
-        workspace_id: workspaceId,
-      });
-
-      const formData = new FormData();
-      formData.append("file", dataFileDetails);
-      formData.append("insertion_params", insertion_params);
-
-      const fileNameAndIds = {
-        userId: userId,
-        fileName: fileNameDetails,
-        id: workspaceId,
-      };
-
+      if (response?.ok) {
+        console.log("Use the response here!");
+      } else {
+        throw "startError";
+      }
       await createWorkspace(fileNameAndIds, userId);
-      const response = await startProcess(formData);
       const responseGetTable = await getTable(userId, workspaceId);
-      console.log(responseGetTable.data);
+
       setDataDetails(responseGetTable.data);
       setIsModalOpen(false);
       setResultModal(true);
-    } catch (e) {
-      console.error(e);
+    } catch (apiError) {
+      if (apiError === "startError") {
+        setErrorMessage(`HTTP Response Code: ${response?.status}`);
+      } else {
+        setErrorMessage(apiError.response.data.detail);
+      }
       setIsModalOpen(false);
       setErrorModal(true);
     }
@@ -141,7 +152,6 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
 
   const next = () => {
     if (
-      (current === 0 && workspaceTypeDetails == null) ||
       (current === 1 && dataDetails == null) ||
       (current === 3 && processingDetails == null)
     ) {
@@ -175,7 +185,11 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
         fileName={fileNameDetails}
         processingDetails={processingDetails}
       />
-      <ErrorModal isErrorModal={isErrorModal} setErrorModal={setErrorModal} />
+      <ErrorModal
+        isErrorModal={isErrorModal}
+        setErrorModal={setErrorModal}
+        errorMessage={errorMessage}
+      />
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>
@@ -202,7 +216,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
             title={steps[current].title}
             onBack={prev}
           >
-            <Descriptions>
+            <Descriptions column={1}>
               <Descriptions.Item span={4}>
                 {steps[current].subTitle}
               </Descriptions.Item>

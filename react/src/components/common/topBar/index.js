@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
-import { Avatar, Button, Col, Dropdown, Input, Layout, Row } from "antd";
+import { Avatar, Button, Col, Dropdown, Input, Layout, Row, Tag } from "antd";
 import {
   LogoutOutlined,
   SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutSuccess } from "../../../reducers/actions/authActions";
-import logo from "../../../assets/logo1.png";
+import logo from "../../../assets/logo_transparent.png";
 
 const { Header } = Layout;
 
@@ -35,10 +35,6 @@ const TopBar = ({ name, isLoggedIn }) => {
     },
     {
       key: "3",
-      label: <a href="/burakdag">Your Profile</a>,
-    },
-    {
-      key: "4",
       label: (
         <div onClick={onClickLogout}>
           Sign Out <LogoutOutlined />
@@ -51,7 +47,11 @@ const TopBar = ({ name, isLoggedIn }) => {
     <Row gutter={16}>
       <Col>
         <div>
-          <img src={logo} className="logo-size-topbar" />
+          <img
+            src={logo}
+            className="logo-size-topbar"
+            onClick={() => navigate(`/`)}
+          />
         </div>
       </Col>
       <Col offset={18}>
@@ -76,7 +76,8 @@ const TopBar = ({ name, isLoggedIn }) => {
             type="text"
           />
         </Col>
-        <Col className="gutter-row" span={2} offset={6}>
+        <Col className="gutter-row" span={6} offset={6}>
+          <Tag color="#3F403F">{name}</Tag>
           <Dropdown
             menu={{
               items,

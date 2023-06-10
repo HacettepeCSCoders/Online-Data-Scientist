@@ -64,69 +64,104 @@ const StatisticalProcessingForm = ({ setValues, setWorkspaceTypeDetails }) => {
     let test = [];
     !shapiroWilkTestEnabled
       ? (values["shapiro_wilk"] = undefined)
-      : (values["shapiro_wilk"] = [shapiroColumn]);
+      : shapiroColumn !== ""
+      ? (values["shapiro_wilk"] = [shapiroColumn])
+      : (values["shapiro_wilk"] = undefined);
     !dagostinoK2TestEnabled
       ? (values["dagostino_k2"] = undefined)
-      : (values["dagostino_k2"] = [dagostinoK2Column]);
+      : dagostinoK2Column !== ""
+      ? (values["dagostino_k2"] = [dagostinoK2Column])
+      : (values["dagostino_k2"] = undefined);
     !andersonDarlingTestEnabled
       ? (values["anderson_darling"] = undefined)
-      : (values["anderson_darling"] = [andersonDarlingColumn]);
+      : andersonDarlingColumn !== ""
+      ? (values["anderson_darling"] = [andersonDarlingColumn])
+      : (values["anderson_darling"] = undefined);
     !pearsonCorrelationTestEnabled
       ? (values["pearson_correlation"] = undefined)
-      : (values["pearson_correlation"] = [
+      : (pearsonCorrelationColumn1 !== "") & (pearsonCorrelationColumn2 !== "")
+      ? (values["pearson_correlation"] = [
           pearsonCorrelationColumn1,
           pearsonCorrelationColumn2,
-        ]);
+        ])
+      : (values["pearson_correlation"] = undefined);
     !spearmanCorrelationTestEnabled
       ? (values["spearman_correlation"] = undefined)
-      : (values["spearman_correlation"] = [
+      : (spearmanCorrelationColumn1 !== "") &
+        (spearmanCorrelationColumn2 !== "")
+      ? (values["spearman_correlation"] = [
           spearmanCorrelationColumn1,
           spearmanCorrelationColumn2,
-        ]);
+        ])
+      : (values["spearman_correlation"] = undefined);
     !kendallCorrelationTestEnabled
       ? (values["kendall_correlation"] = undefined)
-      : (values["kendall_correlation"] = [
+      : (kendallCorrelationColumn1 !== "") & (kendallCorrelationColumn2 !== "")
+      ? (values["kendall_correlation"] = [
           kendallCorrelationColumn1,
           kendallCorrelationColumn2,
-        ]);
+        ])
+      : (values["kendall_correlation"] = undefined);
     !chiSquareTestEnabled
       ? (values["chi_square"] = undefined)
-      : (values["chi_square"] = [chiSquareColumn1, chiSquareColumn2]);
+      : (chiSquareColumn1 !== "") & (chiSquareColumn2 !== "")
+      ? (values["chi_square"] = [chiSquareColumn1, chiSquareColumn2])
+      : (values["chi_square"] = undefined);
     !augmentedTestEnabled
       ? (values["augmented_dickey_fuller"] = undefined)
-      : (values["augmented_dickey_fuller"] = [augmentedColumn1]);
+      : augmentedColumn1 !== ""
+      ? (values["augmented_dickey_fuller"] = [augmentedColumn1])
+      : (values["augmented_dickey_fuller"] = undefined);
     !kwiatkowskiTestEnabled
       ? (values["kwiatkowski"] = undefined)
-      : (values["kwiatkowski"] = [kwiatkowskiColumn1]);
+      : kwiatkowskiColumn1 !== ""
+      ? (values["kwiatkowski"] = [kwiatkowskiColumn1])
+      : (values["kwiatkowski"] = undefined);
     !tTestEnabled
       ? (values["student_t"] = undefined)
-      : (values["student_t"] = [tColumn1, tColumn2]);
+      : (tColumn1 !== "") & (tColumn2 !== "")
+      ? (values["student_t"] = [tColumn1, tColumn2])
+      : (values["student_t"] = undefined);
     !pairedtTestEnabled
       ? (values["paired_student_t"] = undefined)
-      : (values["paired_student_t"] = [pairedtColumn1, pairedtColumn2]);
+      : (pairedtColumn1 !== "") & (pairedtColumn2 !== "")
+      ? (values["paired_student_t"] = [pairedtColumn1, pairedtColumn2])
+      : (values["paired_student_t"] = undefined);
     !anovaTestEnabled
       ? (values["analysis_of_variance"] = undefined)
-      : (values["analysis_of_variance"] = [
+      : (anovaColumn1 !== "") & (anovaColumn2 !== "") & (anovaColumn3 !== "")
+      ? (values["analysis_of_variance"] = [
           anovaColumn1,
           anovaColumn2,
           anovaColumn3,
-        ]);
+        ])
+      : (values["analysis_of_variance"] = undefined);
     !mannTestEnabled
       ? (values["mann_whitney_u"] = undefined)
-      : (values["mann_whitney_u"] = [mannColumn1, mannColumn2]);
+      : (mannColumn1 !== "") & (mannColumn2 !== "")
+      ? (values["mann_whitney_u"] = [mannColumn1, mannColumn2])
+      : (values["mann_whitney_u"] = undefined);
     !wilcoxonTestEnabled
       ? (values["wilcoxon_signed_rank"] = undefined)
-      : (values["wilcoxon_signed_rank"] = [wilcoxonColumn1, wilcoxonColumn2]);
+      : (wilcoxonColumn1 !== "") & (wilcoxonColumn2 !== "")
+      ? (values["wilcoxon_signed_rank"] = [wilcoxonColumn1, wilcoxonColumn2])
+      : (values["wilcoxon_signed_rank"] = undefined);
     !kruskalTestEnabled
       ? (values["kruskal_wallis"] = undefined)
-      : (values["kruskal_wallis"] = [kruskalColumn1, kruskalColumn2]);
+      : (kruskalColumn1 !== "") & (kruskalColumn2 !== "")
+      ? (values["kruskal_wallis"] = [kruskalColumn1, kruskalColumn2])
+      : (values["kruskal_wallis"] = undefined);
     !friedmanTestEnabled
       ? (values["friedman"] = undefined)
-      : (values["friedman"] = [
+      : (friedmanColumn1 !== "") &
+        (friedmanColumn2 !== "") &
+        (friedmanColumn3 !== "")
+      ? (values["friedman"] = [
           friedmanColumn1,
           friedmanColumn2,
           friedmanColumn3,
-        ]);
+        ])
+      : (values["friedman"] = undefined);
 
     for (const [key, value] of Object.entries(values)) {
       if (value != undefined) {

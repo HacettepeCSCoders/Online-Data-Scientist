@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Button, Descriptions } from "antd";
+import { Button, Descriptions, Tag } from "antd";
 
 const ResultTab = ({ result, workspaceTypeDetails }) => {
   const printRef = React.useRef();
@@ -23,11 +23,15 @@ const ResultTab = ({ result, workspaceTypeDetails }) => {
 
   useEffect(() => {
     let arr = [];
-    for (const [key, value] of Object.entries(result)) {
-      let obj = {};
-      obj.name = key;
-      obj.res = value;
-      arr.push(obj);
+    if (workspaceTypeDetails == "statistical") {
+      for (const [key, value] of Object.entries(result)) {
+        let obj = {};
+        obj.name = key;
+        obj.res = value;
+        arr.push(obj);
+      }
+    } else if (workspaceTypeDetails == "dataManipulation") {
+      console.log();
     }
     setTestArray(arr);
   }, []);
@@ -41,16 +45,22 @@ const ResultTab = ({ result, workspaceTypeDetails }) => {
             size="middle"
             layout="vertical"
             bordered
+            column={1}
           >
             {testArray &&
-              testArray.map((item) => (
-                <Descriptions.Item label={item.name}>
-                  {item.res}
-                </Descriptions.Item>
-              ))}
+              testArray.map((item) => {
+                return (
+                  <Descriptions.Item
+                    label={<Tag className="nav-background">{item.name}</Tag>}
+                  >
+                    {item.res}
+                  </Descriptions.Item>
+                );
+              })}
           </Descriptions>
         )}
       </div>
+      <br />
       <Button className="dark-background" onClick={generatePDF}>
         Export PDF
       </Button>
