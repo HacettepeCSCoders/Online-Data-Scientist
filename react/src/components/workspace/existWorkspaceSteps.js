@@ -10,9 +10,10 @@ import WaitingModal from "./modal/waitingModal";
 import { PageHeader } from "@ant-design/pro-layout";
 import ErrorModal from "./modal/errorModal";
 import { useNavigate } from "react-router-dom";
+import { CSVLink } from "react-csv";
 const { Content, Sider } = Layout;
 
-const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
+const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
   const [current, setCurrent] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [result, setResult] = useState({});
@@ -208,10 +209,25 @@ const ExistWorkspaceSteps = ({ workspaceId, userId }) => {
           title={existSteps[current].title}
           onBack={prev}
         >
+          <Descriptions column={1}>
+            <Descriptions.Item>
+              {existSteps[current].subTitle}
+            </Descriptions.Item>
+          </Descriptions>
           <Descriptions>
             <Descriptions.Item>
               {existSteps[current].subTitle}
             </Descriptions.Item>
+            <Descriptions.Item>
+              <Tag>{fileName} </Tag>
+            </Descriptions.Item>
+            {current === 0 && dataDetails && (
+              <Descriptions.Item>
+                <CSVLink filename={fileName} data={dataDetails}>
+                  <Button className="dark-background">Download CSV File</Button>
+                </CSVLink>
+              </Descriptions.Item>
+            )}
           </Descriptions>
         </PageHeader>
         <div>{existSteps[current].content}</div>

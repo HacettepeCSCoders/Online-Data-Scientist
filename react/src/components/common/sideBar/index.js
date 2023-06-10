@@ -4,14 +4,13 @@ import {
   HomeOutlined,
   PieChartOutlined,
   PlusOutlined,
-  ThunderboltOutlined,
 } from "@ant-design/icons";
-import logo from "../../../assets/logo1.png";
+import logo from "../../../assets/logo_transparent.png";
 import { useNavigate } from "react-router-dom";
 import { RiAdminFill } from "react-icons/ri";
 
 const { Sider } = Layout;
-const SideBar = () => {
+const SideBar = ({ isAdmin }) => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -44,7 +43,7 @@ const SideBar = () => {
                 <Col>
                   <HomeOutlined className="icon-font" />
                 </Col>
-                <Col>HomePage</Col>
+                <Col>Home Page</Col>
               </Row>
             </div>
           </Menu.Item>
@@ -60,18 +59,20 @@ const SideBar = () => {
               </Row>
             </div>
           </Menu.Item>
-          <Menu.Item key="3" className="customclass">
-            <div onClick={() => navigate("/panel")}>
-              <Row>
-                <Col>
-                  <RiAdminFill className="icon-font" />
-                </Col>
-                <Col>
-                  <div> Panel </div>
-                </Col>
-              </Row>
-            </div>
-          </Menu.Item>
+          {isAdmin && (
+            <Menu.Item key="3" className="customclass">
+              <div onClick={() => navigate("/panel")}>
+                <Row>
+                  <Col>
+                    <RiAdminFill className="icon-font" />
+                  </Col>
+                  <Col>
+                    <div> Panel </div>
+                  </Col>
+                </Row>
+              </div>
+            </Menu.Item>
+          )}
         </Menu>
       </Sider>
     </>

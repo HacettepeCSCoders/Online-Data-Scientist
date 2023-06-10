@@ -7,6 +7,7 @@ import {
   Descriptions,
   Space,
   Typography,
+  message,
 } from "antd";
 import { PageHeader } from "@ant-design/pro-layout";
 import {
@@ -20,7 +21,31 @@ const { Content } = Layout;
 
 const AllWorkspaces = () => {
   const [allWorkspaces, setAllWorkspaces] = useState();
+  const [deleteMessageApi, deleteMessageApiContext] = message.useMessage();
   let navigate = useNavigate();
+
+  const getAll = async () => {
+    try {
+      const response = await getAllWorkspaces(userId);
+      let arr = [];
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i].active !== false) {
+          arr.push(response.data[i]);
+        }
+      }
+
+      for (let i = 0; i < arr.length; i++) {
+        arr[i].updateDate = new Date(arr[i].updateDate);
+        arr[i].createDate = new Date(arr[i].createDate);
+      }
+      arr.sort(function (a, b) {
+        return new Date(b.updateDate) - new Date(a.updateDate);
+      });
+      setAllWorkspaces(arr);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const { userId } = useSelector((store) => ({
     userId: store.id,
@@ -31,34 +56,35 @@ const AllWorkspaces = () => {
     navigate(`/workspace/${workspaceId}/new`);
   };
 
+  const deleteMesage = (workspaceId) => {
+    deleteMessageApi.open({
+      type: "info",
+      content: (
+        <>
+          Do you really want to delete?
+          <div>
+            <Button
+              onClick={() => {
+                try {
+                  removeWorkspace(workspaceId);
+                  window.location.reload(false);
+                } catch (e) {
+                  console.log(e);
+                }
+              }}
+            >
+              Yes
+            </Button>
+            <Button>No</Button>
+          </div>
+        </>
+      ),
+      duration: 1.25,
+    });
+  };
+
   const onClickDelete = async (workspaceId) => {
-    try {
-      await removeWorkspace(workspaceId);
-    } catch {
-      console.error();
-    }
-    const getAll = async () => {
-      try {
-        const response = await getAllWorkspaces(userId);
-        let arr = [];
-        for (let i = 0; i < response.data.length; i++) {
-          if (response.data[i].active !== false) {
-            arr.push(response.data[i]);
-          }
-        }
-        for (let i = 0; i < arr.length; i++) {
-          arr[i].updateDate = new Date(arr[i].updateDate);
-          arr[i].createDate = new Date(arr[i].createDate);
-        }
-        arr.sort(function (a, b) {
-          return new Date(b.updateDate) - new Date(a.updateDate);
-        });
-        setAllWorkspaces(arr);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    getAll();
+    deleteMesage(workspaceId);
   };
 
   const onClickGoToWorkspace = (workspaceId) => {
@@ -66,29 +92,7 @@ const AllWorkspaces = () => {
   };
 
   useEffect(() => {
-    const getAllFirst = async () => {
-      try {
-        const response = await getAllWorkspaces(userId);
-        let arr = [];
-        for (let i = 0; i < response.data.length; i++) {
-          if (response.data[i].active !== false) {
-            arr.push(response.data[i]);
-          }
-        }
-
-        for (let i = 0; i < arr.length; i++) {
-          arr[i].updateDate = new Date(arr[i].updateDate);
-          arr[i].createDate = new Date(arr[i].createDate);
-        }
-        arr.sort(function (a, b) {
-          return new Date(b.updateDate) - new Date(a.updateDate);
-        });
-        setAllWorkspaces(arr);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    getAllFirst();
+    getAll();
   }, []);
 
   const columns = [
@@ -139,13 +143,14 @@ const AllWorkspaces = () => {
 
   return (
     <>
+      {deleteMessageApiContext}
       <PageHeader
         className="pageHeader-workspace"
         title="Your Workspaces"
         onBack={() => {
           navigate("/", { replace: true });
         }}
-        subTitle="see all workspaces , delete or add colab "
+        subTitle="You can view and delete workspaces on this page."
       >
         <Button onClick={onClickPlus} className="button-allWorkspace">
           + New Workspace

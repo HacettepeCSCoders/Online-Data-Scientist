@@ -12,11 +12,13 @@ import SideBar from "./components/common/sideBar";
 import TopBar from "./components/common/topBar";
 
 import "./styles/common.css";
+import Panel from "./views/panel";
 
 const App = () => {
-  const { name, isLoggedIn } = useSelector((store) => ({
+  const { name, isLoggedIn, isAdmin } = useSelector((store) => ({
     name: store.name,
     isLoggedIn: store.isLoggedIn,
+    isAdmin: store.isAdmin,
   }));
 
   return (
@@ -24,7 +26,7 @@ const App = () => {
       <Suspense fallback={<Skeleton active />}>
         <Router>
           <Layout>
-            {isLoggedIn && <SideBar></SideBar>}
+            {isLoggedIn && <SideBar isAdmin={isAdmin}></SideBar>}
             <Layout>
               <TopBar name={name} isLoggedIn={isLoggedIn} />
               <Routes>
@@ -44,6 +46,9 @@ const App = () => {
                       />
                     ))}
 
+                {isAdmin === true && isLoggedIn && (
+                  <Route path="/panel" element={<Panel />} />
+                )}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Layout>

@@ -11,6 +11,7 @@ import { getWorkspace } from "../../services/workspaceService";
 const ExistWorkspace = () => {
   const routeParams = useParams();
   const [workspace, setWorkspace] = useState([]);
+  const [fileName, setFileName] = useState("");
   const pathId = routeParams.workspaceId;
   let navigate = useNavigate();
 
@@ -24,24 +25,12 @@ const ExistWorkspace = () => {
       event.returnValue = "";
       return "";
     };
-    // const getAll = async () => {
-    //   try {
-    //     const response = await getAllUsers();
-    //     console.log(response.data.length);
-    //     const arr = response.data;
-    //     console.log(arr);
-    //     setAllWorkspaces(arr);
-    //   } catch (e) {
-    //     console.log(e);
-    //   }
-    // };
-    // getAll();
 
     const getWork = async () => {
       try {
-        const response = await getWorkspace(userId, pathId); // change struct
-        console.log(response);
+        const response = await getWorkspace(pathId); // change struct
         setWorkspace(response.data);
+        setFileName(response.data.fileName);
       } catch (e) {
         console.log(e);
         navigate("/");
@@ -55,13 +44,6 @@ const ExistWorkspace = () => {
   }, []);
 
   useEffect(() => {
-    // for (let i = 0; i < allWorkspaces.length; i++) {
-    //   if (username === allWorkspaces[i].username) {
-    //     console.log("a");
-    //   }
-    // }
-    // console.log(allWorkspaces.length);
-
     if (workspace.userId !== userId) {
       // navigate("/");
     }
@@ -74,7 +56,11 @@ const ExistWorkspace = () => {
           <DataProvider>
             <ProcessingProvider>
               <Layout className="layout-background">
-                <ExistWorkspaceSteps workspaceId={pathId} userId={userId} />
+                <ExistWorkspaceSteps
+                  workspaceId={pathId}
+                  userId={userId}
+                  fileName={fileName}
+                />
               </Layout>
             </ProcessingProvider>
           </DataProvider>
