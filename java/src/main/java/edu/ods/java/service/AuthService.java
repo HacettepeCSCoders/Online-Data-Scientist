@@ -74,8 +74,8 @@ public class AuthService {
 		if (userRepository.existsByUsername(request.getUsername())) {
 			User user = userRepository.findByUsername(request.getUsername()).get();
 
-			if (user.getPassword().equals(request.getOldPassword())) {
-				user.setPassword(request.getNewPassword());
+			if (user.getPassword().equals(passwordEncoder.encode(request.getOldPassword()))) {
+				user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 			}
 			userRepository.save(user);
 		}
