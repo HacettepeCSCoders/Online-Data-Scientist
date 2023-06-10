@@ -8,7 +8,7 @@ import {
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutSuccess } from "../../../reducers/actions/authActions";
-import logo from "../../../assets/logo_transparent.png";
+import logo from "../../../assets/favicon_s.png";
 
 const { Header } = Layout;
 
