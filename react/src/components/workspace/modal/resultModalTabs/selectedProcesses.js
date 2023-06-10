@@ -9,6 +9,7 @@ const SelectedProcesses = ({
 }) => {
   const [processes, setProcesses] = useState([]);
   const [statisticalTest, setStatisticalTest] = useState([]);
+  const [knnTest, setKnnTest] = useState({});
   const colArr = getColumnsStruct(dataDetails);
 
   useEffect(() => {
@@ -52,6 +53,8 @@ const SelectedProcesses = ({
       console.log(arr);
     } else if (workspaceTypeDetails == "statistical") {
       setStatisticalTest(processingDetails);
+    } else if (workspaceTypeDetails == "knn") {
+      setKnnTest(processingDetails);
     }
   }, []);
   return (
@@ -60,10 +63,12 @@ const SelectedProcesses = ({
         title={
           workspaceTypeDetails == "statistical"
             ? "Statistical Test"
-            : "Data Manipulation"
+            : workspaceTypeDetails == "dataManipulation"
+            ? "Data Manipulation"
+            : "K-Nearest Neighbor"
         }
         size="middle"
-        layout="vertical"
+        layout={knnTest ? "horizontal" : "vertical"}
         bordered={true}
         column={1}
       >
@@ -94,6 +99,17 @@ const SelectedProcesses = ({
               </>
             );
           })}
+        {Object.keys(knnTest).map((item, i) => {
+          return (
+            <>
+              <Descriptions.Item
+                label={<Tag className="nav-background">{item} </Tag>}
+              >
+                <Tag>{knnTest[item]} </Tag>
+              </Descriptions.Item>
+            </>
+          );
+        })}
       </Descriptions>
     </>
   );
