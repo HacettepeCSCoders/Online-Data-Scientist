@@ -22,9 +22,9 @@ export const removeWorkspace = (workspaceId) => {
   });
 };
 
-export const getWorkspace = (userId, workspaceId) => {
+export const getWorkspace = (workspaceId) => {
   return axios({
     method: "get",
-    url: `http://localhost:8080/api/v1/users/${3}`,
+    url: `http://localhost:8080/api/v1/workspaces/${workspaceId}`,
   });
 };

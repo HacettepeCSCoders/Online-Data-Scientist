@@ -19,8 +19,7 @@ export const loginHandler = (creds) => {
   return async function (dispatch) {
     const response = await login(creds);
     const user = response.data;
-    console.log(user.access_token);
-    dispatch(loginSuccess(response));
+    dispatch(loginSuccess(user));
 
     return response;
   };

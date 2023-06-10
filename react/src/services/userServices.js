@@ -7,9 +7,9 @@ export const getAllUsers = () => {
   });
 };
 
-export const deleteUser = (userId) => {
+export const deleteUser = (username) => {
   return axios({
     method: "post",
-    url: `http://localhost:8080/api/v1/users/deactivate/${userId}`,
+    url: `http://localhost:8080/api/v1/users/deactivateByUsername/${username}`,
   });
 };

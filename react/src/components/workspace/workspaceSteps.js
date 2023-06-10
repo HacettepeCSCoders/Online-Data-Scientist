@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
 import { steps } from "../../utils/workspace/steps";
-import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { useFileName } from "../../hocs/fileNameProvider";
@@ -19,7 +18,6 @@ const { Content, Sider } = Layout;
 const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [current, setCurrent] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
-  const { workspaceTypeDetails } = useWorkspaceType();
   const { dataDetails, setDataDetails } = useData();
   const { processingDetails, setProcessingDetails } = useProcessing();
   const { fileNameDetails } = useFileName();
@@ -154,7 +152,6 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
 
   const next = () => {
     if (
-      (current === 0 && workspaceTypeDetails == null) ||
       (current === 1 && dataDetails == null) ||
       (current === 3 && processingDetails == null)
     ) {
@@ -219,7 +216,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
             title={steps[current].title}
             onBack={prev}
           >
-            <Descriptions>
+            <Descriptions column={1}>
               <Descriptions.Item span={4}>
                 {steps[current].subTitle}
               </Descriptions.Item>
