@@ -10,7 +10,7 @@ from pydantic import Json
 from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kendalltau, chi2_contingency, ttest_ind, \
     ttest_rel, f_oneway, mannwhitneyu, wilcoxon, kruskal, friedmanchisquare
 from sklearn.preprocessing import OrdinalEncoder
-from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR
+from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR, text
 from statsmodels.tsa.stattools import adfuller, kpss
 
 import Model
@@ -71,6 +71,40 @@ def get_table(
     parsed = df.to_csv(index=False)
     return parsed
 
+@app.delete('/python/delete-user')
+async def delete_user(
+        response: Response,
+        user_id: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    __delete_user_from_sql__(user_id, con)
+    con.close()
+
+    response.status_code = 204
+
+@app.delete('/python/delete-workspace')
+async def delete_workspace(
+        response: Response,
+        user_id: str,
+        workspace_id: str
+):
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+    __delete_workspace_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    response.status_code = 204
 
 @app.post('/python/manipulate')
 async def manipulate(
@@ -585,6 +619,21 @@ def __create_table_if_not_exists__(con, schema_name, table_name):
         except Exception:
             raise HTTPException(status_code=400, detail="Can't create table")
 
+# function for deleting user from database
+def __delete_user_from_sql__(user_id, con):
+    try:
+        con.execute(text(f"DROP SCHEMA \"{str(user_id)}\" CASCADE;"))
+        con.commit()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't delete user from database")
+
+# function for deleting table from database
+def __delete_workspace_from_sql__(user_id, workspace_id, con):
+    try:
+        con.execute(text(f"DROP TABLE \"{str(user_id)}\".\"{str(workspace_id)}\" CASCADE;"))
+        con.commit()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't delete workspace from database")
 
 # manipulate dataframe helper function
 def __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices, fill_missing_strategy):
