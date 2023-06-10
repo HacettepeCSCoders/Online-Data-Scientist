@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="project name change">
+    <list default="true" id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="updated master branch yaml config for cicd">
+      <change beforePath="$PROJECT_DIR$/../python/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../python/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../python/.idea/python.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../python/.idea/python.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -13,9 +15,32 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="feature/docker" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
     <option name="RESET_MODE" value="HARD" />
-    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="recentNewPullRequestHead">
+      <RepoCoordinatesHolder>
+        <option name="owner" value="HacettepeCSCoders" />
+        <option name="repository" value="Online-Data-Scientist" />
+      </RepoCoordinatesHolder>
+    </option>
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="9291d186-928b-43ba-8b31-87ae4a866d06" />
+        <option name="url" value="https://github.com/HacettepeCSCoders/Online-Data-Scientist.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -30,6 +55,8 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;U:/iç/Sources/WorkSpace[4.1]/479-480-DesignProject/Online-Data-Scientist/react&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -37,7 +64,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="npm.install">
+  <component name="RunManager" selected="npm.start">
     <configuration name="install" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="install" />
@@ -67,6 +94,18 @@
       <updated>1678190566266</updated>
       <workItem from="1678190567669" duration="122000" />
       <workItem from="1678191392140" duration="719000" />
+      <workItem from="1679932488198" duration="349000" />
+      <workItem from="1685523924300" duration="4838000" />
+      <workItem from="1685966002654" duration="2135000" />
+      <workItem from="1685996944508" duration="3161000" />
+      <workItem from="1686044971063" duration="2171000" />
+      <workItem from="1686055955128" duration="3255000" />
+      <workItem from="1686077539436" duration="4476000" />
+      <workItem from="1686087012227" duration="779000" />
+      <workItem from="1686159299215" duration="2868000" />
+      <workItem from="1686255165567" duration="1100000" />
+      <workItem from="1686341097618" duration="738000" />
+      <workItem from="1686389002078" duration="869000" />
     </task>
     <task id="LOCAL-00001" summary="project name change">
       <created>1678190638947</created>
@@ -89,34 +128,83 @@
       <option name="project" value="LOCAL" />
       <updated>1678191269321</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="python requirements and dockerfile added">
+      <created>1685655599321</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1685655599322</updated>
+    </task>
+    <task id="LOCAL-00005" summary="update">
+      <created>1685972998556</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1685972998556</updated>
+    </task>
+    <task id="LOCAL-00006" summary="update">
+      <created>1686006866293</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1686006866293</updated>
+    </task>
+    <task id="LOCAL-00007" summary="update">
+      <created>1686006939105</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1686006939105</updated>
+    </task>
+    <task id="LOCAL-00008" summary="update fe packagelock">
+      <created>1686084402190</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1686084402190</updated>
+    </task>
+    <task id="LOCAL-00009" summary="updtade urls">
+      <created>1686086392474</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1686086392474</updated>
+    </task>
+    <task id="LOCAL-00010" summary="updated master">
+      <created>1686087707727</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1686087707727</updated>
+    </task>
+    <task id="LOCAL-00011" summary="updated feature">
+      <created>1686087788104</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1686087788104</updated>
+    </task>
+    <task id="LOCAL-00012" summary="updated feature">
+      <created>1686162810680</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1686162810680</updated>
+    </task>
+    <task id="LOCAL-00013" summary="updated master branch yaml config for cicd">
+      <created>1686255400715</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1686255400716</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="master" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
     <option name="RECENT_FILTERS">
       <map>
         <entry key="Branch">
@@ -132,9 +220,25 @@
         </entry>
       </map>
     </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="project name change" />
-    <option name="LAST_COMMIT_MESSAGE" value="project name change" />
+    <MESSAGE value="python requirements and dockerfile added" />
+    <MESSAGE value="update" />
+    <MESSAGE value="update fe packagelock" />
+    <MESSAGE value="updtade urls" />
+    <MESSAGE value="updated master" />
+    <MESSAGE value="updated feature" />
+    <MESSAGE value="updated master branch yaml config for cicd" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated master branch yaml config for cicd" />
   </component>
 </project>
