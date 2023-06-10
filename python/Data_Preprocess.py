@@ -105,7 +105,7 @@ async def delete_workspace(
         DB_CONNECTION_PARAMS['db_port'],
         DB_CONNECTION_PARAMS['db_name']
     )
-    __delete_workspace_from_sql__(workspace_id, user_id, con)
+    __delete_workspace_from_sql__(user_id, workspace_id, con)
     con.close()
 
     response.status_code = 204
