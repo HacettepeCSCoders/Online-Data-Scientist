@@ -47,7 +47,7 @@ const App = () => {
                     ))}
 
                 {isAdmin === true && isLoggedIn && (
-                  <Route path="/panel" element={<Panel />} />
+                  <Route path="/panel" element={<Panel name={name} />} />
                 )}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

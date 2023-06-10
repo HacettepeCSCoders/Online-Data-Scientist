@@ -3,14 +3,20 @@ import { Avatar, List, Layout, Skeleton, message, Button } from "antd";
 import { deleteUser, getAllUsers } from "../../services/userServices";
 const { Content } = Layout;
 
-const UserList = () => {
+const UserList = ({ name }) => {
   const [userList, setUserList] = useState();
   const [deleteMessageApi, deleteMessageApiContext] = message.useMessage();
 
   const getAll = async () => {
     try {
       const response = await getAllUsers();
-      setUserList(response.data);
+      let arr = [];
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i].username != name) {
+          arr.push(response.data[i]);
+        }
+      }
+      setUserList(arr);
     } catch (e) {
       console.log(e);
     }
