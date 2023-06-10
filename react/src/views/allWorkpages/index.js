@@ -16,6 +16,7 @@ import {
 } from "../../services/workspaceService";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { deleteWorkspace } from "../../services/processService";
 const { Text } = Typography;
 const { Content } = Layout;
 
@@ -67,6 +68,7 @@ const AllWorkspaces = () => {
               onClick={() => {
                 try {
                   removeWorkspace(workspaceId);
+                  deleteWorkspace(userId, workspaceId);
                   window.location.reload(false);
                 } catch (e) {
                   console.log(e);

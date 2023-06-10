@@ -213,11 +213,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
             <Descriptions.Item>
               {existSteps[current].subTitle}
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions>
-            <Descriptions.Item>
-              {existSteps[current].subTitle}
-            </Descriptions.Item>
+
             <Descriptions.Item>
               <Tag>{fileName} </Tag>
             </Descriptions.Item>
