@@ -247,6 +247,16 @@
     margin-bottom: 20px;
  }
 
+ .search-Result{
+    margin-top: 5px;
+  width: 200;
+  height: 100px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0.35) 0px 5px 15px;
+  overflow: hidden;
+  overflow-y: auto;
+ }
+
 
 
 

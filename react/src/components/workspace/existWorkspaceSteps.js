@@ -155,7 +155,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
       }
     };
     getData();
-  }, []);
+  }, [workspaceId]);
 
   const items = existSteps.map((item) => ({
     key: item.title,
