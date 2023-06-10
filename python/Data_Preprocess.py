@@ -5,13 +5,21 @@ import sqlalchemy as db
 import uvicorn
 from fastapi import FastAPI, UploadFile, File, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from matplotlib import pyplot as plt
 from pandas.core.dtypes.common import is_datetime64tz_dtype
 from pydantic import Json
 from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kendalltau, chi2_contingency, ttest_ind, \
     ttest_rel, f_oneway, mannwhitneyu, wilcoxon, kruskal, friedmanchisquare
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, silhouette_score
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import OrdinalEncoder, StandardScaler
+from sklearn.svm import SVC
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR, text
+from starlette.responses import StreamingResponse
 from statsmodels.tsa.stattools import adfuller, kpss
+from traitlets import Integer
 
 import Model
 
@@ -109,6 +117,9 @@ async def delete_workspace(
     con.close()
 
     response.status_code = 204
+
+
+##################### -DATA PREPROCESS- #####################
 
 @app.post('/python/manipulate')
 async def manipulate(
@@ -228,6 +239,329 @@ async def insert(
 
     return "Created table", \
         ret_old_non_num
+
+
+##################### -MACHINE LEARNING OPERATIONS- #####################
+
+# Classification
+
+# K Nearest Neighbors (KNN)
+@app.post('/python/classification/knn')
+async def knn(
+        classification_params: Json[Model.KnnParams]
+):
+    # retrieve classification params as dictionary
+    classification_params = classification_params.dict()
+
+    # get data from request
+    user_id = str(classification_params['user_id'])
+    workspace_id = str(classification_params['workspace_id'])
+    target_column = classification_params['target_column']
+    to_learn_columns = classification_params['to_learn_columns']
+    k = classification_params['k']
+    test_size = classification_params['test_size']
+    random_state = classification_params['random_state']
+    metric = classification_params['metric']
+
+    if k < 2:
+        raise HTTPException(status_code=400, detail="Invalid k value.")
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+    df = df.dropna()
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+
+    y_index = df.columns.get_loc(target_column)
+    x_df = df.loc[:, to_learn_columns]
+    y_df = df.iloc[:, y_index]
+
+    # check if there are any missing values
+    if x_df.isnull().values.any() or y_df.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x_df.values
+    y_data = y_df.values
+
+    # split data into train and test sets
+    x_train, x_test, y_train, y_test = __split_train_test__(x_data, y_data, test_size=test_size,
+                                                            random_state=random_state)
+
+    # scale data
+    scaler = StandardScaler()
+    x_train = scaler.fit_transform(x_train)
+    x_test = scaler.transform(x_test)
+
+    # train model
+    classifier = KNeighborsClassifier(n_neighbors=k, metric=metric)
+    classifier.fit(x_train, y_train)
+
+    # predict test set results
+    y_pred = classifier.predict(x_test)
+
+    # results
+
+    # create confusion matrix
+    cm = __create_confusion_matrix__(y_test, y_pred)
+    # create classification report
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='macro')
+    recall = recall_score(y_test, y_pred, average='macro')
+    f1 = f1_score(y_test, y_pred, average='macro')
+
+    # plt.figure(figsize=(10, 5))
+    # plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    # plt.title(f"Predicted values with k={k}", fontsize=20)
+    #
+    # buf = io.BytesIO()
+    # plt.savefig(buf, format="png")
+    # buf.seek(0)
+    #
+    # txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+    #
+    # # Combine the image and text into a single response
+    # response = StreamingResponse(
+    #     iter([buf.getvalue(), txt]),
+    #     media_type="image/png;text/plain",
+    # )
+    #
+    # # Return the response
+    # return response
+    return {
+        "confusion_matrix": cm.tolist(),
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1
+    }
+
+# Support Vector Machine (SVM)
+@app.post('/python/classification/svm')
+async def svm(
+        svm_params: Json[Model.SvmParams]
+):
+    # retrieve classification params as dictionary
+    svm_params = svm_params.dict()
+
+    # get data from request
+    user_id = str(svm_params['user_id'])
+    workspace_id = str(svm_params['workspace_id'])
+    target_column = svm_params['target_column']
+    to_learn_columns = svm_params['to_learn_columns']
+    kernel = svm_params['kernel']
+    test_size = svm_params['test_size']
+    random_state = svm_params['random_state']
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+    df = df.dropna()
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+
+    y_index = df.columns.get_loc(target_column)
+    x_df = df.loc[:, to_learn_columns]
+    y_df = df.iloc[:, y_index]
+
+    # check if there are any missing values
+    if x_df.isnull().values.any() or y_df.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x_df.values
+    y_data = y_df.values
+
+    # split data into train and test sets
+    x_train, x_test, y_train, y_test = __split_train_test__(x_data, y_data, test_size=test_size,
+                                                            random_state=random_state)
+
+    # scale data
+    scaler = StandardScaler()
+    x_train = scaler.fit_transform(x_train)
+    x_test = scaler.transform(x_test)
+
+    # train model
+    classifier = SVC(kernel=kernel)
+    classifier.fit(x_train, y_train)
+
+    # predict test set results
+    y_pred = classifier.predict(x_test)
+
+    # results
+
+    # create confusion matrix
+    cm = __create_confusion_matrix__(y_test, y_pred)
+    # create classification report
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='macro')
+    recall = recall_score(y_test, y_pred, average='macro')
+    f1 = f1_score(y_test, y_pred, average='macro')
+
+    # # plot results
+    # plt.figure(figsize=(10, 5))
+    # plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    # plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+    #
+    # buf = io.BytesIO()
+    # plt.savefig(buf, format="png")
+    # buf.seek(0)
+    #
+    # txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+    #
+    # # Combine the image and text into a single response
+    # response = StreamingResponse(
+    #     iter([buf.getvalue(), txt]),
+    #     media_type="image/png;text/plain",
+    # )
+    #
+    # # Return the response
+    # return response
+
+    return {
+        "confusion_matrix": cm.tolist(),
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1
+    }
+
+# Clustering
+
+#  K-Means
+@app.post('/python/clustering/kmeans')
+async def kmeans(
+        kmeans_params: Json[Model.KMeansParams]
+):
+    # retrieve classification params as dictionary
+    kmeans_params = kmeans_params.dict()
+
+    # get data from request
+    user_id = str(kmeans_params['user_id'])
+    workspace_id = str(kmeans_params['workspace_id'])
+    columns = kmeans_params['columns']
+    random_state = kmeans_params['random_state']
+    n_init = kmeans_params['n_init']
+    n_max = kmeans_params['n_max']
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+    df = df.dropna()
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+
+    x = df.loc[:, columns]
+
+    # check if there are any missing values
+    if x.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x.values
+
+    # K-Means algorithm
+    kmeans = KMeans(n_clusters=1, random_state=random_state)
+    y_pred = kmeans.fit_predict(x_data)
+
+    # plot results
+    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=50)
+    plt.title(f"Predicted values with n_clusters={1}", fontsize=20)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    # Return the response
+    return StreamingResponse(buf, media_type="image/png")
+
+# dbscan
+@app.post('/python/clustering/dbscan')
+async def dbscan(
+        dbscan_params: Json[Model.DBScanParams]
+):
+    # retrieve classification params as dictionary
+    dbscan_params = dbscan_params.dict()
+
+    # get data from request
+    user_id = str(dbscan_params['user_id'])
+    workspace_id = str(dbscan_params['workspace_id'])
+    columns = dbscan_params['columns']
+    eps = dbscan_params['eps']
+    min_samples = dbscan_params['min_samples']
+    metric = dbscan_params['metric']
+    algorithm = dbscan_params['algorithm']
+    leaf_size = dbscan_params['leaf_size']
+    p = dbscan_params['p']
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+    df = df.dropna()
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+
+    x = df.loc[:, columns]
+
+    # check if there are any missing values
+    if x.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x.values
+
+    # DBSCAN algorithm
+    dbscan = DBSCAN(eps=eps, min_samples=min_samples, metric=metric, algorithm=algorithm, leaf_size=leaf_size, p=p)
+    y_pred = dbscan.fit_predict(x_data)
+
+    # plot results
+    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=50)
+    plt.title(f"Predicted values with eps={eps}", fontsize=20)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    # Return the response
+    return StreamingResponse(buf, media_type="image/png")
+
 
 
 ##################### -STATISTICAL TESTS- #####################
@@ -691,6 +1025,22 @@ def __encode_categorical_data__(df, columns):
     except Exception:
         raise HTTPException(status_code=400, detail="Can't encode categorical data")
     return df, ret_old_non_num
+
+# function for splitting dataframe to train and test
+def __split_train_test__(x_data, y_data, test_size, random_state):
+    try:
+        X_train, X_test, Y_train, Y_test = train_test_split(x_data, y_data, test_size=test_size, random_state=random_state)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't split dataframe to train and test")
+    return X_train, X_test, Y_train, Y_test
+
+# function for creating confusion matrix
+def __create_confusion_matrix__(test_data, pred_data):
+    try:
+        cm = confusion_matrix(test_data, pred_data)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't create confusion matrix")
+    return cm
 
 
 # function for validating successful request
