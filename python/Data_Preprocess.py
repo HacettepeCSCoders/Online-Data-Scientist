@@ -19,7 +19,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler
 from sklearn.svm import SVC
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR, text
-from starlette.responses import StreamingResponse
 from statsmodels.tsa.stattools import adfuller, kpss
 
 import Model
@@ -40,7 +39,7 @@ app.add_middleware(
 DB_CONNECTION_PARAMS = {
     'db_user': 'postgres',
     'db_password': 'postgres',
-    'db_host': 'db',
+    'db_host': 'localhost',
     'db_port': 5432,
     'db_name': 'postgres'
 }
