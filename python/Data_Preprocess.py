@@ -57,11 +57,6 @@ DTYPE_MAP = {
 
 
 ##################### -DATA PREPROCESS- #####################
-@app.get('/python/test')
-def get_table(
-):
-    return "test"
-
 @app.get('/python/get-table')
 def get_table(
         user_id: str,
