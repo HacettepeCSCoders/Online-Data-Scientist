@@ -12,7 +12,7 @@ export const login = async (creds) => {
   try {
     const response = await axios({
       method: "post",
-      url: "http://localhost:8080/api/v1/auth/login",
+      url: "/api/v1/auth/login",
       data: creds,
       config: { headers: { "Content-Type": "multipart/form-data" } },
     });
@@ -24,7 +24,7 @@ export const login = async (creds) => {
 export const signup = async (creds) => {
   return axios({
     method: "post",
-    url: "http://localhost:8080/api/v1/auth/register",
+    url: "/api/v1/auth/register",
     data: creds,
     config: { headers: { "Content-Type": "multipart/form-data" } },
   });
