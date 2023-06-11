@@ -1,3 +1,4 @@
+import base64
 import io
 
 import numpy as np
@@ -289,6 +290,7 @@ async def knn(
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
+
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
     y_df = df.iloc[:, y_index]
@@ -320,8 +322,8 @@ async def knn(
     y_pred = classifier.predict(x_test_knn)
 
     ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
-    ret_df['actual'] = y_test.astype(int)
-    ret_df['pred'] = y_pred.astype(int)
+    ret_df[target_column + '(actual)'] = y_test
+    ret_df['predicted'] = y_pred
 
     # results
 
@@ -333,31 +335,23 @@ async def knn(
     recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    # plt.figure(figsize=(10, 5))
-    # plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    # plt.title(f"Predicted values with k={best_k}", fontsize=20)
-    #
-    # buf = io.BytesIO()
-    # plt.savefig(buf, format="png")
-    # buf.seek(0)
-    #
-    # txt = f"Best k value: {best_k}\nConfusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-    #
-    # # Combine the image and text into a single response
-    # response = StreamingResponse(
-    #     iter([buf.getvalue(), txt, ret_df.to_csv()]),
-    #     media_type="image/png;text/plain;text/csv"
-    # )
-    #
-    # # Return the response
-    # return response
+    plt.figure(figsize=(10, 5))
+    plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.title(f"Predicted values with k={best_k}", fontsize=20)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
     return {
         'best_k': int(best_k),
         'confusion_matrix': cm.tolist(),
         'accuracy': accuracy,
         'precision': precision,
         'recall': recall,
-        'f1': f1
+        'f1': f1,
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
     }
 
 
@@ -377,6 +371,20 @@ async def svm(
     kernel = svm_params['kernel']
     test_size = svm_params['test_size']
     random_state = svm_params['random_state']
+
+    # check kernel value is valid
+    if kernel not in ['linear', 'poly', 'rbf', 'sigmoid']:
+        raise HTTPException(status_code=400, detail="Invalid kernel value.")
+
+    if random_state < 0:
+        raise HTTPException(status_code=400, detail="Invalid random state value.")
+
+    if test_size <= 0 or test_size >= 1:
+        raise HTTPException(status_code=400, detail="Invalid test size value.")
+
+    if len(to_learn_columns) < 2:
+        raise HTTPException(status_code=400, detail="Invalid number of columns.")
+
 
     # connect to db
     con = __connect_to_db__(
@@ -419,8 +427,8 @@ async def svm(
     y_pred = classifier.predict(x_test_svm)
 
     ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
-    ret_df['actual'] = y_test
-    ret_df['pred'] = y_pred
+    ret_df[target_column + '(actual)'] = y_test
+    ret_df['predicted'] = y_pred
 
     # results
 
@@ -432,32 +440,23 @@ async def svm(
     recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    # # plot results
-    # plt.figure(figsize=(10, 5))
-    # plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    # plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
-    #
-    # buf = io.BytesIO()
-    # plt.savefig(buf, format="png")
-    # buf.seek(0)
-    #
-    # txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-    #
-    # # Combine the image and text into a single response
-    # response = StreamingResponse(
-    #     iter([buf.getvalue(), txt, ret_df.to_csv()]),
-    #     media_type="image/png;text/plain;text/csv"
-    # )
-    #
-    # # Return the response
-    # return response
+    # plot results
+    plt.figure(figsize=(10, 5))
+    plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
 
     return {
         'confusion_matrix': cm.tolist(),
         'accuracy': accuracy,
         'precision': precision,
         'recall': recall,
-        'f1': f1
+        'f1': f1,
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
     }
 
 # Clustering
@@ -499,13 +498,17 @@ async def kmeans(
     x_data = x.values
     n_clusters = df[target_column].nunique(dropna=True)
 
+    # scale data
+    scaler = StandardScaler()
+    x_data = scaler.fit_transform(x_data)
+
     # K-Means algorithm
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
     y_pred = kmeans.fit_predict(x_data)
 
     ret_df = pd.DataFrame(x_data, columns=columns)
-    ret_df[target_column] = df[target_column]
-    ret_df['pred'] = y_pred
+    ret_df[target_column + '(actual)'] = df[target_column]
+    ret_df['predicted'] = y_pred
 
     # plot results
     plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
@@ -515,8 +518,10 @@ async def kmeans(
     plt.savefig(buf, format="png")
     buf.seek(0)
 
-    # Return the response
-    return StreamingResponse(buf, media_type="image/png")
+    return {
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
+    }
 
 # dbscan
 @app.post('/python/clustering/dbscan')
@@ -568,13 +573,17 @@ async def dbscan(
 
     x_data = x.values
 
+    # scale data
+    scaler = StandardScaler()
+    x_data = scaler.fit_transform(x_data)
+
     # DBSCAN algorithm
     dbscan = DBSCAN(eps=eps, min_samples=min_samples, metric=metric, algorithm=algorithm, leaf_size=leaf_size, p=p)
     y_pred = dbscan.fit_predict(x_data)
 
     ret_df = pd.DataFrame(x_data, columns=columns)
-    ret_df[target_column] = df[target_column]
-    ret_df['pred'] = y_pred
+    ret_df[target_column + '(actual)'] = df[target_column]
+    ret_df['predicted'] = y_pred
 
     # plot results
     plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
