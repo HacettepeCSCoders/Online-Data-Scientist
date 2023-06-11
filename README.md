@@ -1,4 +1,4 @@
-# Book Portal
+# Online Data Scientist
 
 ![Architecture](documentation/images/Intro.png)
 <hr>
