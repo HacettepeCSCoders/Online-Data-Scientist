@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const startProcess = async (dataAndProcess) => {
-  return fetch("http://localhost:8000/python/insert", {
+  return fetch("/python/insert", {
     method: "POST",
     body: dataAndProcess,
   });
@@ -10,14 +10,14 @@ export const startProcess = async (dataAndProcess) => {
 export const getTable = async (user_id, workspace_id) => {
   return axios({
     method: "GET",
-    url: `http://localhost:8000/python/get-table?user_id=${user_id}&workspace_id=${workspace_id}`,
+    url: `/python/get-table?user_id=${user_id}&workspace_id=${workspace_id}`,
   });
 };
 
 export const makeTest = async (data) => {
   return axios({
     method: "POST",
-    url: `http://localhost:8000/python/make-tests`,
+    url: `/python/make-tests`,
     data: data,
   });
 };
@@ -25,7 +25,7 @@ export const makeTest = async (data) => {
 export const manipulate = async (data) => {
   return axios({
     method: "POST",
-    url: `http://localhost:8000/python/manipulate`,
+    url: `/python/manipulate`,
     data: data,
   });
 };
@@ -40,7 +40,7 @@ export const deleteWorkspace = async (user_id, workspace_id) => {
 export const knnTest = async (body) => {
   return axios({
     method: "POST",
-    url: `http://localhost:8000/python/classification/knn`,
+    url: `/python/classification/knn`,
     data: body,
   });
 };
@@ -48,7 +48,7 @@ export const knnTest = async (body) => {
 export const svmTest = async (body) => {
   return axios({
     method: "POST",
-    url: `http://localhost:8000/python/classification/svm`,
+    url: `/python/classification/svm`,
     data: body,
   });
 };
@@ -56,7 +56,7 @@ export const svmTest = async (body) => {
 export const kmeansTest = async (body) => {
   return axios({
     method: "POST",
-    url: `http://localhost:8000/python/clustering/kmeans`,
+    url: `/python/clustering/kmeans`,
     data: body,
   });
 };
@@ -64,7 +64,7 @@ export const kmeansTest = async (body) => {
 export const dbScanTest = async (body) => {
   return axios({
     method: "POST",
-    url: `http://localhost:8000/python/clustering/dbscan`,
+    url: `/python/clustering/dbscan`,
     data: body,
   });
 };
