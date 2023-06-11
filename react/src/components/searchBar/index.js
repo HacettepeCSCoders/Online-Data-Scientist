@@ -66,7 +66,7 @@ const SearchBar = ({ userId }) => {
         />
       </div>
       {filteredData.length != 0 && (
-        <div className="search-Result">
+        <div className="search-Result text-center">
           {filteredData.slice(0, 10).map((value) => {
             return (
               <div key={value.id}>

@@ -1,15 +1,23 @@
+import base64
 import io
 
+import numpy as np
 import pandas as pd
 import sqlalchemy as db
 import uvicorn
 from fastapi import FastAPI, UploadFile, File, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from matplotlib import pyplot as plt
 from pandas.core.dtypes.common import is_datetime64tz_dtype
 from pydantic import Json
 from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kendalltau, chi2_contingency, ttest_ind, \
     ttest_rel, f_oneway, mannwhitneyu, wilcoxon, kruskal, friedmanchisquare
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import OrdinalEncoder, StandardScaler
+from sklearn.svm import SVC
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR, text
 from statsmodels.tsa.stattools import adfuller, kpss
 
@@ -31,7 +39,7 @@ app.add_middleware(
 DB_CONNECTION_PARAMS = {
     'db_user': 'postgres',
     'db_password': 'postgres',
-    'db_host': 'db',
+    'db_host': 'localhost',
     'db_port': 5432,
     'db_name': 'postgres'
 }
@@ -49,11 +57,6 @@ DTYPE_MAP = {
 
 
 ##################### -DATA PREPROCESS- #####################
-@app.get('/python/test')
-def get_table(
-):
-    return "test"
-
 @app.get('/python/get-table')
 def get_table(
         user_id: str,
@@ -109,6 +112,9 @@ async def delete_workspace(
     con.close()
 
     response.status_code = 204
+
+
+##################### -DATA PREPROCESS- #####################
 
 @app.post('/python/manipulate')
 async def manipulate(
@@ -228,6 +234,398 @@ async def insert(
 
     return "Created table", \
         ret_old_non_num
+
+
+##################### -MACHINE LEARNING OPERATIONS- #####################
+
+# Classification
+
+# K Nearest Neighbors (KNN)
+@app.post('/python/classification/knn')
+async def knn(
+        classification_params: Json[Model.KnnParams]
+):
+    # retrieve classification params as dictionary
+    classification_params = classification_params.dict()
+
+    # get data from request
+    user_id = str(classification_params['user_id'])
+    workspace_id = str(classification_params['workspace_id'])
+    target_column = classification_params['target_column']
+    to_learn_columns = classification_params['to_learn_columns']
+    max_k = classification_params['max_k']
+    test_size = classification_params['test_size']
+    random_state = classification_params['random_state']
+    metric = classification_params['metric']
+
+    if max_k < 2:
+        raise HTTPException(status_code=400, detail="Invalid k value.")
+
+    if test_size <= 0 or test_size >= 1:
+        raise HTTPException(status_code=400, detail="Invalid test size value.")
+
+    if random_state < 0:
+        raise HTTPException(status_code=400, detail="Invalid random state value.")
+
+    if metric not in ['euclidean', 'manhattan', 'chebyshev', 'minkowski']:
+        raise HTTPException(status_code=400, detail="Invalid metric value.")
+
+    if len(to_learn_columns) < 2:
+        raise HTTPException(status_code=400, detail="Invalid number of columns.")
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    y_index = df.columns.get_loc(target_column)
+    x_df = df.loc[:, to_learn_columns]
+    y_df = df.iloc[:, y_index]
+
+    # check if there are any missing values
+    if x_df.isnull().values.any() or y_df.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x_df.values
+    y_data = y_df.values
+
+    # split data into train and test sets
+    x_train, x_test, y_train, y_test = __split_train_test__(x_data, y_data, test_size=test_size,
+                                                            random_state=random_state)
+
+    # scale data
+    scaler = StandardScaler()
+    x_train_knn = scaler.fit_transform(x_train)
+    x_test_knn = scaler.transform(x_test)
+
+    # find best k
+    best_k = __find_best_k__(x_train_knn, y_train, x_test_knn, y_test, max_k, metric)
+
+    # train model
+    classifier = KNeighborsClassifier(n_neighbors=best_k, metric=metric)
+    classifier.fit(x_train_knn, y_train)
+
+    # predict test set results
+    y_pred = classifier.predict(x_test_knn)
+
+    ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
+    ret_df[target_column + '(actual)'] = y_test
+    ret_df['predicted'] = y_pred
+
+    # results
+
+    # create confusion matrix
+    cm = __create_confusion_matrix__(y_test, y_pred)
+    # create classification report
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='macro', zero_division=0)
+    recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
+    f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
+
+    plt.figure(figsize=(10, 5))
+    scatter = plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.title(f"Predicted values with k={best_k}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    return {
+        'Best K Value': int(best_k),
+        'Confusion Matrix': cm.tolist(),
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1,
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
+    }
+
+
+# Support Vector Machine (SVM)
+@app.post('/python/classification/svm')
+async def svm(
+        svm_params: Json[Model.SvmParams]
+):
+    # retrieve classification params as dictionary
+    svm_params = svm_params.dict()
+
+    # get data from request
+    user_id = str(svm_params['user_id'])
+    workspace_id = str(svm_params['workspace_id'])
+    to_learn_columns = svm_params['to_learn_columns']
+    target_column = svm_params['target_column']
+    kernel = svm_params['kernel']
+    test_size = svm_params['test_size']
+    random_state = svm_params['random_state']
+
+    # check kernel value is valid
+    if kernel not in ['linear', 'poly', 'rbf', 'sigmoid']:
+        raise HTTPException(status_code=400, detail="Invalid kernel value.")
+
+    if random_state < 0:
+        raise HTTPException(status_code=400, detail="Invalid random state value.")
+
+    if test_size <= 0 or test_size >= 1:
+        raise HTTPException(status_code=400, detail="Invalid test size value.")
+
+    if len(to_learn_columns) < 2:
+        raise HTTPException(status_code=400, detail="Invalid number of columns.")
+
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    y_index = df.columns.get_loc(target_column)
+    x_df = df.loc[:, to_learn_columns]
+    y_df = df.iloc[:, y_index]
+
+    # check if there are any missing values
+    if x_df.isnull().values.any() or y_df.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x_df.values
+    y_data = y_df.values
+
+    # split data into train and test sets
+    x_train, x_test, y_train, y_test = __split_train_test__(x_data, y_data, test_size=test_size,
+                                                            random_state=random_state)
+
+    # scale data
+    scaler = StandardScaler()
+    x_train_svm = scaler.fit_transform(x_train)
+    x_test_svm = scaler.transform(x_test)
+
+    # train model
+    classifier = SVC(kernel=kernel)
+    classifier.fit(x_train_svm, y_train)
+
+    # predict test set results
+    y_pred = classifier.predict(x_test_svm)
+
+    ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
+    ret_df[target_column + '(actual)'] = y_test
+    ret_df['predicted'] = y_pred
+
+    # results
+
+    # create confusion matrix
+    cm = __create_confusion_matrix__(y_test, y_pred)
+    # create classification report
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='macro', zero_division=0)
+    recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
+    f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
+
+    # plot results
+    plt.figure(figsize=(10, 5))
+    scatter = plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    return {
+        'Confusion Matrix': cm.tolist(),
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1,
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
+    }
+
+# Clustering
+
+#  K-Means
+@app.post('/python/clustering/kmeans')
+async def kmeans(
+        kmeans_params: Json[Model.KMeansParams]
+):
+    # retrieve classification params as dictionary
+    kmeans_params = kmeans_params.dict()
+
+    # get data from request
+    user_id = str(kmeans_params['user_id'])
+    workspace_id = str(kmeans_params['workspace_id'])
+    columns = kmeans_params['columns']
+    target_column = kmeans_params['target_column']
+    random_state = kmeans_params['random_state']
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    x = df.loc[:, columns]
+
+    # check if there are any missing values
+    if x.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x.values
+    n_clusters = df[target_column].nunique(dropna=True)
+
+    # scale data
+    scaler = StandardScaler()
+    x_data = scaler.fit_transform(x_data)
+
+    # K-Means algorithm
+    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
+    y_pred = kmeans.fit_predict(x_data)
+
+    ret_df = pd.DataFrame(x_data, columns=columns)
+    ret_df[target_column + '(actual)'] = df[target_column]
+    ret_df['predicted'] = y_pred
+
+    # plot results
+    plt.figure(figsize=(10, 5))
+    scatter = plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
+    plt.title(f"Predicted values with n_clusters={n_clusters}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    return {
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
+    }
+
+# dbscan
+@app.post('/python/clustering/dbscan')
+async def dbscan(
+        dbscan_params: Json[Model.DBScanParams]
+):
+    # retrieve classification params as dictionary
+    dbscan_params = dbscan_params.dict()
+
+    # get data from request
+    user_id = str(dbscan_params['user_id'])
+    workspace_id = str(dbscan_params['workspace_id'])
+    columns = dbscan_params['columns']
+    target_column = dbscan_params['target_column']
+    eps = dbscan_params['eps']
+    min_samples = dbscan_params['min_samples']
+    metric = dbscan_params['metric']
+    algorithm = dbscan_params['algorithm']
+    leaf_size = dbscan_params['leaf_size']
+    p = dbscan_params['p']
+
+    # check if algorithm is valid
+    if algorithm not in ['auto', 'ball_tree', 'kd_tree', 'brute']:
+        raise HTTPException(status_code=400, detail="Invalid algorithm.")
+
+    # check if metric is valid
+    if metric not in ['euclidean', 'l1', 'l2', 'manhattan', 'cosine']:
+        raise HTTPException(status_code=400, detail="Invalid metric.")
+
+
+    # connect to db
+    con = __connect_to_db__(
+        DB_CONNECTION_PARAMS['db_user'],
+        DB_CONNECTION_PARAMS['db_password'],
+        DB_CONNECTION_PARAMS['db_host'],
+        DB_CONNECTION_PARAMS['db_port'],
+        DB_CONNECTION_PARAMS['db_name']
+    )
+
+    # get dataframe from db
+    df = __get_table_from_sql__(workspace_id, user_id, con)
+    con.close()
+
+    x = df.loc[:, columns]
+
+    # check if there are any missing values
+    if x.isnull().values.any():
+        raise HTTPException(status_code=400, detail="There are missing values in the data.")
+
+    x_data = x.values
+
+    # scale data
+    scaler = StandardScaler()
+    x_data = scaler.fit_transform(x_data)
+
+    # DBSCAN algorithm
+    dbscan = DBSCAN(eps=eps, min_samples=min_samples, metric=metric, algorithm=algorithm, leaf_size=leaf_size, p=p)
+    y_pred = dbscan.fit_predict(x_data)
+
+    ret_df = pd.DataFrame(x_data, columns=columns)
+    ret_df[target_column + '(actual)'] = df[target_column]
+    ret_df['predicted'] = y_pred
+
+    # plot results
+    plt.figure(figsize=(10, 5))
+    scatter = plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
+    plt.title(f"Predicted values with eps={eps}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    return {
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
+    }
+
 
 
 ##################### -STATISTICAL TESTS- #####################
@@ -511,7 +909,7 @@ def make_tests(
     )
 
     df = __get_table_from_sql__(workspace_id, user_id, con)
-
+    con.close()
 
     for test in test_list:
         if test['column_1'] not in df.columns and (test['column_2'] not in df.columns or test['column_2'] is None) \
@@ -691,6 +1089,37 @@ def __encode_categorical_data__(df, columns):
     except Exception:
         raise HTTPException(status_code=400, detail="Can't encode categorical data")
     return df, ret_old_non_num
+
+# function for splitting dataframe to train and test
+def __split_train_test__(x_data, y_data, test_size, random_state):
+    try:
+        X_train, X_test, Y_train, Y_test = train_test_split(x_data, y_data, test_size=test_size, random_state=random_state)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't split dataframe to train and test")
+    return X_train, X_test, Y_train, Y_test
+
+# function for creating confusion matrix
+def __create_confusion_matrix__(test_data, pred_data):
+    try:
+        cm = confusion_matrix(test_data, pred_data)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't create confusion matrix")
+    return cm
+
+# function for finding best k for kNN
+def __find_best_k__(x_train, y_train, x_test, y_test, max_k, metric):
+    try:
+        k_values = np.arange(1, max_k + 1, 2)
+        k_scores = []
+        for k in k_values:
+            knn = KNeighborsClassifier(n_neighbors=k, metric=metric)
+            knn.fit(x_train, y_train)
+            y_pred = knn.predict(x_test)
+            k_scores.append(accuracy_score(y_test, y_pred))
+        best_k = k_values[np.argmax(k_scores)]
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't find best k")
+    return best_k
 
 
 # function for validating successful request
