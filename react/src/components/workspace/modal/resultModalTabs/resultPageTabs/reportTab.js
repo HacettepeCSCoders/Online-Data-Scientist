@@ -8,6 +8,7 @@ const ReportTab = ({ result, workspaceTypeDetails }) => {
   const printRef = React.useRef();
   const [testArray, setTestArray] = useState();
   const [mlArray, setMlarray] = useState();
+  const [manipText, setManipText] = useState();
 
   const generatePDF = async () => {
     const element = printRef.current;
@@ -34,11 +35,11 @@ const ReportTab = ({ result, workspaceTypeDetails }) => {
       }
       setTestArray(arr);
     } else if (workspaceTypeDetails === "dataManipulation") {
-      console.log();
+      setManipText(
+        " All selected processes have been successfully executed. If you want to continue the ML and Statistic tests. You can continue from the Workspace page."
+      );
     } else if (workspaceTypeDetails === "knn") {
       setMlarray(result);
-      console.log(typeof result["Confusion Matrix"]);
-      console.table(result["Confusion Matrix"]);
     } else {
       setMlarray(result);
     }
@@ -103,6 +104,13 @@ const ReportTab = ({ result, workspaceTypeDetails }) => {
                   </>
                 );
               })}
+            {manipText && (
+              <Descriptions.Item
+                label={<Tag className="nav-background">Success</Tag>}
+              >
+                {manipText}
+              </Descriptions.Item>
+            )}
           </Descriptions>
         </div>
       </div>

@@ -15,9 +15,8 @@ const ChangePassword = ({ name }) => {
     delete values.confirmPassword;
     try {
       const response = await changePassword(values);
-      console.log(response);
     } catch (e) {
-      console.log(e);
+      setError("Please give correct credentials");
     }
   };
 

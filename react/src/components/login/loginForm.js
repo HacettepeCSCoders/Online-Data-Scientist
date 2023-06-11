@@ -1,11 +1,12 @@
 import React from "react";
-import { Anchor, Button, Form, Input } from "antd";
+import { Anchor, Button, Form, Input, Alert } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Link } = Anchor;
 
-export const LoginForm = ({ onClickLogin }) => {
+export const LoginForm = ({ onClickLogin, error, setError }) => {
   const onFinish = (values) => {
+    setError(undefined);
     console.log(values);
     onClickLogin(values);
   };
@@ -47,6 +48,7 @@ export const LoginForm = ({ onClickLogin }) => {
           placeholder="Password"
         />
       </Form.Item>
+      {error && <Alert message={error} type="error" showIcon closable />}
       <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
         <Button htmlType="submit" className="form-button-color">
           Login

@@ -272,7 +272,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
         <PageHeader
           className="pageHeader-workspace"
           title={existSteps[current].title}
-          onBack={prev}
+          onBack={current !== 0 ? prev : false}
         >
           <Descriptions column={1}>
             <Descriptions.Item>

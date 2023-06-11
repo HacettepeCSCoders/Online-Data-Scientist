@@ -9,9 +9,22 @@ import PredictTabs from "./resultPageTabs/predictTabs";
 const ResultTab = ({ result, workspaceTypeDetails }) => {
   let resultTabs = [];
   if (
-    workspaceTypeDetails !== "statistical" &&
-    workspaceTypeDetails !== "dataManipulation"
+    workspaceTypeDetails === "statistical" ||
+    workspaceTypeDetails === "dataManipulation"
   ) {
+    resultTabs = [
+      {
+        key: 1,
+        label: "Report",
+        children: (
+          <ReportTab
+            result={result}
+            workspaceTypeDetails={workspaceTypeDetails}
+          />
+        ),
+      },
+    ];
+  } else if (workspaceTypeDetails === "knn" || workspaceTypeDetails === "svm") {
     resultTabs = [
       {
         key: 1,
@@ -48,9 +61,19 @@ const ResultTab = ({ result, workspaceTypeDetails }) => {
     resultTabs = [
       {
         key: 1,
-        label: "Report",
+        label: "Visualize",
         children: (
-          <ReportTab
+          <VisualizeTab
+            result={result}
+            workspaceTypeDetails={workspaceTypeDetails}
+          />
+        ),
+      },
+      {
+        key: 2,
+        label: "Predicted",
+        children: (
+          <PredictTabs
             result={result}
             workspaceTypeDetails={workspaceTypeDetails}
           />

@@ -18,23 +18,16 @@ export const login = async (creds) => {
     });
     console.log(response);
     return response;
-  } catch (e) {
-    console.log(e);
-  }
+  } catch (e) {}
 };
 
 export const signup = async (creds) => {
-  try {
-    const response = await axios({
-      method: "post",
-      url: "http://localhost:8080/api/v1/auth/register",
-      data: creds,
-      config: { headers: { "Content-Type": "multipart/form-data" } },
-    });
-    return response;
-  } catch (e) {
-    console.log(e);
-  }
+  return axios({
+    method: "post",
+    url: "http://localhost:8080/api/v1/auth/register",
+    data: creds,
+    config: { headers: { "Content-Type": "multipart/form-data" } },
+  });
 };
 
 export const changePassword = async (creds) => {

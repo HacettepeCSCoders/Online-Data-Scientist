@@ -29,22 +29,19 @@ const SearchBar = ({ userId }) => {
           return new Date(b.updateDate) - new Date(a.updateDate);
         });
         setData(arr);
-        setFilteredData(arr);
       } catch (e) {
-        console.log(e);
         setError(e);
       }
     };
     getAll();
   }, []);
   const handleFilter = (e) => {
-    console.log(e);
     const searchInput = e.target.value;
     setInput(searchInput);
     const newFilter = data.filter((value) => {
       return value.fileName.toLowerCase().includes(searchInput.toLowerCase());
     });
-    if (searchInput === "") {
+    if (searchInput === "" || searchInput === undefined) {
       setFilteredData([]);
     } else {
       setFilteredData(newFilter);
@@ -75,7 +72,7 @@ const SearchBar = ({ userId }) => {
                     onClickGoToWorkspace(value.id);
                   }}
                 >
-                  <Tag>{value.fileName} </Tag> <Tag>{value.id} </Tag>{" "}
+                  <Tag>{value.fileName} </Tag> <Tag>{value.id} </Tag>
                 </p>
               </div>
             );

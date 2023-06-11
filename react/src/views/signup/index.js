@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../../styles/form.css";
 import SignupForm from "../../components/signup/signupForm";
 import { Col, Row } from "antd";
@@ -9,16 +9,19 @@ import { useNavigate } from "react-router-dom";
 const Signup = () => {
   const dispatch = useDispatch();
   let navigate = useNavigate();
+  const [error, setError] = useState();
 
   const onClickSignup = async (values) => {
     console.log("Post sent");
     console.log(values);
     delete values.confirmPassword;
     try {
-      dispatch(signupHandler(values));
+      const response = await signupHandler(values);
       navigate("/login");
     } catch (apiError) {
       console.log(apiError);
+      console.log(apiError.message);
+      setError(apiError.message);
     }
   };
 
@@ -30,6 +33,8 @@ const Signup = () => {
             <SignupForm
               className="form-c"
               onClickSignup={onClickSignup}
+              error={error}
+              setError={setError}
             ></SignupForm>
           </Col>
         </Row>

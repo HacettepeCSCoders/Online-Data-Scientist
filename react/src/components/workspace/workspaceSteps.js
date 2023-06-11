@@ -12,6 +12,7 @@ import { PageHeader } from "@ant-design/pro-layout";
 import ErrorModal from "./modal/errorModal";
 import { useDataFiles } from "../../hocs/dataFileProvider";
 import { useNavigate } from "react-router-dom";
+import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 
 const { Content, Sider } = Layout;
 
@@ -20,6 +21,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const { dataDetails, setDataDetails } = useData();
   const { processingDetails, setProcessingDetails } = useProcessing();
+  const { workspaceTypeDetails } = useWorkspaceType();
   const { fileNameDetails } = useFileName();
   const { dataFileDetails } = useDataFiles();
   const [prevMessageApi, prevMessageApiContext] = message.useMessage();
@@ -184,6 +186,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
         dataDetails={dataDetails}
         fileName={fileNameDetails}
         processingDetails={processingDetails}
+        workspaceTypeDetails={workspaceTypeDetails}
       />
       <ErrorModal
         isErrorModal={isErrorModal}
@@ -214,7 +217,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
           <PageHeader
             className="pageHeader-workspace"
             title={steps[current].title}
-            onBack={prev}
+            onBack={current !== 0 ? prev : false}
           >
             <Descriptions column={1}>
               <Descriptions.Item span={4}>

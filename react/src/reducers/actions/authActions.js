@@ -26,8 +26,5 @@ export const loginHandler = (creds) => {
 };
 
 export const signupHandler = (creds) => {
-  return async function (dispatch) {
-    const response = await signup(creds);
-    return response;
-  };
+  return signup(creds);
 };

@@ -3,7 +3,7 @@ import axios from "axios";
 export const getAllWorkspaces = (userId) => {
   return axios({
     method: "get",
-    url: `/api/v1/users/${userId}/workspaces`,
+    url: `http://localhost:8080/api/v1/users/${userId}/workspaces`,
   });
 };
 

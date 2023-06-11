@@ -1,11 +1,17 @@
 import React from "react";
-import { Anchor, Button, Form, Input } from "antd";
+import { Anchor, Button, Form, Input, Alert } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Link } = Anchor;
 
-export const SignupForm = ({ onClickSignup }) => {
+export const SignupForm = ({ onClickSignup, error, setError }) => {
   const onFinish = (values) => {
+    setError(undefined);
+
+    if (values.password !== values.confirmPassword) {
+      setError("Password mismatch");
+      return;
+    }
     onClickSignup(values);
   };
 
@@ -56,7 +62,7 @@ export const SignupForm = ({ onClickSignup }) => {
           placeholder="Confirm Password"
         />
       </Form.Item>
-
+      {error && <Alert message={error} type="error" showIcon closable />}
       <Form.Item wrapperCol={{ offset: 5, span: 16 }}>
         <Button type="primary" htmlType="submit" className="form-button-color">
           Create account
