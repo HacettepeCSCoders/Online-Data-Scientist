@@ -60,7 +60,7 @@ class StatisticalTestList(BaseModel):
 class KnnParams(BaseModel):
     user_id: int
     workspace_id: int
-    k: int = 5
+    max_k: int = 5
     to_learn_columns: List[str]
     target_column: str
     test_size: float = 0.2
@@ -80,14 +80,14 @@ class KMeansParams(BaseModel):
     user_id: int
     workspace_id: int
     columns: List[str]
+    target_column: str
     random_state: int = 42
-    n_init: int = 1
-    n_max: int = 10
 
 class DBScanParams(BaseModel):
     user_id: int
     workspace_id: int
     columns: List[str]
+    target_column: str
     eps: float = 0.5
     min_samples: int = 5
     metric: str = 'euclidean'
