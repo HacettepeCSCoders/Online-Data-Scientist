@@ -344,12 +344,12 @@ async def knn(
     buf.seek(0)
 
     return {
-        'best_k': int(best_k),
-        'confusion_matrix': cm.tolist(),
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1': f1,
+        'Best K Value': int(best_k),
+        'Confusion Matrix': cm.tolist(),
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1,
         'data': ret_df.to_csv(index=False),
         'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
     }
@@ -450,11 +450,11 @@ async def svm(
     buf.seek(0)
 
     return {
-        'confusion_matrix': cm.tolist(),
-        'accuracy': accuracy,
-        'precision': precision,
-        'recall': recall,
-        'f1': f1,
+        'Confusion Matrix': cm.tolist(),
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1,
         'data': ret_df.to_csv(index=False),
         'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
     }
@@ -593,8 +593,10 @@ async def dbscan(
     plt.savefig(buf, format="png")
     buf.seek(0)
 
-    # Return the response
-    return StreamingResponse(buf, media_type="image/png")
+    return {
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
+    }
 
 
 
