@@ -289,7 +289,7 @@ async def knn(
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
-
+    df = df.dropna()
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
     y_df = df.iloc[:, y_index]
@@ -334,24 +334,32 @@ async def knn(
     recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    plt.figure(figsize=(10, 5))
-    plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    plt.title(f"Predicted values with k={best_k}", fontsize=20)
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png")
-    buf.seek(0)
-
-    txt = f"Best k value: {best_k}\nConfusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-
-    # Combine the image and text into a single response
-    response = StreamingResponse(
-        iter([buf.getvalue(), txt, ret_df.to_csv()]),
-        media_type="image/png;text/plain;text/csv"
-    )
-
-    # Return the response
-    return response
+    # plt.figure(figsize=(10, 5))
+    # plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    # plt.title(f"Predicted values with k={best_k}", fontsize=20)
+    #
+    # buf = io.BytesIO()
+    # plt.savefig(buf, format="png")
+    # buf.seek(0)
+    #
+    # txt = f"Best k value: {best_k}\nConfusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+    #
+    # # Combine the image and text into a single response
+    # response = StreamingResponse(
+    #     iter([buf.getvalue(), txt, ret_df.to_csv()]),
+    #     media_type="image/png;text/plain;text/csv"
+    # )
+    #
+    # # Return the response
+    # return response
+    return {
+        'best_k': int(best_k),
+        'confusion_matrix': cm.tolist(),
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
 
 
 # Support Vector Machine (SVM)
@@ -425,25 +433,33 @@ async def svm(
     recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    # plot results
-    plt.figure(figsize=(10, 5))
-    plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+    # # plot results
+    # plt.figure(figsize=(10, 5))
+    # plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    # plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+    #
+    # buf = io.BytesIO()
+    # plt.savefig(buf, format="png")
+    # buf.seek(0)
+    #
+    # txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+    #
+    # # Combine the image and text into a single response
+    # response = StreamingResponse(
+    #     iter([buf.getvalue(), txt, ret_df.to_csv()]),
+    #     media_type="image/png;text/plain;text/csv"
+    # )
+    #
+    # # Return the response
+    # return response
 
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png")
-    buf.seek(0)
-
-    txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-
-    # Combine the image and text into a single response
-    response = StreamingResponse(
-        iter([buf.getvalue(), txt, ret_df.to_csv()]),
-        media_type="image/png;text/plain;text/csv"
-    )
-
-    # Return the response
-    return response
+    return {
+        'confusion_matrix': cm.tolist(),
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
 
 # Clustering
 
@@ -501,7 +517,7 @@ async def kmeans(
     buf.seek(0)
 
     # Return the response
-    return StreamingResponse(iter([buf.getvalue(), ret_df.to_csv()]), media_type="image/png;text/csv")
+    return StreamingResponse(buf, media_type="image/png")
 
 # dbscan
 @app.post('/python/clustering/dbscan')
@@ -522,6 +538,15 @@ async def dbscan(
     algorithm = dbscan_params['algorithm']
     leaf_size = dbscan_params['leaf_size']
     p = dbscan_params['p']
+
+    # check if algorithm is valid
+    if algorithm not in ['auto', 'ball_tree', 'kd_tree', 'brute']:
+        raise HTTPException(status_code=400, detail="Invalid algorithm.")
+
+    # check if metric is valid
+    if metric not in ['euclidean', 'l1', 'l2', 'manhattan', 'cosine']:
+        raise HTTPException(status_code=400, detail="Invalid metric.")
+
 
     # connect to db
     con = __connect_to_db__(
@@ -561,7 +586,7 @@ async def dbscan(
     buf.seek(0)
 
     # Return the response
-    return StreamingResponse(iter([buf.getvalue(), ret_df.to_csv()]), media_type="image/png;text/csv")
+    return StreamingResponse(buf, media_type="image/png")
 
 
 
@@ -846,7 +871,7 @@ def make_tests(
     )
 
     df = __get_table_from_sql__(workspace_id, user_id, con)
-
+    con.close()
 
     for test in test_list:
         if test['column_1'] not in df.columns and (test['column_2'] not in df.columns or test['column_2'] is None) \
