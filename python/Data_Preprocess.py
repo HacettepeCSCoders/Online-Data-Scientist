@@ -266,6 +266,17 @@ async def knn(
     if max_k < 2:
         raise HTTPException(status_code=400, detail="Invalid k value.")
 
+    if test_size <= 0 or test_size >= 1:
+        raise HTTPException(status_code=400, detail="Invalid test size value.")
+
+    if random_state < 0:
+        raise HTTPException(status_code=400, detail="Invalid random state value.")
+
+    if metric not in ['euclidean', 'manhattan', 'chebyshev', 'minkowski']:
+        raise HTTPException(status_code=400, detail="Invalid metric value.")
+
+    if len(to_learn_columns) < 2:
+        raise HTTPException(status_code=400, detail="Invalid number of columns.")
     # connect to db
     con = __connect_to_db__(
         DB_CONNECTION_PARAMS['db_user'],
@@ -311,7 +322,7 @@ async def knn(
     classifier.fit(x_train_knn, y_train)
 
     # predict test set results
-    y_pred = classifier.predict(x_test)
+    y_pred = classifier.predict(x_test_knn)
 
     ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
     ret_df['actual'] = y_test.astype(int)
@@ -329,7 +340,7 @@ async def knn(
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
     plt.figure(figsize=(10, 5))
-    plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
     plt.title(f"Predicted values with k={best_k}", fontsize=20)
 
     buf = io.BytesIO()
@@ -359,8 +370,8 @@ async def svm(
     # get data from request
     user_id = str(svm_params['user_id'])
     workspace_id = str(svm_params['workspace_id'])
-    target_column = svm_params['target_column']
     to_learn_columns = svm_params['to_learn_columns']
+    target_column = svm_params['target_column']
     kernel = svm_params['kernel']
     test_size = svm_params['test_size']
     random_state = svm_params['random_state']
@@ -377,6 +388,10 @@ async def svm(
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
+
+    # ------------------ DELETE HERE AFTER TESTING ------------------
+    df = df.dropna()
+    # ------------------ DELETE HERE AFTER TESTING ------------------
 
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
@@ -395,15 +410,15 @@ async def svm(
 
     # scale data
     scaler = StandardScaler()
-    x_train = scaler.fit_transform(x_train)
-    x_test = scaler.transform(x_test)
+    x_train_svm = scaler.fit_transform(x_train)
+    x_test_svm = scaler.transform(x_test)
 
     # train model
     classifier = SVC(kernel=kernel)
-    classifier.fit(x_train, y_train)
+    classifier.fit(x_train_svm, y_train)
 
     # predict test set results
-    y_pred = classifier.predict(x_test)
+    y_pred = classifier.predict(x_test_svm)
 
     ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
     ret_df['actual'] = y_test
@@ -421,7 +436,7 @@ async def svm(
 
     # plot results
     plt.figure(figsize=(10, 5))
-    plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
     plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
 
     buf = io.BytesIO()
