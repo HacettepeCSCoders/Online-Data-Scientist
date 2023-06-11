@@ -1,6 +1,7 @@
-import { Checkbox, Form, Tabs } from "antd";
-import React, { useState } from "react";
+import { Tabs } from "antd";
+import React from "react";
 import KnnForm from "./classificationTabs/knnForm";
+import SvmForm from "./classificationTabs/svmForm";
 
 const ClassificationForm = ({
   setValues,
@@ -13,6 +14,17 @@ const ClassificationForm = ({
       label: `K-Nearest Neighbor`,
       children: (
         <KnnForm
+          setValues={setValues}
+          setWorkspaceTypeDetails={setWorkspaceTypeDetails}
+          dataDetails={dataDetails}
+        />
+      ),
+    },
+    {
+      key: "2",
+      label: `Support Vector Machine`,
+      children: (
+        <SvmForm
           setValues={setValues}
           setWorkspaceTypeDetails={setWorkspaceTypeDetails}
           dataDetails={dataDetails}
