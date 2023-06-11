@@ -290,10 +290,6 @@ async def knn(
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
 
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-    df = df.dropna()
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
     y_df = df.iloc[:, y_index]
@@ -327,7 +323,6 @@ async def knn(
     ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
     ret_df['actual'] = y_test.astype(int)
     ret_df['pred'] = y_pred.astype(int)
-    print(ret_df)
 
     # results
 
@@ -388,10 +383,6 @@ async def svm(
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
-
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-    df = df.dropna()
-    # ------------------ DELETE HERE AFTER TESTING ------------------
 
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
