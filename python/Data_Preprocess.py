@@ -289,7 +289,6 @@ async def knn(
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
-    df = df.dropna()
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
     y_df = df.iloc[:, y_index]
