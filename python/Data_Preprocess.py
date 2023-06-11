@@ -1,5 +1,6 @@
 import io
 
+import numpy as np
 import pandas as pd
 import sqlalchemy as db
 import uvicorn
@@ -258,12 +259,12 @@ async def knn(
     workspace_id = str(classification_params['workspace_id'])
     target_column = classification_params['target_column']
     to_learn_columns = classification_params['to_learn_columns']
-    k = classification_params['k']
+    max_k = classification_params['max_k']
     test_size = classification_params['test_size']
     random_state = classification_params['random_state']
     metric = classification_params['metric']
 
-    if k < 2:
+    if max_k < 2:
         raise HTTPException(status_code=400, detail="Invalid k value.")
 
     # connect to db
@@ -300,15 +301,23 @@ async def knn(
 
     # scale data
     scaler = StandardScaler()
-    x_train = scaler.fit_transform(x_train)
-    x_test = scaler.transform(x_test)
+    x_train_knn = scaler.fit_transform(x_train)
+    x_test_knn = scaler.transform(x_test)
+
+    # find best k
+    best_k = __find_best_k__(x_train_knn, y_train, x_test_knn, y_test, max_k, metric)
 
     # train model
-    classifier = KNeighborsClassifier(n_neighbors=k, metric=metric)
-    classifier.fit(x_train, y_train)
+    classifier = KNeighborsClassifier(n_neighbors=best_k, metric=metric)
+    classifier.fit(x_train_knn, y_train)
 
     # predict test set results
     y_pred = classifier.predict(x_test)
+
+    ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
+    ret_df['actual'] = y_test.astype(int)
+    ret_df['pred'] = y_pred.astype(int)
+    print(ret_df)
 
     # results
 
@@ -316,35 +325,29 @@ async def knn(
     cm = __create_confusion_matrix__(y_test, y_pred)
     # create classification report
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='macro')
-    recall = recall_score(y_test, y_pred, average='macro')
-    f1 = f1_score(y_test, y_pred, average='macro')
+    precision = precision_score(y_test, y_pred, average='macro', zero_division=0)
+    recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
+    f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    # plt.figure(figsize=(10, 5))
-    # plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    # plt.title(f"Predicted values with k={k}", fontsize=20)
-    #
-    # buf = io.BytesIO()
-    # plt.savefig(buf, format="png")
-    # buf.seek(0)
-    #
-    # txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-    #
-    # # Combine the image and text into a single response
-    # response = StreamingResponse(
-    #     iter([buf.getvalue(), txt]),
-    #     media_type="image/png;text/plain",
-    # )
-    #
-    # # Return the response
-    # return response
-    return {
-        "confusion_matrix": cm.tolist(),
-        "accuracy": accuracy,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1
-    }
+    plt.figure(figsize=(10, 5))
+    plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.title(f"Predicted values with k={best_k}", fontsize=20)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    txt = f"Best k value: {best_k}\nConfusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+
+    # Combine the image and text into a single response
+    response = StreamingResponse(
+        iter([buf.getvalue(), txt, ret_df.to_csv()]),
+        media_type="image/png;text/plain;text/csv"
+    )
+
+    # Return the response
+    return response
+
 
 # Support Vector Machine (SVM)
 @app.post('/python/classification/svm')
@@ -376,10 +379,6 @@ async def svm(
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
 
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-    df = df.dropna()
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
     y_df = df.iloc[:, y_index]
@@ -407,43 +406,39 @@ async def svm(
     # predict test set results
     y_pred = classifier.predict(x_test)
 
+    ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
+    ret_df['actual'] = y_test
+    ret_df['pred'] = y_pred
+
     # results
 
     # create confusion matrix
     cm = __create_confusion_matrix__(y_test, y_pred)
     # create classification report
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='macro')
-    recall = recall_score(y_test, y_pred, average='macro')
-    f1 = f1_score(y_test, y_pred, average='macro')
+    precision = precision_score(y_test, y_pred, average='macro', zero_division=0)
+    recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
+    f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    # # plot results
-    # plt.figure(figsize=(10, 5))
-    # plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    # plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
-    #
-    # buf = io.BytesIO()
-    # plt.savefig(buf, format="png")
-    # buf.seek(0)
-    #
-    # txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-    #
-    # # Combine the image and text into a single response
-    # response = StreamingResponse(
-    #     iter([buf.getvalue(), txt]),
-    #     media_type="image/png;text/plain",
-    # )
-    #
-    # # Return the response
-    # return response
+    # plot results
+    plt.figure(figsize=(10, 5))
+    plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
 
-    return {
-        "confusion_matrix": cm.tolist(),
-        "accuracy": accuracy,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1
-    }
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+
+    txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+
+    # Combine the image and text into a single response
+    response = StreamingResponse(
+        iter([buf.getvalue(), txt, ret_df.to_csv()]),
+        media_type="image/png;text/plain;text/csv"
+    )
+
+    # Return the response
+    return response
 
 # Clustering
 
@@ -459,9 +454,8 @@ async def kmeans(
     user_id = str(kmeans_params['user_id'])
     workspace_id = str(kmeans_params['workspace_id'])
     columns = kmeans_params['columns']
+    target_column = kmeans_params['target_column']
     random_state = kmeans_params['random_state']
-    n_init = kmeans_params['n_init']
-    n_max = kmeans_params['n_max']
 
     # connect to db
     con = __connect_to_db__(
@@ -476,10 +470,6 @@ async def kmeans(
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
 
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-    df = df.dropna()
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-
     x = df.loc[:, columns]
 
     # check if there are any missing values
@@ -487,21 +477,26 @@ async def kmeans(
         raise HTTPException(status_code=400, detail="There are missing values in the data.")
 
     x_data = x.values
+    n_clusters = df[target_column].nunique(dropna=True)
 
     # K-Means algorithm
-    kmeans = KMeans(n_clusters=1, random_state=random_state)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
     y_pred = kmeans.fit_predict(x_data)
 
+    ret_df = pd.DataFrame(x_data, columns=columns)
+    ret_df[target_column] = df[target_column]
+    ret_df['pred'] = y_pred
+
     # plot results
-    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=50)
-    plt.title(f"Predicted values with n_clusters={1}", fontsize=20)
+    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
+    plt.title(f"Predicted values with n_clusters={n_clusters}", fontsize=20)
 
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     buf.seek(0)
 
     # Return the response
-    return StreamingResponse(buf, media_type="image/png")
+    return StreamingResponse(iter([buf.getvalue(), ret_df.to_csv()]), media_type="image/png;text/csv")
 
 # dbscan
 @app.post('/python/clustering/dbscan')
@@ -515,6 +510,7 @@ async def dbscan(
     user_id = str(dbscan_params['user_id'])
     workspace_id = str(dbscan_params['workspace_id'])
     columns = dbscan_params['columns']
+    target_column = dbscan_params['target_column']
     eps = dbscan_params['eps']
     min_samples = dbscan_params['min_samples']
     metric = dbscan_params['metric']
@@ -535,10 +531,6 @@ async def dbscan(
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
 
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-    df = df.dropna()
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-
     x = df.loc[:, columns]
 
     # check if there are any missing values
@@ -551,8 +543,12 @@ async def dbscan(
     dbscan = DBSCAN(eps=eps, min_samples=min_samples, metric=metric, algorithm=algorithm, leaf_size=leaf_size, p=p)
     y_pred = dbscan.fit_predict(x_data)
 
+    ret_df = pd.DataFrame(x_data, columns=columns)
+    ret_df[target_column] = df[target_column]
+    ret_df['pred'] = y_pred
+
     # plot results
-    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=50)
+    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
     plt.title(f"Predicted values with eps={eps}", fontsize=20)
 
     buf = io.BytesIO()
@@ -560,7 +556,7 @@ async def dbscan(
     buf.seek(0)
 
     # Return the response
-    return StreamingResponse(buf, media_type="image/png")
+    return StreamingResponse(iter([buf.getvalue(), ret_df.to_csv()]), media_type="image/png;text/csv")
 
 
 
@@ -1041,6 +1037,21 @@ def __create_confusion_matrix__(test_data, pred_data):
     except Exception:
         raise HTTPException(status_code=400, detail="Can't create confusion matrix")
     return cm
+
+# function for finding best k for kNN
+def __find_best_k__(x_train, y_train, x_test, y_test, max_k, metric):
+    try:
+        k_values = np.arange(1, max_k + 1, 2)
+        k_scores = []
+        for k in k_values:
+            knn = KNeighborsClassifier(n_neighbors=k, metric=metric)
+            knn.fit(x_train, y_train)
+            y_pred = knn.predict(x_test)
+            k_scores.append(accuracy_score(y_test, y_pred))
+        best_k = k_values[np.argmax(k_scores)]
+    except Exception:
+        raise HTTPException(status_code=400, detail="Can't find best k")
+    return best_k
 
 
 # function for validating successful request
