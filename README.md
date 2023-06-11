@@ -44,14 +44,14 @@ The project aims to enable users to perform data analysis, statistical tests, an
 
 ### How to use it?
 
-- #### Deployed website
+- #### Deployed website (Highly recommended)
 
 Steps
 
 1. Go to the link : http://online-data-scientist.xyz (alternative : http://16.171.19.190)
 2. Use it :)
 
-- #### GitHub
+- #### Docker (Recommended)
 
 You will need Docker and Docker-Compose plugin.
 
@@ -61,6 +61,16 @@ Steps
 2. Go to the project folder
 3. Type ``` docker-compose up ``` for creating containers and run them
 4. Type ``` docker-compose up --scale py={desired instance amount} ``` for creating containers with multiple py instance and run them
-4. Voilà app up and running ! (localhost:80)
+5. Voilà app up and running ! (localhost:80)
+
+- #### Local
+
+You will need NodeJS, JDK18, and Python (with modules).
+
+Steps
+
+1. Clone the repo https://github.com/HacettepeCSCoders/Online-Data-Scientist and checkout to the master branch.
+2. Run each tier (React, Java, Python) seperately via an IDE or cmd. (We suggest the Webstorm, Intellij IDEA and PyCharm.)
+3. Go to the localhost:3000
 
 <hr>
