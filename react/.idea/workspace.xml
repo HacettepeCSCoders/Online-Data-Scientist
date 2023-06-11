@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="update xml" />
+    <list default="true" id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="add documents">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,6 +16,25 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
     <option name="RESET_MODE" value="HARD" />
     <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="recentNewPullRequestHead">
+      <RepoCoordinatesHolder>
+        <option name="owner" value="HacettepeCSCoders" />
+        <option name="repository" value="Online-Data-Scientist" />
+      </RepoCoordinatesHolder>
+    </option>
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="9291d186-928b-43ba-8b31-87ae4a866d06" />
+        <option name="url" value="https://github.com/HacettepeCSCoders/Online-Data-Scientist.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -115,7 +136,21 @@
       <option name="project" value="LOCAL" />
       <updated>1686481310659</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="update services">
+      <created>1686502363388</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1686502363388</updated>
+    </task>
+    <task id="LOCAL-00008" summary="add documents">
+      <created>1686502398400</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1686502398400</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,6 +199,8 @@
     <MESSAGE value="bugfix" />
     <MESSAGE value="assets changed" />
     <MESSAGE value="update xml" />
-    <option name="LAST_COMMIT_MESSAGE" value="update xml" />
+    <MESSAGE value="update services" />
+    <MESSAGE value="add documents" />
+    <option name="LAST_COMMIT_MESSAGE" value="add documents" />
   </component>
 </project>
