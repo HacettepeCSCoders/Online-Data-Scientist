@@ -138,6 +138,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
 
         console.log(response);
         console.log(response.data);
+        console.log(response.data.plot);
         setResult(response.data);
       } else if (workspaceTypeDetails === "svm") {
         const body = {

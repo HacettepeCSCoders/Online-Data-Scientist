@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Tabs } from "antd";
 import DataTab from "./resultModalTabs/dataTab";
 import SelectedProcesses from "./resultModalTabs/selectedProcesses";
