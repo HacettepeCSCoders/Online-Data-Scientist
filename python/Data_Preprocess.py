@@ -39,7 +39,7 @@ app.add_middleware(
 DB_CONNECTION_PARAMS = {
     'db_user': 'postgres',
     'db_password': 'postgres',
-    'db_host': 'localhost',
+    'db_host': 'db',
     'db_port': 5432,
     'db_name': 'postgres'
 }
