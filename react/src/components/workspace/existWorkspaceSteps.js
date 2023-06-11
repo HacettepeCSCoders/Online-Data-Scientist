@@ -4,10 +4,13 @@ import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import {
+  dbScanTest,
   getTable,
+  kmeansTest,
   knnTest,
   makeTest,
   manipulate,
+  svmTest,
 } from "../../services/processService";
 import { existSteps } from "../../utils/workspace/existSteps";
 import ResultModal from "./modal/resultModal";
@@ -131,17 +134,54 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
           ...processingDetails,
         };
 
-        const response = await knnTest(JSON.stringify(body));
+        response = await knnTest(JSON.stringify(body));
+
         console.log(response);
         console.log(response.data);
+        setResult(response.data);
+      } else if (workspaceTypeDetails === "svm") {
+        const body = {
+          user_id: userId.toString(),
+          workspace_id: workspaceId,
+          ...processingDetails,
+        };
 
-        // setResult(response.data);
+        response = await svmTest(JSON.stringify(body));
+
+        console.log(response);
+        console.log(response.data);
+        setResult(response.data);
+      } else if (workspaceTypeDetails === "kmean") {
+        const body = {
+          user_id: userId.toString(),
+          workspace_id: workspaceId,
+          ...processingDetails,
+        };
+
+        response = await kmeansTest(JSON.stringify(body));
+
+        console.log(response);
+        console.log(response.data);
+        setResult(response.data);
+      } else if (workspaceTypeDetails === "dbScan") {
+        const body = {
+          user_id: userId.toString(),
+          workspace_id: workspaceId,
+          ...processingDetails,
+        };
+
+        response = await dbScanTest(JSON.stringify(body));
+
+        console.log(response);
+        console.log(response.data);
+        setResult(response.data);
       }
       setIsModalOpen(false);
       setResultModal(true);
     } catch (apiError) {
       console.log("Hata var");
       console.log(apiError);
+      apiError.response && setErrorMessage(apiError.response.data.detail);
       setIsModalOpen(false);
       setErrorModal(true);
     }
@@ -237,15 +277,17 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
             <Descriptions.Item>
               {existSteps[current].subTitle}
             </Descriptions.Item>
-            <Descriptions.Item>
-              <Button
-                onClick={() => {
-                  setDataModal(true);
-                }}
-              >
-                Data
-              </Button>
-            </Descriptions.Item>
+            {current !== 0 && (
+              <Descriptions.Item>
+                <Button
+                  onClick={() => {
+                    setDataModal(true);
+                  }}
+                >
+                  Data
+                </Button>
+              </Descriptions.Item>
+            )}
 
             <Descriptions.Item>
               <Tag>{fileName} </Tag>

@@ -44,3 +44,27 @@ export const knnTest = async (body) => {
     data: body,
   });
 };
+
+export const svmTest = async (body) => {
+  return axios({
+    method: "POST",
+    url: `http://localhost:8000/python/classification/svm`,
+    data: body,
+  });
+};
+
+export const kmeansTest = async (body) => {
+  return axios({
+    method: "POST",
+    url: `http://localhost:8000/python/clustering/kmeans`,
+    data: body,
+  });
+};
+
+export const dbScanTest = async (body) => {
+  return axios({
+    method: "POST",
+    url: `http://localhost:8000/python/clustering/dbscan`,
+    data: body,
+  });
+};
