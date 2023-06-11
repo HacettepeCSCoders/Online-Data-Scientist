@@ -141,7 +141,7 @@ async def manipulate(
     )
 
     # get dataframe from db
-    df = __get_table_from_sql__(workspace_id, user_id, con)
+    df: pd.DataFrame = __get_table_from_sql__(workspace_id, user_id, con)
 
     # check if given columns are valid
     if to_drop_columns_indices:
@@ -153,7 +153,7 @@ async def manipulate(
 
 
     # manipulate dataframe
-    df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices,
+    df = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices,
                                                 fill_missing_strategy)
 
     # encode categorical data
@@ -187,11 +187,17 @@ async def insert(
     # read data and manipulate dataframe
     content = await file.read()
     with io.BytesIO(content) as data:
-        if 'csv' in file.content_type:
+        file_parts = file.filename.split(".")
+        file_extension = file_parts[-1]
+        if 'csv' == file_extension:
             if ord(';') in data.getvalue():
                 df = pd.read_csv(data, sep=';')
             else:
                 df = pd.read_csv(data, sep=',')
+        elif 'xlsx' == file_extension or 'xls' == file_extension:
+            df = pd.read_excel(data)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid file type.")
 
     df: pd.DataFrame = __manipulate_dataframe__(df, to_drop_columns_indices, to_drop_rows_indices,
                                                 fill_missing_strategy)
