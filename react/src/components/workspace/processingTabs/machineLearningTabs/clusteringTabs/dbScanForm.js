@@ -1,4 +1,4 @@
-import { Form, Button } from "antd";
+import { Form, Button, Select, Space } from "antd";
 import React, { useState } from "react";
 import DropColumnSelect from "../../processSelect/dropColumnSelect";
 import IntegerSlider from "../../processSelect/integerSlider";
@@ -9,10 +9,14 @@ const DBScanForm = ({ setValues, setWorkspaceTypeDetails }) => {
   const [label, setLabel] = useState();
   const [eps, setEps] = useState(0.2);
   const [minSamples, setMinSamples] = useState(5);
+  const [leafSize, setLeafSize] = useState(30);
 
   const onFinish = (values) => {
     values.columns = learnigColumns;
     values.target_column = label;
+    values.eps = eps;
+    values.min_samples = minSamples;
+    values.leafSize = leafSize;
 
     setValues(values);
     setWorkspaceTypeDetails("dbScan");
@@ -47,6 +51,56 @@ const DBScanForm = ({ setValues, setWorkspaceTypeDetails }) => {
           colNameOrId={"name"}
           mode={null}
         ></DropColumnSelect>
+      </Form.Item>
+      <Form.Item
+        name="eps"
+        label="Eps Values"
+        wrapperCol={{ offset: 0, span: 8 }}
+      >
+        <DecimalSlider
+          setValue={setEps}
+          maxInput={1}
+          maxSlider={1}
+          defaultVal={0.5}
+        />
+      </Form.Item>
+      <Form.Item
+        name="leaf_size"
+        label="Leaf Size"
+        wrapperCol={{ offset: 0, span: 8 }}
+      >
+        <IntegerSlider
+          setValue={setLeafSize}
+          maxInput={100}
+          maxSlider={100}
+          defaultVal={30}
+        />
+      </Form.Item>
+      <Form.Item
+        name="min_samples"
+        label="Minimum Samples"
+        wrapperCol={{ offset: 0, span: 8 }}
+      >
+        <IntegerSlider
+          setValue={setMinSamples}
+          maxInput={20}
+          maxSlider={100}
+          defaultVal={5}
+        />
+      </Form.Item>
+      <Form.Item label="Algorithm" wrapperCol={{ offset: 0, span: 8 }}>
+        <Select
+          placeholder={"auto"}
+          disabled={true}
+          className="select-column-width"
+        ></Select>
+      </Form.Item>
+      <Form.Item label="Metric" wrapperCol={{ offset: 0, span: 8 }}>
+        <Select
+          placeholder={"euclidian"}
+          disabled={true}
+          className="select-column-width"
+        ></Select>
       </Form.Item>
 
       <Form.Item wrapperCol={{ offset: 6, span: 16 }}>

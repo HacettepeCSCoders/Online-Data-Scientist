@@ -6,6 +6,7 @@ const DataModal = ({ setDataModal, isDataModal, dataDetails }) => {
   return (
     <>
       <Modal
+        className="result-modal"
         open={isDataModal}
         cancelButtonProps={{ style: { display: "none" } }}
         okButtonProps={{ style: { display: "none" } }}
