@@ -145,7 +145,7 @@ const WorkspaceSteps = ({ workspaceId, userId }) => {
       if (apiError === "startError") {
         setErrorMessage(`HTTP Response Code: ${response?.status}`);
       } else {
-        setErrorMessage(apiError.response.data.detail);
+        apiError.response && setErrorMessage(apiError.response.data.detail);
       }
       setIsModalOpen(false);
       setErrorModal(true);
