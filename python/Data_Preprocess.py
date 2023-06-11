@@ -378,6 +378,20 @@ async def svm(
     test_size = svm_params['test_size']
     random_state = svm_params['random_state']
 
+    # check kernel value is valid
+    if kernel not in ['linear', 'poly', 'rbf', 'sigmoid']:
+        raise HTTPException(status_code=400, detail="Invalid kernel value.")
+
+    if random_state < 0:
+        raise HTTPException(status_code=400, detail="Invalid random state value.")
+
+    if test_size <= 0 or test_size >= 1:
+        raise HTTPException(status_code=400, detail="Invalid test size value.")
+
+    if len(to_learn_columns) < 2:
+        raise HTTPException(status_code=400, detail="Invalid number of columns.")
+
+
     # connect to db
     con = __connect_to_db__(
         DB_CONNECTION_PARAMS['db_user'],
