@@ -9,8 +9,6 @@ export const steps = [
   {
     title: "Welcome to Workspace",
     content: <WelcomeWorkspace />,
-    subTitle:
-      "After this stage, we will help you make the best use of the data wehave. First of all, please select the field for which you will use the data you have.",
   },
   {
     title: "Upload CSV or Excel File",

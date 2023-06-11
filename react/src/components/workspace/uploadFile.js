@@ -34,7 +34,6 @@ const UploadFile = () => {
       };
     });
     promise.then((d) => {
-      console.log(d);
       setData(d);
     });
   };
@@ -58,7 +57,7 @@ const UploadFile = () => {
     <>
       <div>
         <Dragger
-          accept=".txt, .csv, .xlsx, .xls"
+          accept=" .csv, .xlsx, .xls"
           showUploadList={true}
           multiple={false}
           beforeUpload={(file) => {
@@ -80,7 +79,7 @@ const UploadFile = () => {
             Click or drag file to this area to upload
           </p>
           <p className="ant-upload-hint">
-            Support for a single upload. Please upload Excel, CSV or TXT files.
+            Support for a single upload. Please upload Excel or CSV files.
             Uploading company data or other group files is a violation.
           </p>
         </Dragger>
