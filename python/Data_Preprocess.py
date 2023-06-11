@@ -593,8 +593,10 @@ async def dbscan(
     plt.savefig(buf, format="png")
     buf.seek(0)
 
-    # Return the response
-    return StreamingResponse(buf, media_type="image/png")
+    return {
+        'data': ret_df.to_csv(index=False),
+        'plot': base64.b64encode(buf.getvalue()).decode("utf-8")
+    }
 
 
 
