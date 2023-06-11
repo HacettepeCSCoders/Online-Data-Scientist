@@ -7,7 +7,6 @@ const { Link } = Anchor;
 export const LoginForm = ({ onClickLogin, error, setError }) => {
   const onFinish = (values) => {
     setError(undefined);
-    console.log(values);
     onClickLogin(values);
   };
 

@@ -16,7 +16,6 @@ const Login = () => {
       await dispatch(loginHandler(values));
       navigate("/");
     } catch (apiError) {
-      console.log(apiError);
       console.log("aas");
       setError("Please give correct credentials");
     }
