@@ -33,7 +33,7 @@ export const manipulate = async (data) => {
 export const deleteWorkspace = async (user_id, workspace_id) => {
   return axios({
     method: "DELETE",
-    url: `http://localhost:8000/python/delete-workspace?user_id=${user_id}&workspace_id=${workspace_id}`,
+    url: `/python/delete-workspace?user_id=${user_id}&workspace_id=${workspace_id}`,
   });
 };
 
