@@ -12,7 +12,7 @@ from pydantic import Json
 from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kendalltau, chi2_contingency, ttest_ind, \
     ttest_rel, f_oneway, mannwhitneyu, wilcoxon, kruskal, friedmanchisquare
 from sklearn.cluster import KMeans, DBSCAN
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, silhouette_score
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler
@@ -20,7 +20,6 @@ from sklearn.svm import SVC
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR, text
 from starlette.responses import StreamingResponse
 from statsmodels.tsa.stattools import adfuller, kpss
-from traitlets import Integer
 
 import Model
 
