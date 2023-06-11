@@ -6,6 +6,7 @@ import { Button, Descriptions, Tag } from "antd";
 const ResultTab = ({ result, workspaceTypeDetails }) => {
   const printRef = React.useRef();
   const [testArray, setTestArray] = useState();
+  const [mlArray, setMlarray] = useState();
 
   const generatePDF = async () => {
     const element = printRef.current;
@@ -23,42 +24,67 @@ const ResultTab = ({ result, workspaceTypeDetails }) => {
 
   useEffect(() => {
     let arr = [];
-    if (workspaceTypeDetails == "statistical") {
+    if (workspaceTypeDetails === "statistical") {
       for (const [key, value] of Object.entries(result)) {
         let obj = {};
         obj.name = key;
         obj.res = value;
         arr.push(obj);
       }
-    } else if (workspaceTypeDetails == "dataManipulation") {
+      setTestArray(arr);
+    } else if (workspaceTypeDetails === "dataManipulation") {
       console.log();
+    } else {
+      setMlarray(result);
     }
-    setTestArray(arr);
   }, []);
 
   return (
     <>
       <div ref={printRef}>
-        {workspaceTypeDetails == "statistical" && (
-          <Descriptions
-            title="Statistical Test"
-            size="middle"
-            layout="vertical"
-            bordered
-            column={1}
-          >
-            {testArray &&
-              testArray.map((item) => {
-                return (
+        <Descriptions
+          title={
+            workspaceTypeDetails === "statistical"
+              ? "Statistical Test"
+              : workspaceTypeDetails === "dataManipulation"
+              ? "Data Manipulation"
+              : workspaceTypeDetails === "knn"
+              ? "K-Nearest Neighbor"
+              : workspaceTypeDetails === "svm"
+              ? "Support Vector Machine"
+              : workspaceTypeDetails === "kmean"
+              ? "K Mean"
+              : "DBScan"
+          }
+          size="middle"
+          layout="vertical"
+          bordered
+          column={1}
+        >
+          {workspaceTypeDetails === "statistical" &&
+            testArray &&
+            testArray.map((item) => {
+              return (
+                <Descriptions.Item
+                  label={<Tag className="nav-background">{item.name}</Tag>}
+                >
+                  {item.res}
+                </Descriptions.Item>
+              );
+            })}
+          {mlArray &&
+            Object.keys(mlArray).map((item, i) => {
+              return (
+                <>
                   <Descriptions.Item
-                    label={<Tag className="nav-background">{item.name}</Tag>}
+                    label={<Tag className="nav-background">{item} </Tag>}
                   >
-                    {item.res}
+                    {mlArray[item]}
                   </Descriptions.Item>
-                );
-              })}
-          </Descriptions>
-        )}
+                </>
+              );
+            })}
+        </Descriptions>
       </div>
       <br />
       <Button className="dark-background" onClick={generatePDF}>

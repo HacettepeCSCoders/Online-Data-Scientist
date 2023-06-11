@@ -4,22 +4,17 @@ import DropColumnSelect from "../../processSelect/dropColumnSelect";
 import IntegerSlider from "../../processSelect/integerSlider";
 import DecimalSlider from "../../processSelect/decimalSlider";
 
-const KnnForm = ({ setValues, setWorkspaceTypeDetails, dataDetails }) => {
+const KMeanForm = ({ setValues, setWorkspaceTypeDetails }) => {
   const [learnigColumns, setLearningColumns] = useState();
   const [label, setLabel] = useState();
-  const [kValue, setKValue] = useState(3);
-  const [testSize, setTestSize] = useState(0.2);
   const [randomState, setRandomState] = useState(42);
 
   const onFinish = (values) => {
-    values.to_learn_columns = learnigColumns;
+    values.columns = learnigColumns;
     values.target_column = label;
-    values.max_k = kValue;
-    values.test_size = testSize;
     values.random_state = randomState;
-
     setValues(values);
-    setWorkspaceTypeDetails("knn");
+    setWorkspaceTypeDetails("kmean");
   };
   return (
     <Form
@@ -29,7 +24,7 @@ const KnnForm = ({ setValues, setWorkspaceTypeDetails, dataDetails }) => {
       autoComplete="off"
     >
       <Form.Item
-        name="to_learn_columns"
+        name="columns"
         label="Learn Columns"
         required={true}
         wrapperCol={{ offset: 0, span: 8 }}
@@ -51,30 +46,6 @@ const KnnForm = ({ setValues, setWorkspaceTypeDetails, dataDetails }) => {
           colNameOrId={"name"}
           mode={null}
         ></DropColumnSelect>
-      </Form.Item>
-      <Form.Item
-        name="max_k"
-        label="K-Value"
-        wrapperCol={{ offset: 0, span: 8 }}
-      >
-        <IntegerSlider
-          setValue={setKValue}
-          maxInput={100}
-          maxSlider={20}
-          defaultVal={3}
-        />
-      </Form.Item>
-      <Form.Item
-        name="test_size"
-        label="Test Size"
-        wrapperCol={{ offset: 0, span: 8 }}
-      >
-        <DecimalSlider
-          setValue={setTestSize}
-          maxInput={0.9}
-          maxSlider={0.9}
-          defaultVal={0.2}
-        />
       </Form.Item>
       <Form.Item
         name="random_state"
@@ -107,4 +78,4 @@ const KnnForm = ({ setValues, setWorkspaceTypeDetails, dataDetails }) => {
   );
 };
 
-export default KnnForm;
+export default KMeanForm;

@@ -9,7 +9,7 @@ const SelectedProcesses = ({
 }) => {
   const [processes, setProcesses] = useState([]);
   const [statisticalTest, setStatisticalTest] = useState([]);
-  const [knnTest, setKnnTest] = useState({});
+  const [classificationTest, setclassificationTest] = useState({});
   const colArr = getColumnsStruct(dataDetails);
 
   useEffect(() => {
@@ -51,24 +51,30 @@ const SelectedProcesses = ({
       }
       setProcesses(arr);
       console.log(arr);
-    } else if (workspaceTypeDetails == "statistical") {
+    } else if (workspaceTypeDetails === "statistical") {
       setStatisticalTest(processingDetails);
-    } else if (workspaceTypeDetails == "knn") {
-      setKnnTest(processingDetails);
+    } else {
+      setclassificationTest(processingDetails);
     }
   }, []);
   return (
     <>
       <Descriptions
         title={
-          workspaceTypeDetails == "statistical"
+          workspaceTypeDetails === "statistical"
             ? "Statistical Test"
-            : workspaceTypeDetails == "dataManipulation"
+            : workspaceTypeDetails === "dataManipulation"
             ? "Data Manipulation"
-            : "K-Nearest Neighbor"
+            : workspaceTypeDetails === "knn"
+            ? "K-Nearest Neighbor"
+            : workspaceTypeDetails === "svm"
+            ? "Support Vector Machine"
+            : workspaceTypeDetails === "kmean"
+            ? "K Mean"
+            : "DBScan"
         }
         size="middle"
-        layout={knnTest ? "horizontal" : "vertical"}
+        layout={classificationTest ? "horizontal" : "vertical"}
         bordered={true}
         column={1}
       >
@@ -99,17 +105,18 @@ const SelectedProcesses = ({
               </>
             );
           })}
-        {Object.keys(knnTest).map((item, i) => {
-          return (
-            <>
-              <Descriptions.Item
-                label={<Tag className="nav-background">{item} </Tag>}
-              >
-                <Tag>{knnTest[item]} </Tag>
-              </Descriptions.Item>
-            </>
-          );
-        })}
+        {classificationTest &&
+          Object.keys(classificationTest).map((item, i) => {
+            return (
+              <>
+                <Descriptions.Item
+                  label={<Tag className="nav-background">{item} </Tag>}
+                >
+                  <Tag>{classificationTest[item]} </Tag>
+                </Descriptions.Item>
+              </>
+            );
+          })}
       </Descriptions>
     </>
   );

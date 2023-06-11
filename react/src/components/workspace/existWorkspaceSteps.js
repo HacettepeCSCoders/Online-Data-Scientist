@@ -3,7 +3,12 @@ import { Button, Layout, Tag, Steps, message, Descriptions } from "antd";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
 import { useData } from "../../hocs/dataProvider";
 import { useProcessing } from "../../hocs/proccesingProvider";
-import { getTable, makeTest, manipulate } from "../../services/processService";
+import {
+  getTable,
+  knnTest,
+  makeTest,
+  manipulate,
+} from "../../services/processService";
 import { existSteps } from "../../utils/workspace/existSteps";
 import ResultModal from "./modal/resultModal";
 import WaitingModal from "./modal/waitingModal";
@@ -11,6 +16,7 @@ import { PageHeader } from "@ant-design/pro-layout";
 import ErrorModal from "./modal/errorModal";
 import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
+import DataModal from "./modal/dataModal";
 const { Content, Sider } = Layout;
 
 const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
@@ -26,6 +32,8 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
   const [isErrorModal, setErrorModal] = useState(false);
   const [isWaitingModalOpen, setIsModalOpen] = useState(false);
   const [isResultModal, setResultModal] = useState(false);
+  const [isDataModal, setDataModal] = useState(false);
+
   let navigate = useNavigate();
 
   const handleResultCancel = () => {
@@ -97,7 +105,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
     try {
       setIsModalOpen(true);
 
-      if (workspaceTypeDetails == "dataManipulation") {
+      if (workspaceTypeDetails === "dataManipulation") {
         const body = {
           user_id: userId.toString(),
           workspace_id: workspaceId,
@@ -107,7 +115,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
         const responseGetTable = await getTable(userId, workspaceId);
         setDataDetails(responseGetTable.data);
         console.log(response);
-      } else if (workspaceTypeDetails == "statistical") {
+      } else if (workspaceTypeDetails === "statistical") {
         const body = {
           user_id: userId.toString(),
           workspace_id: workspaceId,
@@ -116,13 +124,24 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
         console.log(body);
         response = await makeTest(JSON.stringify(body));
         setResult(response.data);
+      } else if (workspaceTypeDetails === "knn") {
+        const body = {
+          user_id: userId.toString(),
+          workspace_id: workspaceId,
+          ...processingDetails,
+        };
+
+        const response = await knnTest(JSON.stringify(body));
+        console.log(response);
+        console.log(response.data);
+
+        // setResult(response.data);
       }
       setIsModalOpen(false);
       setResultModal(true);
     } catch (apiError) {
       console.log("Hata var");
       console.log(apiError);
-      setErrorMessage(apiError.response.data.detail);
       setIsModalOpen(false);
       setErrorModal(true);
     }
@@ -182,6 +201,11 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
         setErrorModal={setErrorModal}
         errorMessage={errorMessage}
       />
+      <DataModal
+        isDataModal={isDataModal}
+        setDataModal={setDataModal}
+        dataDetails={dataDetails}
+      />
       <Content className="content-nav">
         <div className="div-workspaceSteps">
           <Tag color="#9FB8AD">{workspaceId}</Tag>
@@ -212,6 +236,15 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
           <Descriptions column={1}>
             <Descriptions.Item>
               {existSteps[current].subTitle}
+            </Descriptions.Item>
+            <Descriptions.Item>
+              <Button
+                onClick={() => {
+                  setDataModal(true);
+                }}
+              >
+                Data
+              </Button>
             </Descriptions.Item>
 
             <Descriptions.Item>

@@ -12,7 +12,13 @@ const MachineLearningForm = ({
     {
       key: "1",
       label: `Clustering`,
-      children: <ClusteringForm />,
+      children: (
+        <ClusteringForm
+          setValues={setValues}
+          setWorkspaceTypeDetails={setWorkspaceTypeDetails}
+          dataDetails={dataDetails}
+        />
+      ),
     },
     {
       key: "2",

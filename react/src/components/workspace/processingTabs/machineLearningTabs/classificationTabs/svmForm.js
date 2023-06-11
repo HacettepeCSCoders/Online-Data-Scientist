@@ -1,10 +1,10 @@
-import { Form, Button } from "antd";
+import { Checkbox, Form, Select, Transfer, Row, Col, Button } from "antd";
 import React, { useState } from "react";
 import DropColumnSelect from "../../processSelect/dropColumnSelect";
 import IntegerSlider from "../../processSelect/integerSlider";
 import DecimalSlider from "../../processSelect/decimalSlider";
 
-const KnnForm = ({ setValues, setWorkspaceTypeDetails, dataDetails }) => {
+const SvmForm = ({ setValues, setWorkspaceTypeDetails }) => {
   const [learnigColumns, setLearningColumns] = useState();
   const [label, setLabel] = useState();
   const [kValue, setKValue] = useState(3);
@@ -19,7 +19,7 @@ const KnnForm = ({ setValues, setWorkspaceTypeDetails, dataDetails }) => {
     values.random_state = randomState;
 
     setValues(values);
-    setWorkspaceTypeDetails("knn");
+    setWorkspaceTypeDetails("svm");
   };
   return (
     <Form
@@ -107,4 +107,4 @@ const KnnForm = ({ setValues, setWorkspaceTypeDetails, dataDetails }) => {
   );
 };
 
-export default KnnForm;
+export default SvmForm;
