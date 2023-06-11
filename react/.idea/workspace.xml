@@ -4,39 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="assets changed" />
+    <list default="true" id="4b7e909b-7600-44b8-9c16-f340046d7543" name="Changes" comment="update xml" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$/.." value="feature/docker" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
     <option name="RESET_MODE" value="HARD" />
-  </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN"
-  }
-}]]></component>
-  <component name="GithubPullRequestsUISettings">
-    <option name="recentNewPullRequestHead">
-      <RepoCoordinatesHolder>
-        <option name="owner" value="HacettepeCSCoders" />
-        <option name="repository" value="Online-Data-Scientist" />
-      </RepoCoordinatesHolder>
-    </option>
-    <option name="selectedUrlAndAccountId">
-      <UrlAndAccount>
-        <option name="accountId" value="9291d186-928b-43ba-8b31-87ae4a866d06" />
-        <option name="url" value="https://github.com/HacettepeCSCoders/Online-Data-Scientist.git" />
-      </UrlAndAccount>
-    </option>
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -131,7 +108,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686395611912</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="update xml">
+      <created>1686481310659</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1686481310659</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -179,6 +163,7 @@
     <MESSAGE value="project name change" />
     <MESSAGE value="bugfix" />
     <MESSAGE value="assets changed" />
-    <option name="LAST_COMMIT_MESSAGE" value="assets changed" />
+    <MESSAGE value="update xml" />
+    <option name="LAST_COMMIT_MESSAGE" value="update xml" />
   </component>
 </project>
