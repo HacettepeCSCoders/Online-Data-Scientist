@@ -248,7 +248,7 @@
  }
 
  .search-Result{
-    margin-top: 5px;
+    
   width: 200;
   height: 100px;
   background-color: white;
@@ -256,6 +256,14 @@
   overflow: hidden;
   overflow-y: auto;
  }
+
+ .text-center{
+    text-align: center;
+ }
+ .search {
+    margin-top: 15px;
+ }
+
 
 
 

@@ -9,6 +9,7 @@ const SelectedProcesses = ({
 }) => {
   const [processes, setProcesses] = useState([]);
   const [statisticalTest, setStatisticalTest] = useState([]);
+  const [classificationTest, setclassificationTest] = useState({});
   const colArr = getColumnsStruct(dataDetails);
 
   useEffect(() => {
@@ -50,20 +51,30 @@ const SelectedProcesses = ({
       }
       setProcesses(arr);
       console.log(arr);
-    } else if (workspaceTypeDetails == "statistical") {
+    } else if (workspaceTypeDetails === "statistical") {
       setStatisticalTest(processingDetails);
+    } else {
+      setclassificationTest(processingDetails);
     }
   }, []);
   return (
     <>
       <Descriptions
         title={
-          workspaceTypeDetails == "statistical"
+          workspaceTypeDetails === "statistical"
             ? "Statistical Test"
-            : "Data Manipulation"
+            : workspaceTypeDetails === "dataManipulation"
+            ? "Data Manipulation"
+            : workspaceTypeDetails === "knn"
+            ? "K-Nearest Neighbor"
+            : workspaceTypeDetails === "svm"
+            ? "Support Vector Machine"
+            : workspaceTypeDetails === "kmean"
+            ? "K Mean"
+            : "DBScan"
         }
         size="middle"
-        layout="vertical"
+        layout={classificationTest ? "horizontal" : "vertical"}
         bordered={true}
         column={1}
       >
@@ -91,6 +102,18 @@ const SelectedProcesses = ({
                   {item.column_3 && <Tag>{item.column_3} </Tag>}
                 </Descriptions.Item>
                 <br />
+              </>
+            );
+          })}
+        {classificationTest &&
+          Object.keys(classificationTest).map((item, i) => {
+            return (
+              <>
+                <Descriptions.Item
+                  label={<Tag className="nav-background">{item} </Tag>}
+                >
+                  <Tag>{classificationTest[item]} </Tag>
+                </Descriptions.Item>
               </>
             );
           })}

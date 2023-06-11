@@ -2,13 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import DataManipulationForm from "./processingTabs/dataManipulationForm";
 import StatisticalProcessingForm from "./processingTabs/statisticalProcessingForm";
+import MachineLearningForm from "./processingTabs/machineLearnigForm";
 import { useProcessing } from "../../hocs/proccesingProvider";
 import { useWorkspaceType } from "../../hocs/workspaceTypeProvider";
+import { useData } from "../../hocs/dataProvider";
 
 const SelectProcessing = ({ newWorkspace }) => {
   const [values, setValues] = useState();
   const { setProcessingDetails } = useProcessing();
   const { setWorkspaceTypeDetails } = useWorkspaceType();
+  const { dataDetails } = useData();
 
   useEffect(() => {
     let check = false;
@@ -22,6 +25,7 @@ const SelectProcessing = ({ newWorkspace }) => {
         }
       }
     }
+    console.log(values);
     check && setProcessingDetails(values);
   }, [values]);
 
@@ -67,7 +71,14 @@ const SelectProcessing = ({ newWorkspace }) => {
         {
           key: "3",
           label: "Machine Learning",
-          children: <div> sag</div>,
+          children: (
+            <MachineLearningForm
+              values={values}
+              setValues={setValues}
+              setWorkspaceTypeDetails={setWorkspaceTypeDetails}
+              dataDetails={dataDetails}
+            />
+          ),
         },
       ]);
 
