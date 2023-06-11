@@ -12,7 +12,7 @@ from pydantic import Json
 from scipy.stats import shapiro, normaltest, anderson, pearsonr, spearmanr, kendalltau, chi2_contingency, ttest_ind, \
     ttest_rel, f_oneway, mannwhitneyu, wilcoxon, kruskal, friedmanchisquare
 from sklearn.cluster import KMeans, DBSCAN
-from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, silhouette_score
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler
@@ -20,7 +20,6 @@ from sklearn.svm import SVC
 from sqlalchemy import INTEGER, FLOAT, TIMESTAMP, BOOLEAN, VARCHAR, text
 from starlette.responses import StreamingResponse
 from statsmodels.tsa.stattools import adfuller, kpss
-from traitlets import Integer
 
 import Model
 
@@ -267,6 +266,17 @@ async def knn(
     if max_k < 2:
         raise HTTPException(status_code=400, detail="Invalid k value.")
 
+    if test_size <= 0 or test_size >= 1:
+        raise HTTPException(status_code=400, detail="Invalid test size value.")
+
+    if random_state < 0:
+        raise HTTPException(status_code=400, detail="Invalid random state value.")
+
+    if metric not in ['euclidean', 'manhattan', 'chebyshev', 'minkowski']:
+        raise HTTPException(status_code=400, detail="Invalid metric value.")
+
+    if len(to_learn_columns) < 2:
+        raise HTTPException(status_code=400, detail="Invalid number of columns.")
     # connect to db
     con = __connect_to_db__(
         DB_CONNECTION_PARAMS['db_user'],
@@ -279,11 +289,6 @@ async def knn(
     # get dataframe from db
     df = __get_table_from_sql__(workspace_id, user_id, con)
     con.close()
-
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-    df = df.dropna()
-    # ------------------ DELETE HERE AFTER TESTING ------------------
-
     y_index = df.columns.get_loc(target_column)
     x_df = df.loc[:, to_learn_columns]
     y_df = df.iloc[:, y_index]
@@ -312,12 +317,11 @@ async def knn(
     classifier.fit(x_train_knn, y_train)
 
     # predict test set results
-    y_pred = classifier.predict(x_test)
+    y_pred = classifier.predict(x_test_knn)
 
     ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
     ret_df['actual'] = y_test.astype(int)
     ret_df['pred'] = y_pred.astype(int)
-    print(ret_df)
 
     # results
 
@@ -329,24 +333,32 @@ async def knn(
     recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    plt.figure(figsize=(10, 5))
-    plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    plt.title(f"Predicted values with k={best_k}", fontsize=20)
-
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png")
-    buf.seek(0)
-
-    txt = f"Best k value: {best_k}\nConfusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-
-    # Combine the image and text into a single response
-    response = StreamingResponse(
-        iter([buf.getvalue(), txt, ret_df.to_csv()]),
-        media_type="image/png;text/plain;text/csv"
-    )
-
-    # Return the response
-    return response
+    # plt.figure(figsize=(10, 5))
+    # plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    # plt.title(f"Predicted values with k={best_k}", fontsize=20)
+    #
+    # buf = io.BytesIO()
+    # plt.savefig(buf, format="png")
+    # buf.seek(0)
+    #
+    # txt = f"Best k value: {best_k}\nConfusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+    #
+    # # Combine the image and text into a single response
+    # response = StreamingResponse(
+    #     iter([buf.getvalue(), txt, ret_df.to_csv()]),
+    #     media_type="image/png;text/plain;text/csv"
+    # )
+    #
+    # # Return the response
+    # return response
+    return {
+        'best_k': int(best_k),
+        'confusion_matrix': cm.tolist(),
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
 
 
 # Support Vector Machine (SVM)
@@ -360,8 +372,8 @@ async def svm(
     # get data from request
     user_id = str(svm_params['user_id'])
     workspace_id = str(svm_params['workspace_id'])
-    target_column = svm_params['target_column']
     to_learn_columns = svm_params['to_learn_columns']
+    target_column = svm_params['target_column']
     kernel = svm_params['kernel']
     test_size = svm_params['test_size']
     random_state = svm_params['random_state']
@@ -396,15 +408,15 @@ async def svm(
 
     # scale data
     scaler = StandardScaler()
-    x_train = scaler.fit_transform(x_train)
-    x_test = scaler.transform(x_test)
+    x_train_svm = scaler.fit_transform(x_train)
+    x_test_svm = scaler.transform(x_test)
 
     # train model
     classifier = SVC(kernel=kernel)
-    classifier.fit(x_train, y_train)
+    classifier.fit(x_train_svm, y_train)
 
     # predict test set results
-    y_pred = classifier.predict(x_test)
+    y_pred = classifier.predict(x_test_svm)
 
     ret_df = pd.DataFrame(x_test, columns=to_learn_columns)
     ret_df['actual'] = y_test
@@ -420,25 +432,33 @@ async def svm(
     recall = recall_score(y_test, y_pred, average='macro', zero_division=0)
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
-    # plot results
-    plt.figure(figsize=(10, 5))
-    plt.scatter(x_test[:, 0], x_test[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
-    plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+    # # plot results
+    # plt.figure(figsize=(10, 5))
+    # plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    # plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+    #
+    # buf = io.BytesIO()
+    # plt.savefig(buf, format="png")
+    # buf.seek(0)
+    #
+    # txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
+    #
+    # # Combine the image and text into a single response
+    # response = StreamingResponse(
+    #     iter([buf.getvalue(), txt, ret_df.to_csv()]),
+    #     media_type="image/png;text/plain;text/csv"
+    # )
+    #
+    # # Return the response
+    # return response
 
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png")
-    buf.seek(0)
-
-    txt = f"Confusion Matrix: {cm}\nAccuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}\nF1: {f1}"
-
-    # Combine the image and text into a single response
-    response = StreamingResponse(
-        iter([buf.getvalue(), txt, ret_df.to_csv()]),
-        media_type="image/png;text/plain;text/csv"
-    )
-
-    # Return the response
-    return response
+    return {
+        'confusion_matrix': cm.tolist(),
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
 
 # Clustering
 
@@ -496,7 +516,7 @@ async def kmeans(
     buf.seek(0)
 
     # Return the response
-    return StreamingResponse(iter([buf.getvalue(), ret_df.to_csv()]), media_type="image/png;text/csv")
+    return StreamingResponse(buf, media_type="image/png")
 
 # dbscan
 @app.post('/python/clustering/dbscan')
@@ -517,6 +537,15 @@ async def dbscan(
     algorithm = dbscan_params['algorithm']
     leaf_size = dbscan_params['leaf_size']
     p = dbscan_params['p']
+
+    # check if algorithm is valid
+    if algorithm not in ['auto', 'ball_tree', 'kd_tree', 'brute']:
+        raise HTTPException(status_code=400, detail="Invalid algorithm.")
+
+    # check if metric is valid
+    if metric not in ['euclidean', 'l1', 'l2', 'manhattan', 'cosine']:
+        raise HTTPException(status_code=400, detail="Invalid metric.")
+
 
     # connect to db
     con = __connect_to_db__(
@@ -556,7 +585,7 @@ async def dbscan(
     buf.seek(0)
 
     # Return the response
-    return StreamingResponse(iter([buf.getvalue(), ret_df.to_csv()]), media_type="image/png;text/csv")
+    return StreamingResponse(buf, media_type="image/png")
 
 
 
@@ -841,7 +870,7 @@ def make_tests(
     )
 
     df = __get_table_from_sql__(workspace_id, user_id, con)
-
+    con.close()
 
     for test in test_list:
         if test['column_1'] not in df.columns and (test['column_2'] not in df.columns or test['column_2'] is None) \

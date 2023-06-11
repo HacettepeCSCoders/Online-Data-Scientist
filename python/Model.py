@@ -93,4 +93,4 @@ class DBScanParams(BaseModel):
     metric: str = 'euclidean'
     algorithm: str = 'auto'
     leaf_size: int = 30
-    p: int = None
+    p: int = 2
