@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Button, Descriptions, Tag } from "antd";
+import { act } from "react-dom/test-utils";
 
 const ReportTab = ({ result, workspaceTypeDetails }) => {
   const printRef = React.useRef();
@@ -36,6 +37,8 @@ const ReportTab = ({ result, workspaceTypeDetails }) => {
       console.log();
     } else if (workspaceTypeDetails === "knn") {
       setMlarray(result);
+      console.log(typeof result["Confusion Matrix"]);
+      console.table(result["Confusion Matrix"]);
     } else {
       setMlarray(result);
     }
@@ -83,7 +86,18 @@ const ReportTab = ({ result, workspaceTypeDetails }) => {
                       <Descriptions.Item
                         label={<Tag className="nav-background">{item} </Tag>}
                       >
-                        {mlArray[item]}
+                        {item === "Confusion Matrix" &&
+                        typeof mlArray[item] === "object"
+                          ? mlArray[item].map((a, i) => {
+                              return (
+                                <>
+                                  {a.join(", ")}
+
+                                  <br />
+                                </>
+                              );
+                            })
+                          : mlArray[item]}
                       </Descriptions.Item>
                     )}
                   </>

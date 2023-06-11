@@ -24,7 +24,7 @@ export const SignupForm = ({ onClickSignup }) => {
       autoComplete="off"
       className="form-center"
     >
-      <Form.Item wrapperCol={{ offset: 3, span: 16 }}>
+      <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
         <h1> Sign Up</h1>
       </Form.Item>
       <Form.Item

@@ -32,7 +32,7 @@ const MainPage = () => {
                 <div>
                   <BarChartOutlined className="main-icon" />
                   <h4>Powerful Analytics</h4>
-                  <p>Perform advanced statistical analytics</p>
+                  <p>Perform advanced statistical analytics.</p>
                 </div>
               </Card>
             </Col>
