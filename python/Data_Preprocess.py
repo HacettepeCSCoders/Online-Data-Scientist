@@ -336,8 +336,16 @@ async def knn(
     f1 = f1_score(y_test, y_pred, average='macro', zero_division=0)
 
     plt.figure(figsize=(10, 5))
-    plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    scatter = plt.scatter(x_test_knn[:, 0], x_test_knn[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
     plt.title(f"Predicted values with k={best_k}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
 
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
@@ -442,8 +450,16 @@ async def svm(
 
     # plot results
     plt.figure(figsize=(10, 5))
-    plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
+    scatter = plt.scatter(x_test_svm[:, 0], x_test_svm[:, 1], c=y_pred, marker='*', s=100, edgecolors='black')
     plt.title(f"Predicted values with kernel={kernel}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
 
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
@@ -511,8 +527,17 @@ async def kmeans(
     ret_df['predicted'] = y_pred
 
     # plot results
-    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
+    plt.figure(figsize=(10, 5))
+    scatter = plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
     plt.title(f"Predicted values with n_clusters={n_clusters}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
 
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
@@ -586,8 +611,17 @@ async def dbscan(
     ret_df['predicted'] = y_pred
 
     # plot results
-    plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
+    plt.figure(figsize=(10, 5))
+    scatter = plt.scatter(x_data[:, 0], x_data[:, 1], c=y_pred, s=100)
     plt.title(f"Predicted values with eps={eps}", fontsize=20)
+
+    # Add colorbar
+    colorbar = plt.colorbar(scatter)
+    colorbar.set_label("Data Values")
+
+    # Add legend
+    handles, labels = scatter.legend_elements()
+    legend = plt.legend(handles, labels, loc="upper right")
 
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
