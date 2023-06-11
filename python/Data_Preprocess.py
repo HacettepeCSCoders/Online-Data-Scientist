@@ -499,6 +499,10 @@ async def kmeans(
     x_data = x.values
     n_clusters = df[target_column].nunique(dropna=True)
 
+    # scale data
+    scaler = StandardScaler()
+    x_data = scaler.fit_transform(x_data)
+
     # K-Means algorithm
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
     y_pred = kmeans.fit_predict(x_data)
@@ -567,6 +571,10 @@ async def dbscan(
         raise HTTPException(status_code=400, detail="There are missing values in the data.")
 
     x_data = x.values
+
+    # scale data
+    scaler = StandardScaler()
+    x_data = scaler.fit_transform(x_data)
 
     # DBSCAN algorithm
     dbscan = DBSCAN(eps=eps, min_samples=min_samples, metric=metric, algorithm=algorithm, leaf_size=leaf_size, p=p)
