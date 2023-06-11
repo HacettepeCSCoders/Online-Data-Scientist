@@ -155,7 +155,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
       }
     };
     getData();
-  }, []);
+  }, [workspaceId]);
 
   const items = existSteps.map((item) => ({
     key: item.title,
@@ -213,11 +213,7 @@ const ExistWorkspaceSteps = ({ workspaceId, userId, fileName }) => {
             <Descriptions.Item>
               {existSteps[current].subTitle}
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions>
-            <Descriptions.Item>
-              {existSteps[current].subTitle}
-            </Descriptions.Item>
+
             <Descriptions.Item>
               <Tag>{fileName} </Tag>
             </Descriptions.Item>

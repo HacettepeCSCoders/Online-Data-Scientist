@@ -23,10 +23,14 @@
 .sider-menu {
     background-color: #9FB8AD !important;
 }
-
 .logo-size {
     width: 200px;
     height: 150px;
+}
+
+.logo-size-collapsed {
+    width: 80px;
+    height: 50px;
 }
 
 .logo-size-topbar {
@@ -233,6 +237,25 @@
     font-size: 4rem;
   margin-bottom: 1.5rem;
 }
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #9FB8AD !important; 
+    font-weight: 500;
+ }
+
+ .setting-user{
+    margin-bottom: 20px;
+ }
+
+ .search-Result{
+    margin-top: 5px;
+  width: 200;
+  height: 100px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0.35) 0px 5px 15px;
+  overflow: hidden;
+  overflow-y: auto;
+ }
 
 
 

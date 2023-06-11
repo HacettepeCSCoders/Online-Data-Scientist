@@ -2,7 +2,7 @@ import React from "react";
 import UserList from "../../components/admin/userList";
 import { PageHeader } from "@ant-design/pro-layout";
 
-const Panel = () => {
+const Panel = ({ name }) => {
   return (
     <>
       <PageHeader
@@ -10,7 +10,7 @@ const Panel = () => {
         title="User List"
         subTitle="You can view and delete users on this page."
       ></PageHeader>
-      <UserList></UserList>
+      <UserList name={name}></UserList>
     </>
   );
 };

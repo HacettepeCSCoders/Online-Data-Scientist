@@ -15,10 +15,11 @@ import "./styles/common.css";
 import Panel from "./views/panel";
 
 const App = () => {
-  const { name, isLoggedIn, isAdmin } = useSelector((store) => ({
+  const { name, isLoggedIn, isAdmin, userId } = useSelector((store) => ({
     name: store.name,
     isLoggedIn: store.isLoggedIn,
     isAdmin: store.isAdmin,
+    userId: store.id,
   }));
 
   return (
@@ -28,7 +29,7 @@ const App = () => {
           <Layout>
             {isLoggedIn && <SideBar isAdmin={isAdmin}></SideBar>}
             <Layout>
-              <TopBar name={name} isLoggedIn={isLoggedIn} />
+              <TopBar name={name} isLoggedIn={isLoggedIn} userId={userId} />
               <Routes>
                 {!isLoggedIn
                   ? routes.map((route) => (
@@ -47,7 +48,7 @@ const App = () => {
                     ))}
 
                 {isAdmin === true && isLoggedIn && (
-                  <Route path="/panel" element={<Panel />} />
+                  <Route path="/panel" element={<Panel name={name} />} />
                 )}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

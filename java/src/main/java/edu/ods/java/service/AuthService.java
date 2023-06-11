@@ -74,10 +74,14 @@ public class AuthService {
 		if (userRepository.existsByUsername(request.getUsername())) {
 			User user = userRepository.findByUsername(request.getUsername()).get();
 
-			if (user.getPassword().equals(request.getOldPassword())) {
-				user.setPassword(request.getNewPassword());
+			if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+				user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+				userRepository.save(user);
+				return user;
 			}
-			userRepository.save(user);
+			else{
+				throw new IllegalArgumentException("Passwords do not match!");
+			}
 		}
 		throw new IllegalArgumentException("Email is not registered!");
 	}

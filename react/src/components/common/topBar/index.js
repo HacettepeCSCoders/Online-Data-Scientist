@@ -8,11 +8,12 @@ import {
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutSuccess } from "../../../reducers/actions/authActions";
-import logo from "../../../assets/logo_transparent.png";
+import logo from "../../../assets/favicon_s.png";
+import SearchBar from "../../searchBar";
 
 const { Header } = Layout;
 
-const TopBar = ({ name, isLoggedIn }) => {
+const TopBar = ({ name, isLoggedIn, userId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -70,11 +71,7 @@ const TopBar = ({ name, isLoggedIn }) => {
     checkLoggedTopbar = (
       <Row gutter={16}>
         <Col span={8} offset={4}>
-          <Input
-            prefix={<SearchOutlined className="site-form-item-icon" />}
-            placeholder="Search..."
-            type="text"
-          />
+          <SearchBar userId={userId} />
         </Col>
         <Col className="gutter-row" span={6} offset={6}>
           <Tag color="#3F403F">{name}</Tag>

@@ -31,9 +31,17 @@ export const signup = async (creds) => {
       data: creds,
       config: { headers: { "Content-Type": "multipart/form-data" } },
     });
-    console.log(response);
     return response;
   } catch (e) {
     console.log(e);
   }
+};
+
+export const changePassword = async (creds) => {
+  return axios({
+    method: "POST",
+    url: `http://localhost:8080/api/v1/auth/changePassword`,
+    data: creds,
+    config: { headers: { "Content-Type": "multipart/form-data" } },
+  });
 };
